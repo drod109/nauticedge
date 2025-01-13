@@ -27,8 +27,16 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
 - **Security & Compliance**
   - Bank-grade encryption
   - Two-factor authentication
+    - TOTP-based authentication
+    - Recovery codes
+    - Rate limiting
+    - Device tracking
   - Role-based access control
   - Industry compliance tools
+  - Session management
+    - Device recognition
+    - Location tracking
+    - Concurrent session control
 
 ## Tech Stack
 
@@ -48,8 +56,11 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
 - **Authentication**
   - Supabase Auth
   - Email/Password
-  - Multi-factor authentication
+  - Multi-factor authentication (TOTP)
+  - Microsoft/Google Authenticator support
   - Session management
+  - Device tracking
+  - Location-based security
 
 ## Prerequisites
 
@@ -124,8 +135,17 @@ nauticedge/
 ### Authentication Flow
 - Email/password authentication
 - Session management
+  - Device fingerprinting
+  - Location tracking
+  - Concurrent session handling
+  - Session termination
 - Device tracking
-- MFA support
+- Multi-Factor Authentication
+  - TOTP-based authentication
+  - QR code setup
+  - Recovery codes
+  - Rate limiting
+  - Device verification
 
 ### Survey Management
 - Create and edit surveys
@@ -150,6 +170,15 @@ nauticedge/
 ## Security
 
 - All data is encrypted at rest and in transit
+- Two-factor authentication (TOTP)
+  - Compatible with Google/Microsoft Authenticator
+  - Backup recovery codes
+  - Rate limiting for failed attempts
+- Session security
+  - Device fingerprinting
+  - Location tracking
+  - Concurrent session management
+  - Automatic session cleanup
 - Regular security audits
 - Compliance with maritime industry standards
 - Automated backup systems

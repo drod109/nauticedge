@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Shield, X } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 
 interface MFANotificationProps {
   onSetup: () => void;
@@ -7,6 +8,34 @@ interface MFANotificationProps {
 }
 
 const MFANotification: React.FC<MFANotificationProps> = ({ onSetup, onDismiss }) => {
+  const [shouldShow, setShouldShow] = useState(false);
+
+  useEffect(() => {
+    const checkMFAStatus = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data } = await supabase
+          .from('user_mfa')
+          .select('enabled')
+          .eq('user_id', user.id)
+          .single();
+
+        // Only show notification if MFA is not enabled
+        setShouldShow(!data?.enabled);
+      } catch (error) {
+        console.error('Error checking MFA status:', error);
+      }
+    };
+
+    checkMFAStatus();
+  }, []);
+
+  if (!shouldShow) {
+    return null;
+  }
+
   return (
     <div className="fixed bottom-4 right-4 max-w-sm w-full bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-50">
       <div className="flex items-start">
