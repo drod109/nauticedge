@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   FileText, 
   Download, 
@@ -10,8 +10,14 @@ import {
   DollarSign,
   Calendar,
   FileSearch,
-  ClipboardList
+  ClipboardList,
+  Smartphone,
+  Laptop,
+  Monitor
 } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+import MFANotification from '../auth/MFANotification';
+import MFASetup from '../auth/MFASetup';
 
 const recentSurveys = [
   {
@@ -33,6 +39,7 @@ const recentSurveys = [
     status: 'draft'
   }
 ];
+
 
 const paymentRecords = [
   {
@@ -60,7 +67,6 @@ const paymentRecords = [
     surveyId: 'SUR-003'
   }
 ];
-
 const getStatusStyle = (status: string) => {
   switch (status.toLowerCase()) {
     case 'completed':
@@ -76,9 +82,6 @@ const getStatusStyle = (status: string) => {
       return 'bg-gray-100 text-gray-800';
   }
 };
-
-import MFANotification from '../auth/MFANotification';
-import MFASetup from '../auth/MFASetup';
 
 const DashboardContent = () => {
   const [showMFANotification, setShowMFANotification] = useState(true);

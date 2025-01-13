@@ -1,20 +1,59 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Shield } from 'lucide-react';
 import MFAVerification from './MFAVerification';
+import { supabase } from '../../lib/supabase';
+
+import { getBrowserInfo } from '../../utils/browser';
+import { getLocationInfo } from '../../utils/location';
 
 const LoginForm = () => {
-  const [email, setEmail] = useState('john.doe@example.com');
-  const [password, setPassword] = useState('1234');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showMFAVerification, setShowMFAVerification] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Check if user has MFA enabled
-    const hasMFA = true; // This would come from your backend
-    if (hasMFA) {
-      setShowMFAVerification(true);
-    } else {
-      window.location.href = '/dashboard';
+    setLoading(true);
+    setError(null);
+
+    try {
+      const locationInfo = await getLocationInfo();
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (signInError) throw signInError;
+
+      if (data.user) {
+        // Create session record
+        const browserInfo = getBrowserInfo();
+        const { error: sessionError } = await supabase
+          .from('user_sessions')
+          .insert([{
+            user_id: data.user.id,
+            session_id: data.session?.access_token,
+            ip_address: '0.0.0.0', // This will be set by the server
+            user_agent: navigator.userAgent,
+            device_info: {
+              type: browserInfo.isMobile ? 'mobile' : 'desktop',
+              browser: browserInfo.browser,
+              os: browserInfo.os
+            },
+            location: locationInfo,
+            is_active: true
+          }]);
+
+        if (sessionError) throw sessionError;
+
+        window.location.href = '/dashboard';
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred during sign in');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -41,6 +80,12 @@ const LoginForm = () => {
   return (
     <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Welcome back</h2>
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
@@ -79,10 +124,14 @@ const LoginForm = () => {
         </div>
         <button
           type="submit"
+          disabled={loading}
           className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
         >
-          Sign in
+          {loading ? 'Signing in...' : 'Sign in'}
         </button>
+        <p className="text-center text-sm text-gray-600">
+          Don't have an account? <a href="/signup" className="text-blue-600 hover:text-blue-500">Sign up</a>
+        </p>
       </form>
 
       <div className="mt-6">

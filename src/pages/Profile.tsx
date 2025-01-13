@@ -1,7 +1,13 @@
-import React, { useState } from 'react';
-import { Camera, Pencil, CreditCard, Computer, LogOut, X, Check, Mail, Phone, Building, Globe, Plus, User2, Building2, CreditCard as BillingIcon, Eye, EyeOff } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Pencil, Mail, Phone, Globe, User2, Building2, CreditCard as BillingIcon, Check } from 'lucide-react';
 import Sidebar from '../components/dashboard/Sidebar';
 import Header from '../components/dashboard/Header';
+import ProfilePhoto from '../components/profile/ProfilePhoto.tsx';
+import { supabase } from '../lib/supabase';
+import ActiveSessions from '../components/profile/ActiveSessions';
+import BillingSection from '../components/profile/BillingSection';
+import CompanySection from '../components/profile/CompanySection';
+import type { UserSession } from '../types/auth';
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState('personal');
@@ -10,57 +16,278 @@ const Profile = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [editForm, setEditForm] = useState({
+    phone: '',
+    location: '',
+    company_name: '',
+    company_position: '',
+    registration_number: '',
+    tax_id: ''
+  });
+  const [userData, setUserData] = useState<{
+    id: string;
+    email: string;
+    full_name: string;
+    photo_url: string | null;
+    phone: string;
+    location: string;
+    company_name: string;
+    company_position: string;
+    registration_number: string;
+    tax_id: string;
+  } | null>(null);
+  const [sessions, setSessions] = useState<UserSession[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isEditingCompany, setIsEditingCompany] = useState(false);
+  const [currentPlan, setCurrentPlan] = useState<string>('basic');
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const plans = [
-    {
-      name: 'Basic',
-      price: 49,
-      features: ['Up to 20 surveys per month', 'Basic report templates', 'Email support'],
-      current: true
-    },
-    {
-      name: 'Professional',
-      price: 99,
-      features: ['Unlimited surveys', 'Custom report templates', 'Priority support', 'API access'],
-    },
-    {
-      name: 'Enterprise',
-      price: 249,
-      features: ['Custom everything', 'Dedicated support', 'SLA guarantee', 'Custom integrations']
-    }
-  ];
+  const handlePhotoUpdate = (url: string) => {
+    setUserData(prev => ({
+      ...prev,
+      photo_url: url
+    }));
+  };
 
-  const paymentMethods = [
-    {
-      id: 1,
-      type: 'visa',
-      last4: '4242',
-      expiry: '04/24',
-      default: true
-    },
-    {
-      id: 2,
-      type: 'mastercard',
-      last4: '5555',
-      expiry: '07/25',
-      default: false
-    }
-  ];
+  const handleCompanyEditSubmit = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) {
+        throw new Error('User ID not found');
+      }
 
-  const billingHistory = [
-    {
-      id: 'INV-2024-001',
-      date: 'Mar 1, 2024',
-      amount: 99.00,
-      status: 'Paid'
-    },
-    {
-      id: 'INV-2024-002',
-      date: 'Feb 1, 2024',
-      amount: 99.00,
-      status: 'Paid'
+      const { error: updateError } = await supabase
+        .from('users_metadata')
+        .update({
+          company_name: editForm.company_name,
+          company_position: editForm.company_position,
+          registration_number: editForm.registration_number,
+          tax_id: editForm.tax_id,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id);
+
+      if (updateError) throw updateError;
+
+      // Update local state
+      setUserData(prev => ({
+        ...prev,
+        company_name: editForm.company_name,
+        company_position: editForm.company_position,
+        registration_number: editForm.registration_number,
+        tax_id: editForm.tax_id
+      }));
+
+      setIsEditingCompany(false);
+    } catch (err) {
+      console.error('Error updating company information:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update company information');
     }
-  ];
+  };
+
+  const fetchSessions = useCallback(async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
+      const { data: sessionsData, error: sessionsError } = await supabase
+        .from('user_sessions')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (sessionsError) throw sessionsError;
+
+      setSessions(sessionsData || []);
+    } catch (err) {
+      console.error('Error fetching sessions:', err);
+      setError('Failed to load session information');
+    }
+  }, []);
+
+  const handleEditSubmit = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) {
+        throw new Error('User ID not found');
+      }
+
+      // First check if metadata exists
+      const { data: existingMetadata } = await supabase
+        .from('users_metadata')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      // If metadata doesn't exist, create it first
+      if (!existingMetadata) {
+        const { error: insertError } = await supabase
+          .from('users_metadata')
+          .insert({
+            user_id: user.id,
+            phone: editForm.phone,
+            location: editForm.location,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+
+        if (insertError) throw insertError;
+      } else {
+        // If metadata exists, update it
+        const { error: updateError } = await supabase
+          .from('users_metadata')
+          .update({
+            phone: editForm.phone,
+            location: editForm.location,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user.id);
+
+        if (updateError) throw updateError;
+      }
+
+      // Refresh user data after update
+      await fetchUserData();
+      setIsEditing(false);
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update profile');
+    }
+  };
+
+  const detectLocation = () => {
+    setIsLoadingLocation(true);
+    if ("geolocation" in navigator) {
+      const apiKey = import.meta.env.VITE_OPENCAGE_API_KEY;
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        try {
+          const response = await fetch(
+            `https://api.opencagedata.com/geocode/v1/json?q=${position.coords.latitude}+${position.coords.longitude}&key=${apiKey}`
+          );
+          const data = await response.json();
+          if (data.results && data.results[0]) {
+            const locationString = data.results[0].formatted;
+            setEditForm(prev => ({ ...prev, location: locationString }));
+          }
+        } catch (error) {
+          console.error('Error fetching location details:', error);
+        } finally {
+          setIsLoadingLocation(false);
+        }
+      }, (error) => {
+        console.error('Error getting location:', error);
+        setIsLoadingLocation(false);
+      });
+    }
+  };
+
+  const handleLogoutSession = async (sessionId: string) => {
+    try {
+      const { error } = await supabase
+        .from('user_sessions')
+        .update({ 
+          is_active: false,
+          ended_at: new Date().toISOString()
+        })
+        .eq('id', sessionId);
+
+      if (error) throw error;
+
+      // Refresh sessions list
+      await fetchSessions();
+    } catch (err) {
+      console.error('Error logging out session:', err);
+      setError('Failed to end session');
+    }
+  };
+
+  const renderBillingContent = () => (
+    <BillingSection
+      currentPlan={currentPlan}
+      onAddPaymentMethod={() => setIsPaymentModalOpen(true)}
+    />
+  );
+
+  const renderCompanyContent = () => (
+    <CompanySection
+      isEditing={isEditingCompany}
+      editForm={editForm}
+      userData={userData}
+      onEdit={() => setIsEditingCompany(!isEditingCompany)}
+      onCancel={() => setIsEditingCompany(false)}
+      onSave={handleCompanyEditSubmit}
+      onChange={(field, value) => setEditForm(prev => ({ ...prev, [field]: value }))}
+    />
+  );
+
+  const fetchUserData = useCallback(async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { data: metadata } = await supabase
+          .from('users_metadata')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        setUserData({
+          ...user,
+          ...metadata,
+        });
+        
+        setEditForm({
+          phone: metadata?.phone || '',
+          location: metadata?.location || '',
+          company_name: metadata?.company_name || '',
+          company_position: metadata?.company_position || '',
+          registration_number: metadata?.registration_number || '',
+          tax_id: metadata?.tax_id || ''
+        });
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load user data');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const initializeProfile = async () => {
+      try {
+        setIsLoading(true);
+        await fetchUserData();
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          const { data: sessionsData } = await supabase
+            .from('user_sessions')
+            .select('session_id')
+            .eq('user_id', session.user.id)
+            .eq('is_active', true)
+            .order('created_at', { ascending: false });
+
+          if (sessionsData && sessionsData.length > 0) {
+            setCurrentSessionId(sessionsData[0].session_id);
+          }
+          
+          await fetchSessions();
+        }
+      } catch (err) {
+        console.error('Error initializing profile:', err);
+        setError('Failed to load profile data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    initializeProfile();
+  }, [fetchUserData, fetchSessions]);
 
   const renderPersonalContent = () => (
     <div className="p-8">
@@ -68,9 +295,21 @@ const Profile = () => {
       <div className="mb-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Personal Information</h2>
-          <button className="flex items-center text-sm text-blue-600 hover:text-blue-700">
-            <Pencil className="h-4 w-4 mr-1" />
-            Edit
+          <button 
+            onClick={() => setIsEditing(!isEditing)}
+            className="flex items-center text-sm text-blue-600 hover:text-blue-700"
+          >
+            {isEditing ? (
+              <>
+                <Check className="h-4 w-4 mr-1" />
+                Save
+              </>
+            ) : (
+              <>
+                <Pencil className="h-4 w-4 mr-1" />
+                Edit
+              </>
+            )}
           </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -78,7 +317,7 @@ const Profile = () => {
             <label className="block text-sm font-medium text-gray-700">Full Name</label>
             <input
               type="text"
-              value="John Doe"
+              value={userData?.full_name || ''}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               readOnly
             />
@@ -91,7 +330,7 @@ const Profile = () => {
               </div>
               <input
                 type="email"
-                value="john.doe@example.com"
+                value={userData?.email || ''}
                 className="block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 readOnly
               />
@@ -105,9 +344,10 @@ const Profile = () => {
               </div>
               <input
                 type="tel"
-                value="+1 (555) 123-4567"
+                value={isEditing ? editForm.phone : (userData?.phone || 'Not set')}
+                onChange={(e) => isEditing && setEditForm(prev => ({ ...prev, phone: e.target.value }))}
                 className="block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                readOnly
+                readOnly={!isEditing}
               />
             </div>
           </div>
@@ -117,482 +357,54 @@ const Profile = () => {
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Globe className="h-5 w-5 text-gray-400" />
               </div>
-              <input
-                type="text"
-                value="Melbourne, Australia"
-                className="block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                readOnly
-              />
+              <div className="flex w-full">
+                <input
+                  type="text"
+                  value={isEditing ? editForm.location : (userData?.location || 'Not set')}
+                  onChange={(e) => isEditing && setEditForm(prev => ({ ...prev, location: e.target.value }))}
+                  className="block w-full pl-10 px-3 py-2 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500"
+                  readOnly={!isEditing}
+                />
+                {isEditing && (
+                  <button
+                    onClick={detectLocation}
+                    disabled={isLoadingLocation}
+                    className="px-4 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  >
+                    {isLoadingLocation ? (
+                      <div className="h-5 w-5 border-2 border-gray-400 border-t-blue-600 rounded-full animate-spin"></div>
+                    ) : (
+                      'Detect'
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Where you're logged in */}
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Where you're logged in</h2>
-            <p className="mt-1 text-sm text-gray-500">
-              We'll alert you via email if there is any unusual activity on your account
-            </p>
-          </div>
-        </div>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-blue-50 border border-blue-100 rounded-lg">
-            <div className="flex items-center space-x-4">
-              <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Computer className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">2018 Macbook Pro 15-inch</p>
-                <p className="text-sm text-gray-500">Melbourne, Australia • 22 Jan at 4:20pm</p>
-              </div>
-            </div>
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-              Active Now
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-            <div className="flex items-center space-x-4">
-              <div className="h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                <Computer className="h-5 w-5 text-gray-600" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">2020 Macbook Air M1</p>
-                <p className="text-sm text-gray-500">Melbourne, Australia • 22 Jan at 4:20pm</p>
-              </div>
-            </div>
-            <button className="text-sm text-red-600 hover:text-red-700 font-medium">
-              <LogOut className="h-4 w-4" />
+        {isEditing && (
+          <div className="mt-6 flex justify-end space-x-4">
+            <button
+              onClick={() => setIsEditing(false)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleEditSubmit}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+            >
+              Save Changes
             </button>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Password Change Modal */}
-      {isPasswordModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Change Password</h3>
-              <button
-                onClick={() => setIsPasswordModalOpen(false)}
-                className="text-gray-400 hover:text-gray-500"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            <div className="p-6">
-              <form className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Current Password</label>
-                  <div className="mt-1 relative">
-                    <input
-                      type={showCurrentPassword ? "text" : "password"}
-                      className="block w-full pr-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <button
-                      type="button"
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    >
-                      {showCurrentPassword ? (
-                        <EyeOff className="h-5 w-5 text-gray-400" />
-                      ) : (
-                        <Eye className="h-5 w-5 text-gray-400" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">New Password</label>
-                  <div className="mt-1 relative">
-                    <input
-                      type={showNewPassword ? "text" : "password"}
-                      placeholder="Enter Password"
-                      className="block w-full pr-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <button
-                      type="button"
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
-                    >
-                      {showNewPassword ? (
-                        <EyeOff className="h-5 w-5 text-gray-400" />
-                      ) : (
-                        <Eye className="h-5 w-5 text-gray-400" />
-                      )}
-                    </button>
-                  </div>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Your password must be more than 8 characters
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
-                  <div className="mt-1 relative">
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Enter Password"
-                      className="block w-full pr-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <button
-                      type="button"
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="h-5 w-5 text-gray-400" />
-                      ) : (
-                        <Eye className="h-5 w-5 text-gray-400" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </div>
-            <div className="p-6 border-t border-gray-200">
-              <button
-                onClick={() => setIsPasswordModalOpen(false)}
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Update Password
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
-  const renderBillingContent = () => (
-    <div className="p-8">
-      {/* Current Plan */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Current Plan</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`relative p-6 rounded-xl border ${
-                plan.current
-                  ? 'bg-gradient-to-br from-blue-50 to-white border-blue-200 shadow-lg'
-                  : 'bg-white border-gray-200 hover:border-blue-200 hover:shadow-md transition-all'
-              }`}
-            >
-              {plan.current && (
-                <span className="absolute -top-3 -right-3 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
-                  Current Plan
-                </span>
-              )}
-              <div className="mb-4">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                <p className="text-3xl font-bold text-gray-900">
-                  ${plan.price}
-                  <span className="text-base font-normal text-gray-500">/month</span>
-                </p>
-              </div>
-              <ul className="space-y-3 mb-6">
-                {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-start">
-                    <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-600">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-auto">
-                <button
-                  className={`w-full py-2.5 px-4 rounded-lg font-medium transition-colors ${
-                    plan.current
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50'
-                  }`}
-                  disabled={plan.current}
-                >
-                  {plan.current ? 'Current Plan' : 'Upgrade'}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Payment Methods */}
-      <div className="mb-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Payment Methods</h2>
-          <button
-            onClick={() => setIsPaymentModalOpen(true)}
-            className="flex items-center text-sm text-blue-600 hover:text-blue-700"
-          >
-            <Plus className="h-4 w-4 mr-1" />
-            Add New Card
-          </button>
-        </div>
-        <div className="space-y-4">
-          {paymentMethods.map((method) => (
-            <div
-              key={method.id}
-              className="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
-            >
-              <div className="flex items-center space-x-4">
-                <div className="h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <CreditCard className="h-5 w-5 text-gray-600" />
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">
-                    {method.type.charAt(0).toUpperCase() + method.type.slice(1)} ending in {method.last4}
-                  </p>
-                  <p className="text-sm text-gray-500">Expires {method.expiry}</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                {method.default && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Default
-                  </span>
-                )}
-                <button className="text-gray-400 hover:text-gray-500">
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Billing History */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Billing History</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead>
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Invoice
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Amount
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Download
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {billingHistory.map((invoice) => (
-                <tr key={invoice.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {invoice.id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {invoice.date}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${invoice.amount.toFixed(2)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      {invoice.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-blue-600 hover:text-blue-700">
-                      Download
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Add Payment Method Modal */}
-      {isPaymentModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Add Payment Method</h3>
-              <button
-                onClick={() => setIsPaymentModalOpen(false)}
-                className="text-gray-400 hover:text-gray-500"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            <div className="p-6">
-              <form className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Card Number</label>
-                  <input
-                    type="text"
-                    placeholder="1234 1234 1234 1234"
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Expiration Date</label>
-                    <input
-                      type="text"
-                      placeholder="MM/YY"
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">CVC</label>
-                    <input
-                      type="text"
-                      placeholder="123"
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Name on Card</label>
-                  <input
-                    type="text"
-                    placeholder="John Doe"
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="default"
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="default" className="ml-2 text-sm text-gray-700">
-                    Set as default payment method
-                  </label>
-                </div>
-              </form>
-            </div>
-            <div className="p-6 border-t border-gray-200">
-              <button
-                onClick={() => setIsPaymentModalOpen(false)}
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Add Card
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
-  const renderCompanyContent = () => (
-    <div className="p-8">
-      <div className="mb-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Company Information</h2>
-          <button className="flex items-center text-sm text-blue-600 hover:text-blue-700">
-            <Pencil className="h-4 w-4 mr-1" />
-            Edit
-          </button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Company Name</label>
-            <input
-              type="text"
-              value="Marine Surveys Ltd"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              readOnly
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Business Type</label>
-            <input
-              type="text"
-              value="Marine Survey Company"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              readOnly
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Registration Number</label>
-            <input
-              type="text"
-              value="REG123456789"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              readOnly
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Tax ID</label>
-            <input
-              type="text"
-              value="TAX987654321"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              readOnly
-            />
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Business Address</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">Street Address</label>
-            <input
-              type="text"
-              value="123 Harbor Street"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              readOnly
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">City</label>
-            <input
-              type="text"
-              value="Melbourne"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              readOnly
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">State/Province</label>
-            <input
-              type="text"
-              value="Victoria"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              readOnly
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Postal Code</label>
-            <input
-              type="text"
-              value="3000"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              readOnly
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Country</label>
-            <input
-              type="text"
-              value="Australia"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              readOnly
-            />
-          </div>
-        </div>
-      </div>
+      <ActiveSessions
+        sessions={sessions}
+        currentSessionId={currentSessionId}
+        onLogoutSession={handleLogoutSession}
+      />
     </div>
   );
 
@@ -605,31 +417,24 @@ const Profile = () => {
           <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
             <div className="bg-white rounded-lg shadow">
               {/* Profile Header */}
-              {/* Profile Image */}
               <div className="relative px-8 pt-8 pb-4 flex justify-between items-end border-b border-gray-200">
                 <div className="flex items-end space-x-4">
-                  <div className="relative inline-block">
-                    <img
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&q=80"
-                      alt="Profile"
-                      className="w-24 h-24 rounded-full border-4 border-white object-cover shadow-md"
-                    />
-                    <button className="absolute bottom-1 right-1 bg-white rounded-full p-1.5 shadow-sm hover:shadow transition-shadow">
-                      <Camera className="h-4 w-4 text-gray-600" />
-                    </button>
-                    <span className="absolute -right-1 top-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      Verified
-                    </span>
-                  </div>
+                  <ProfilePhoto
+                    userId={userData?.id}
+                    photoUrl={userData?.photo_url}
+                    fullName={userData?.full_name || ''}
+                    onPhotoUpdate={handlePhotoUpdate}
+                    editable={true}
+                  />
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900">John Doe</h1>
-                    <p className="text-gray-500">Marine Surveyor</p>
+                    <h1 className="text-2xl font-bold text-gray-900">{userData?.full_name || 'Loading...'}</h1>
+                    <p className="text-gray-600">{userData?.email || ''}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Navigation */}
-              <div className="px-8 pt-6">
+              {/* Tabs */}
+              <div className="px-8 pt-6 border-b border-gray-200">
                 <div className="flex space-x-8">
                   <button
                     onClick={() => setActiveTab('personal')}
@@ -640,22 +445,7 @@ const Profile = () => {
                     }`}
                   >
                     <User2 className="h-4 w-4" />
-                    <span>
-                    Personal Info
-                    </span>
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('company')}
-                    className={`pb-4 text-sm font-medium flex items-center space-x-2 ${
-                      activeTab === 'company'
-                        ? 'border-b-2 border-blue-600 text-blue-600'
-                        : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    <Building2 className="h-4 w-4" />
-                    <span>
-                    Company
-                    </span>
+                    <span>Personal</span>
                   </button>
                   <button
                     onClick={() => setActiveTab('billing')}
@@ -666,23 +456,35 @@ const Profile = () => {
                     }`}
                   >
                     <BillingIcon className="h-4 w-4" />
-                    <span>
-                    Billing
-                    </span>
+                    <span>Billing</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('company')}
+                    className={`pb-4 text-sm font-medium flex items-center space-x-2 ${
+                      activeTab === 'company'
+                        ? 'border-b-2 border-blue-600 text-blue-600'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    <Building2 className="h-4 w-4" />
+                    <span>Company</span>
                   </button>
                 </div>
               </div>
 
-              {/* Tab Content */}
-              <div>
-                {activeTab === 'personal' ? (
-                  renderPersonalContent()
-                ) : activeTab === 'company' ? (
-                  renderCompanyContent()
-                ) : (
-                  renderBillingContent()
-                )}
-              </div>
+              {/* Loading State */}
+              {isLoading ? (
+                <div className="p-8 flex justify-center">
+                  <div className="h-8 w-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                </div>
+              ) : (
+                <>
+                  {/* Tab Content */}
+                  {activeTab === 'personal' && renderPersonalContent()}
+                  {activeTab === 'billing' && renderBillingContent()}
+                  {activeTab === 'company' && renderCompanyContent()}
+                </>
+              )}
             </div>
           </div>
         </main>

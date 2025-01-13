@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import TestConnection from './components/auth/TestConnection';
+import SignUp from './pages/SignUp';
 
 function App() {
   // Simple route handling
@@ -31,6 +32,10 @@ function App() {
 
   if (path === '/settings') {
     return <Settings />;
+  }
+
+  if (path === '/signup') {
+    return <SignUp />;
   }
 
   return (
