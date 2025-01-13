@@ -156,7 +156,7 @@ nauticedge/
 
 ## Support
 
-For support, email support@nauticedge.com or join our Slack channel.
+For support, email support@nauticedge.io or join our Slack channel.
 
 ## License
 
