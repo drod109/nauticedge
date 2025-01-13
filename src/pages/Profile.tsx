@@ -342,7 +342,7 @@ const Profile = () => {
             <input
               type="text"
               value={userData?.full_name || ''}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 cursor-not-allowed"
               readOnly
             />
           </div>
@@ -355,7 +355,7 @@ const Profile = () => {
               <input
                 type="email"
                 value={userData?.email || ''}
-                className="block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed"
                 readOnly
               />
             </div>
@@ -370,7 +370,7 @@ const Profile = () => {
                 type="tel"
                 value={isEditing ? editForm.phone : (userData?.phone || 'Not set')}
                 onChange={(e) => isEditing && setEditForm(prev => ({ ...prev, phone: e.target.value }))}
-                className="block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className={`block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'focus:ring-blue-500 focus:border-blue-500'}`}
                 readOnly={!isEditing}
               />
             </div>
@@ -386,7 +386,7 @@ const Profile = () => {
                   type="text"
                   value={isEditing ? editForm.location : (userData?.location || 'Not set')}
                   onChange={(e) => isEditing && setEditForm(prev => ({ ...prev, location: e.target.value }))}
-                  className="block w-full pl-10 px-3 py-2 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500"
+                  className={`block w-full pl-10 px-3 py-2 border border-gray-300 rounded-l-md ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'focus:ring-blue-500 focus:border-blue-500'}`}
                   readOnly={!isEditing}
                 />
                 {isEditing && (

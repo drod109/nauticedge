@@ -68,7 +68,7 @@ const CompanySection = ({
                   <input
                     type="text"
                     value={userData?.company_name || 'Not set'}
-                    className="block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed"
                     readOnly
                   />
                 </div>
@@ -78,7 +78,7 @@ const CompanySection = ({
                 <input
                   type="text"
                   value={userData?.company_position || 'Not set'}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 cursor-not-allowed"
                   readOnly
                 />
               </div>
@@ -87,7 +87,7 @@ const CompanySection = ({
                 <input
                   type="text"
                   value={userData?.registration_number || 'Not set'}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 cursor-not-allowed"
                   readOnly
                 />
               </div>
@@ -96,7 +96,7 @@ const CompanySection = ({
                 <input
                   type="text"
                   value={userData?.tax_id || 'Not set'}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 cursor-not-allowed"
                   readOnly
                 />
               </div>
@@ -112,7 +112,7 @@ const CompanySection = ({
                 <input
                   type="text"
                   value={userData?.company_address_line1 || 'Not set'}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 cursor-not-allowed"
                   readOnly
                 />
               </div>
@@ -121,7 +121,7 @@ const CompanySection = ({
                 <input
                   type="text"
                   value={userData?.company_address_line2 || 'Not set'}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 cursor-not-allowed"
                   readOnly
                 />
               </div>
@@ -131,7 +131,7 @@ const CompanySection = ({
                   <input
                     type="text"
                     value={userData?.company_city || 'Not set'}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 cursor-not-allowed"
                     readOnly
                   />
                 </div>
@@ -140,7 +140,7 @@ const CompanySection = ({
                   <input
                     type="text"
                     value={userData?.company_state || 'Not set'}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 cursor-not-allowed"
                     readOnly
                   />
                 </div>
@@ -149,7 +149,7 @@ const CompanySection = ({
                   <input
                     type="text"
                     value={userData?.company_postal_code || 'Not set'}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 cursor-not-allowed"
                     readOnly
                   />
                 </div>
@@ -158,7 +158,7 @@ const CompanySection = ({
                   <input
                     type="text"
                     value={userData?.company_country || 'Not set'}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 cursor-not-allowed"
                     readOnly
                   />
                 </div>
