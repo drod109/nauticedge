@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Lock, Shield } from 'lucide-react';
 import MFAVerification from './MFAVerification';
+import ForgotPassword from './ForgotPassword';
 import { supabase } from '../../lib/supabase';
 import { checkMFAStatus } from '../../lib/mfa';
+import { getRememberedEmail, rememberEmail, forgetEmail } from '../../utils/auth';
 
 import { getBrowserInfo } from '../../utils/browser';
 import { getLocationInfo } from '../../utils/location';
 
 const LoginForm = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(getRememberedEmail() || '');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(!!getRememberedEmail());
   const [showMFAVerification, setShowMFAVerification] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [requiresMFA, setRequiresMFA] = useState(false);
@@ -21,6 +25,13 @@ const LoginForm = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    
+    // Handle remember me preference
+    if (rememberMe) {
+      rememberEmail(email);
+    } else {
+      forgetEmail();
+    }
 
     try {
       const locationInfo = await getLocationInfo();
@@ -122,6 +133,12 @@ const LoginForm = () => {
     );
   }
 
+  if (showForgotPassword) {
+    return (
+      <ForgotPassword onBack={() => setShowForgotPassword(false)} />
+    );
+  }
+
   return (
     <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Welcome back</h2>
@@ -162,10 +179,21 @@ const LoginForm = () => {
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <input type="checkbox" className="h-4 w-4 text-blue-600" id="remember" />
+            <input 
+              type="checkbox" 
+              className="h-4 w-4 text-blue-600" 
+              id="remember"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
             <label htmlFor="remember" className="ml-2 text-sm text-gray-600">Remember me</label>
           </div>
-          <a href="#" className="text-sm text-blue-600 hover:text-blue-500">Forgot password?</a>
+          <button
+            onClick={() => setShowForgotPassword(true)}
+            className="text-sm text-blue-600 hover:text-blue-500"
+          >
+            Forgot password?
+          </button>
         </div>
         <button
           type="submit"
