@@ -24,7 +24,13 @@ const Profile = () => {
     company_name: '',
     company_position: '',
     registration_number: '',
-    tax_id: ''
+    tax_id: '',
+    company_address_line1: '',
+    company_address_line2: '',
+    company_city: '',
+    company_state: '',
+    company_postal_code: '',
+    company_country: ''
   });
   const [userData, setUserData] = useState<{
     id: string;
@@ -67,7 +73,13 @@ const Profile = () => {
           company_position: editForm.company_position,
           registration_number: editForm.registration_number,
           tax_id: editForm.tax_id,
-          updated_at: new Date().toISOString()
+          tax_id: editForm.tax_id,
+          company_address_line1: editForm.company_address_line1,
+          company_address_line2: editForm.company_address_line2,
+          company_city: editForm.company_city,
+          company_state: editForm.company_state,
+          company_postal_code: editForm.company_postal_code,
+          company_country: editForm.company_country
         })
         .eq('user_id', user.id);
 
@@ -79,7 +91,13 @@ const Profile = () => {
         company_name: editForm.company_name,
         company_position: editForm.company_position,
         registration_number: editForm.registration_number,
-        tax_id: editForm.tax_id
+        tax_id: editForm.tax_id,
+        company_address_line1: editForm.company_address_line1,
+        company_address_line2: editForm.company_address_line2,
+        company_city: editForm.company_city,
+        company_state: editForm.company_state,
+        company_postal_code: editForm.company_postal_code,
+        company_country: editForm.company_country
       }));
 
       setIsEditingCompany(false);
@@ -247,7 +265,13 @@ const Profile = () => {
           company_name: metadata?.company_name || '',
           company_position: metadata?.company_position || '',
           registration_number: metadata?.registration_number || '',
-          tax_id: metadata?.tax_id || ''
+          tax_id: metadata?.tax_id || '',
+          company_address_line1: metadata?.company_address_line1 || '',
+          company_address_line2: metadata?.company_address_line2 || '',
+          company_city: metadata?.company_city || '',
+          company_state: metadata?.company_state || '',
+          company_postal_code: metadata?.company_postal_code || '',
+          company_country: metadata?.company_country || ''
         });
       }
     } catch (err) {

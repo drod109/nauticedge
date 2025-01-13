@@ -8,6 +8,12 @@ interface CompanySectionProps {
     company_position: string;
     registration_number: string;
     tax_id: string;
+    company_address_line1: string;
+    company_address_line2: string;
+    company_city: string;
+    company_state: string;
+    company_postal_code: string;
+    company_country: string;
   };
   userData: any;
   onEdit: () => void;
@@ -94,6 +100,76 @@ const CompanySection = ({
             />
           </div>
         </div>
+        
+        {/* Company Address */}
+        <div className="mt-8">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Company Address</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">Address Line 1</label>
+              <input
+                type="text"
+                value={isEditing ? editForm.company_address_line1 : (userData?.company_address_line1 || 'Not set')}
+                onChange={(e) => onChange('company_address_line1', e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                readOnly={!isEditing}
+                placeholder="Street address, P.O. box, company name"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">Address Line 2</label>
+              <input
+                type="text"
+                value={isEditing ? editForm.company_address_line2 : (userData?.company_address_line2 || 'Not set')}
+                onChange={(e) => onChange('company_address_line2', e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                readOnly={!isEditing}
+                placeholder="Apartment, suite, unit, building, floor, etc."
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">City</label>
+              <input
+                type="text"
+                value={isEditing ? editForm.company_city : (userData?.company_city || 'Not set')}
+                onChange={(e) => onChange('company_city', e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                readOnly={!isEditing}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">State / Province</label>
+              <input
+                type="text"
+                value={isEditing ? editForm.company_state : (userData?.company_state || 'Not set')}
+                onChange={(e) => onChange('company_state', e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                readOnly={!isEditing}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Postal Code</label>
+              <input
+                type="text"
+                value={isEditing ? editForm.company_postal_code : (userData?.company_postal_code || 'Not set')}
+                onChange={(e) => onChange('company_postal_code', e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                readOnly={!isEditing}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Country</label>
+              <input
+                type="text"
+                value={isEditing ? editForm.company_country : (userData?.company_country || 'Not set')}
+                onChange={(e) => onChange('company_country', e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                readOnly={!isEditing}
+              />
+            </div>
+          </div>
+        </div>
+        
         {isEditing && (
           <div className="mt-6 flex justify-end space-x-4">
             <button
