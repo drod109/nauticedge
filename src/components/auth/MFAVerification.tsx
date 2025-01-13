@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Shield } from 'lucide-react';
+import { verifyMFALogin } from '../../lib/mfa';
 
 interface MFAVerificationProps {
   onVerify: (code: string) => void;
@@ -8,11 +9,29 @@ interface MFAVerificationProps {
 
 const MFAVerification: React.FC<MFAVerificationProps> = ({ onVerify, onCancel }) => {
   const [code, setCode] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [remainingAttempts, setRemainingAttempts] = useState(5);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (code.length === 6) {
-      onVerify(code);
+    if (code.length !== 6 || loading) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const verified = await verifyMFALogin(code);
+      if (verified) {
+        onVerify(code);
+      } else {
+        throw new Error('Invalid verification code');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to verify code');
+      setRemainingAttempts(prev => prev - 1);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -27,6 +46,15 @@ const MFAVerification: React.FC<MFAVerificationProps> = ({ onVerify, onCancel })
           Enter the verification code from your authenticator app
         </p>
       </div>
+
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-600">{error}</p>
+          <p className="text-sm text-red-600 mt-1">
+            Remaining attempts: {remainingAttempts}
+          </p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -54,10 +82,10 @@ const MFAVerification: React.FC<MFAVerificationProps> = ({ onVerify, onCancel })
           </button>
           <button
             type="submit"
-            disabled={code.length !== 6}
+            disabled={code.length !== 6 || loading || remainingAttempts === 0}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Verify
+            {loading ? 'Verifying...' : 'Verify'}
           </button>
         </div>
       </form>

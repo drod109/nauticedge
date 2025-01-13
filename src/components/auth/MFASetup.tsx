@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { QrCode, Smartphone, Shield, Copy, Check } from 'lucide-react';
+import { initializeMFASetup, completeMFASetup } from '../../lib/mfa';
 
 interface MFASetupProps {
   onComplete: () => void;
@@ -8,28 +9,61 @@ interface MFASetupProps {
 
 const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onSkip }) => {
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [setupData, setSetupData] = useState<{
+    secret: string;
+    recoveryCodes: string[];
+    otpauthUrl: string;
+  } | null>(null);
   
-  // Mock QR code and secret key - in production these would come from your backend
-  const secretKey = 'HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ';
+  useEffect(() => {
+    const setup = async () => {
+      try {
+        const data = await initializeMFASetup();
+        setSetupData(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to initialize MFA setup');
+      }
+    };
+    setup();
+  }, []);
   
   const copySecretKey = () => {
-    navigator.clipboard.writeText(secretKey);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (setupData) {
+      navigator.clipboard.writeText(setupData.secret);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
-  const handleVerification = (e: React.FormEvent) => {
+  const handleVerification = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In production, verify the code with your backend
-    if (verificationCode.length === 6) {
+    if (!setupData || verificationCode.length !== 6) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      await completeMFASetup(verificationCode);
       onComplete();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to verify code');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="max-w-md w-full mx-auto bg-white p-8 rounded-xl shadow-lg">
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      )}
+
       {step === 1 && (
         <div>
           <div className="text-center mb-6">
@@ -87,10 +121,15 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onSkip }) => {
 
           <div className="space-y-6">
             <div className="flex justify-center">
-              {/* Replace with actual QR code in production */}
-              <div className="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                <QrCode className="h-24 w-24 text-gray-400" />
-              </div>
+              {setupData && (
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+                    setupData.otpauthUrl
+                  )}`}
+                  alt="QR Code"
+                  className="w-48 h-48"
+                />
+              )}
             </div>
 
             <div>
@@ -100,7 +139,7 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onSkip }) => {
               <div className="flex">
                 <input
                   type="text"
-                  value={secretKey}
+                  value={setupData?.secret || ''}
                   readOnly
                   className="flex-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-l-lg text-gray-900 sm:text-sm"
                 />
@@ -142,10 +181,10 @@ const MFASetup: React.FC<MFASetupProps> = ({ onComplete, onSkip }) => {
                 </button>
                 <button
                   type="submit"
-                  disabled={verificationCode.length !== 6}
+                  disabled={verificationCode.length !== 6 || loading}
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Verify and Enable
+                  {loading ? 'Verifying...' : 'Verify and Enable'}
                 </button>
               </div>
             </form>

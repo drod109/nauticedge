@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Shield, Globe, Plug, Ruler, ChevronRight } from 'lucide-react';
+import { Shield, Globe, Plug, Ruler, ChevronRight, X } from 'lucide-react';
 import Sidebar from '../components/dashboard/Sidebar';
 import Header from '../components/dashboard/Header';
+import MFAManagement from '../components/auth/MFAManagement';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('security');
+  const [showMFAManagement, setShowMFAManagement] = useState(false);
 
   const renderSecurityContent = () => (
     <div className="p-8">
@@ -18,10 +20,14 @@ const Settings = () => {
             </div>
             <div>
               <p className="font-medium text-gray-900">Two-factor authentication is enabled</p>
-              <p className="text-sm text-gray-500">Last verified March 18, 2024</p>
             </div>
           </div>
-          <button className="text-sm text-blue-600 hover:text-blue-700">Manage</button>
+          <button 
+            onClick={() => setShowMFAManagement(true)} 
+            className="text-sm text-blue-600 hover:text-blue-700"
+          >
+            Manage
+          </button>
         </div>
       </div>
 
@@ -345,6 +351,24 @@ const Settings = () => {
               {activeTab === 'measurement' && renderMeasurementUnitsContent()}
             </div>
           </div>
+          
+          {/* MFA Management Modal */}
+          {showMFAManagement && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                  <h3 className="text-lg font-medium text-gray-900">Manage Two-Factor Authentication</h3>
+                  <button
+                    onClick={() => setShowMFAManagement(false)}
+                    className="text-gray-400 hover:text-gray-500"
+                  >
+                    <X className="h-6 w-6" />
+                  </button>
+                </div>
+                <MFAManagement onClose={() => setShowMFAManagement(false)} />
+              </div>
+            </div>
+          )}
         </main>
       </div>
     </div>

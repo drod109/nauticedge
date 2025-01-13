@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, Lock, Shield } from 'lucide-react';
 import MFAVerification from './MFAVerification';
 import { supabase } from '../../lib/supabase';
+import { checkMFAStatus } from '../../lib/mfa';
 
 import { getBrowserInfo } from '../../utils/browser';
 import { getLocationInfo } from '../../utils/location';
@@ -12,6 +13,9 @@ const LoginForm = () => {
   const [showMFAVerification, setShowMFAVerification] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [requiresMFA, setRequiresMFA] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,25 +32,38 @@ const LoginForm = () => {
       if (signInError) throw signInError;
 
       if (data.user) {
-        // Create session record
-        const browserInfo = getBrowserInfo();
-        const { error: sessionError } = await supabase
-          .from('user_sessions')
-          .insert([{
-            user_id: data.user.id,
-            session_id: data.session?.access_token,
-            ip_address: '0.0.0.0', // This will be set by the server
-            user_agent: navigator.userAgent,
-            device_info: {
-              type: browserInfo.isMobile ? 'mobile' : 'desktop',
-              browser: browserInfo.browser,
-              os: browserInfo.os
-            },
-            location: locationInfo,
-            is_active: true
-          }]);
+        setSessionId(data.session?.access_token || '');
+        setUserId(data.user.id);
+        
+        // Check if user has MFA enabled
+        const hasMFA = await checkMFAStatus();
+        if (hasMFA) {
+          setShowMFAVerification(true);
+          return;
+        }
 
-        if (sessionError) throw sessionError;
+        // Create new session record
+        const browserInfo = getBrowserInfo();
+        const { error: sessionError } = await supabase.rpc('create_user_session', {
+          p_user_id: data.user.id,
+          p_session_id: data.session?.access_token || '',
+          p_user_agent: navigator.userAgent,
+          p_device_info: {
+            type: browserInfo.isMobile ? 'mobile' : 'desktop',
+            browser: browserInfo.browser,
+            os: browserInfo.os
+          },
+          p_location: locationInfo
+        });
+
+        if (sessionError) {
+          // If session already exists, just redirect to dashboard
+          if (sessionError.code === '23505') {
+            window.location.href = '/dashboard';
+            return;
+          }
+          throw sessionError;
+        }
 
         window.location.href = '/dashboard';
       }
@@ -57,10 +74,38 @@ const LoginForm = () => {
     }
   };
 
-  const handleMFAVerify = (code: string) => {
-    // Verify MFA code with backend
-    console.log('Verifying MFA code:', code);
-    window.location.href = '/dashboard';
+  const handleMFAVerify = async (code: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      // Create session record after successful MFA
+      const browserInfo = getBrowserInfo();
+      const locationInfo = await getLocationInfo();
+      
+      const { error: sessionError } = await supabase.rpc('create_user_session', {
+        p_user_id: user.id,
+        p_session_id: sessionId || user.id,
+        p_user_agent: navigator.userAgent,
+        p_device_info: {
+          type: browserInfo.isMobile ? 'mobile' : 'desktop',
+          browser: browserInfo.browser,
+          os: browserInfo.os
+        },
+        p_location: locationInfo
+      });
+
+      if (sessionError) throw sessionError;
+
+      window.location.href = '/dashboard';
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to verify MFA code');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleLogin = () => {
