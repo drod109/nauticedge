@@ -6,6 +6,7 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
 
 ## Features
 
+### Core Features
 - **Digital Survey Tools**
   - Mobile-first survey capabilities
   - Offline data capture
@@ -24,43 +25,56 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - Data visualization
   - Performance metrics
 
-- **Security & Compliance**
-  - Bank-grade encryption
-  - Two-factor authentication
+### Security Features
+- **Enhanced Authentication**
+  - Email/password authentication
+  - Two-factor authentication (2FA)
     - TOTP-based authentication
+    - QR code setup
     - Recovery codes
-    - Rate limiting
-    - Device tracking
-  - Role-based access control
-  - Industry compliance tools
+    - Compatible with Google/Microsoft Authenticator
   - Session management
     - Device recognition
     - Location tracking
     - Concurrent session control
+    - Session termination
+  - Rate limiting for failed attempts
+
+- **Profile Management**
+  - Profile photo upload
+  - Company information
+  - Personal details
+  - Location detection
+
+- **Billing & Payments**
+  - Multiple subscription tiers
+  - Secure payment processing
+  - Invoice management
+  - Payment history
+  - Card management
 
 ## Tech Stack
 
-- **Frontend**
-  - React 18
-  - TypeScript
-  - Tailwind CSS
-  - Lucide Icons
-  - Vite
+### Frontend
+- React 18 with TypeScript
+- Tailwind CSS for styling
+- Lucide Icons
+- Vite for build tooling
 
-- **Backend**
-  - Supabase
-  - PostgreSQL
-  - Row Level Security
+### Backend & Infrastructure
+- Supabase
+  - PostgreSQL database
+  - Row Level Security (RLS)
   - Real-time subscriptions
+  - Storage for profile photos
+  - Database functions and triggers
 
-- **Authentication**
-  - Supabase Auth
-  - Email/Password
-  - Multi-factor authentication (TOTP)
-  - Microsoft/Google Authenticator support
-  - Session management
-  - Device tracking
-  - Location-based security
+### Authentication & Security
+- Supabase Auth
+- Multi-factor authentication (TOTP)
+- Session management
+- Device tracking
+- Location-based security
 
 ## Prerequisites
 
@@ -71,7 +85,7 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
 
 ## Environment Variables
 
-Create a `.env` file in the root directory with the following variables:
+Create a `.env` file in the root directory with:
 
 ```env
 VITE_SUPABASE_URL=your_supabase_url
@@ -118,46 +132,100 @@ VITE_OPENCAGE_API_KEY=your_opencage_api_key
 ```
 nauticedge/
 ├── src/
-│   ├── components/     # Reusable components
-│   ├── hooks/         # Custom React hooks
-│   ├── lib/           # Library configurations
-│   ├── pages/         # Page components
-│   ├── types/         # TypeScript type definitions
-│   └── utils/         # Utility functions
+│   ├── components/
+│   │   ├── auth/         # Authentication components
+│   │   ├── dashboard/    # Dashboard components
+│   │   ├── profile/      # Profile management
+│   │   └── sections/     # Page sections
+│   ├── hooks/           # Custom React hooks
+│   ├── lib/             # Library configurations
+│   ├── pages/           # Page components
+│   ├── types/           # TypeScript definitions
+│   └── utils/           # Utility functions
 ├── supabase/
-│   └── migrations/    # Database migrations
-├── public/            # Static assets
+│   └── migrations/      # Database migrations
+├── public/             # Static assets
 └── ...config files
 ```
 
 ## Key Features Implementation
 
-### Authentication Flow
+### Authentication System
 - Email/password authentication
+- Two-factor authentication (2FA)
+  - TOTP implementation
+  - QR code generation
+  - Recovery codes
+  - Rate limiting
 - Session management
   - Device fingerprinting
   - Location tracking
-  - Concurrent session handling
-  - Session termination
-- Device tracking
-- Multi-Factor Authentication
-  - TOTP-based authentication
-  - QR code setup
-  - Recovery codes
-  - Rate limiting
-  - Device verification
+  - Concurrent session control
+  - Automatic session cleanup
 
-### Survey Management
-- Create and edit surveys
-- Real-time collaboration
-- Offline support
-- Photo/video attachments
+### Profile Management
+- Profile photo upload
+  - Image storage in Supabase
+  - Automatic cleanup of old photos
+- Company information
+  - Basic details
+  - Address management
+  - Registration info
+- Personal details
+  - Contact information
+  - Location detection
+  - Phone verification
 
-### Client Portal
-- Client dashboard
-- Document sharing
-- Communication tools
+### Billing System
+- Subscription management
+  - Multiple plan tiers
+  - Plan upgrades/downgrades
 - Payment processing
+  - Card management
+  - Invoice generation
+  - Payment history
+- Security features
+  - Secure card storage
+  - Payment verification
+
+### Security Implementation
+
+#### Two-Factor Authentication
+- TOTP-based authentication
+- QR code setup process
+- Backup recovery codes
+- Rate limiting for failed attempts
+- Device verification
+
+#### Session Security
+- Device fingerprinting
+- Location tracking
+- Concurrent session management
+- Automatic session cleanup
+- Session termination
+- IP-based security
+
+#### Data Protection
+- Row Level Security (RLS)
+- Data encryption
+- Secure file storage
+- Access control policies
+
+## Database Schema
+
+### Core Tables
+- `users_metadata` - Extended user information
+- `user_sessions` - Active session management
+- `user_mfa` - Multi-factor authentication settings
+- `payment_methods` - Stored payment methods
+- `billing_history` - Payment and invoice records
+
+### Security Tables
+- `mfa_verification_attempts` - 2FA attempt tracking
+- `mfa_temp` - Temporary 2FA setup data
+
+### Views
+- `user_contact_info` - Consolidated user contact details
 
 ## Contributing
 
@@ -185,10 +253,9 @@ nauticedge/
 
 ## Support
 
-For support, email support@nauticedge.com or join our Slack channel.
+For support, email support@nauticedge.io or join our Slack channel.
 
 ## License
-
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
