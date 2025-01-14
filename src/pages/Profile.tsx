@@ -51,6 +51,16 @@ const Profile = () => {
   const [error, setError] = useState<string | null>(null);
   const [isEditingCompany, setIsEditingCompany] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<string>('basic');
+
+  const handlePlanChange = async (newPlan: string) => {
+    try {
+      setCurrentPlan(newPlan);
+      // Additional logic for handling plan change success
+    } catch (error) {
+      console.error('Error updating plan:', error);
+      setError('Failed to update subscription plan');
+    }
+  };
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -229,6 +239,7 @@ const Profile = () => {
   const renderBillingContent = () => (
     <BillingSection
       currentPlan={currentPlan}
+      onPlanChange={handlePlanChange}
       onAddPaymentMethod={() => setIsPaymentModalOpen(true)}
     />
   );

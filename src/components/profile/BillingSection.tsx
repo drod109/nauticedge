@@ -6,13 +6,14 @@ import BillingHistory from './billing/BillingHistory';
 interface BillingSectionProps {
   currentPlan: string;
   onAddPaymentMethod: () => void;
+  onPlanChange: (newPlan: string) => void;
 }
 
-const BillingSection = ({ currentPlan, onAddPaymentMethod }: BillingSectionProps) => {
+const BillingSection = ({ currentPlan, onAddPaymentMethod, onPlanChange }: BillingSectionProps) => {
   return (
     <div className="p-8">
       {/* Current Plan */}
-      <CurrentPlan currentPlan={currentPlan} />
+      <CurrentPlan currentPlan={currentPlan} onPlanChange={onPlanChange} />
 
       {/* Payment Methods */}
       <PaymentMethods onAddPaymentMethod={onAddPaymentMethod} />

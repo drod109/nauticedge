@@ -38,8 +38,13 @@ const Sidebar = () => {
   return (
     <div className={`relative h-screen bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}>
       <div className={`p-6 flex items-center ${isCollapsed ? 'justify-center' : 'space-x-2'}`}>
-        <Ship className="h-8 w-8 text-blue-600 shrink-0" />
-        {!isCollapsed && <span className="text-xl font-bold">NauticEdge</span>}
+        <a 
+          href="/dashboard"
+          className="flex items-center hover:opacity-80 transition-opacity"
+        >
+          <Ship className="h-8 w-8 text-blue-600 shrink-0" />
+          {!isCollapsed && <span className="ml-2 text-xl font-bold">NauticEdge</span>}
+        </a>
       </div>
       
       <button 

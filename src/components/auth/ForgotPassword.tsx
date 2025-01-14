@@ -109,10 +109,11 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack }) => {
         Back to Login
       </button>
 
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Reset Password</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-2">Reset Password</h2>
+      <p className="text-gray-600 mb-6">We'll help you get back into your account</p>
 
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
