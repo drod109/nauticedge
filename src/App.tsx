@@ -13,6 +13,8 @@ import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import TestConnection from './components/auth/TestConnection';
 import SignUp from './pages/SignUp';
+import About from './pages/About';
+import Contact from './pages/Contact';
 
 function App() {
   // Simple route handling
@@ -36,6 +38,14 @@ function App() {
 
   if (path === '/signup') {
     return <SignUp />;
+  }
+
+  if (path === '/about') {
+    return <About />;
+  }
+
+  if (path === '/contact') {
+    return <Contact />;
   }
 
   return (

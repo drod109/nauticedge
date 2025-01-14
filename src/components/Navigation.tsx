@@ -17,7 +17,6 @@ const Navigation = () => {
             <a href="#features" className="text-gray-600 hover:text-blue-600">Features</a>
             <a href="#solutions" className="text-gray-600 hover:text-blue-600">Solutions</a>
             <a href="#pricing" className="text-gray-600 hover:text-blue-600">Pricing</a>
-            <a href="#contact" className="text-gray-600 hover:text-blue-600">Contact</a>
             <div className="flex items-center space-x-4">
               <a href="/login" className="text-gray-900 hover:text-blue-600">
                 Login
@@ -46,7 +45,6 @@ const Navigation = () => {
             <a href="#features" className="block px-3 py-2 text-gray-600">Features</a>
             <a href="#solutions" className="block px-3 py-2 text-gray-600">Solutions</a>
             <a href="#pricing" className="block px-3 py-2 text-gray-600">Pricing</a>
-            <a href="#contact" className="block px-3 py-2 text-gray-600">Contact</a>
             <div className="mt-4 space-y-2">
               <a
                 href="/login"

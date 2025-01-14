@@ -21,7 +21,7 @@ const sections: LinkSection[] = [
   {
     title: 'Company',
     links: [
-      { label: 'About', href: '#' },
+      { label: 'About', href: '/about' },
       { label: 'Careers', href: '#' },
       { label: 'Blog', href: '#' },
       { label: 'Press', href: '#' }
@@ -33,7 +33,7 @@ const sections: LinkSection[] = [
       { label: 'Documentation', href: '#' },
       { label: 'Help Center', href: '#' },
       { label: 'Community', href: '#' },
-      { label: 'Contact', href: '#' }
+      { label: 'Contact', href: '/contact' }
     ]
   },
   {
