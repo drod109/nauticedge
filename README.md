@@ -12,6 +12,7 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - Offline data capture
   - Photo and video documentation
   - Real-time updates and sync
+  - Premium features for Professional and Enterprise plans
 
 - **Client Management**
   - Client profiles and history
@@ -24,6 +25,27 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - Custom reporting
   - Data visualization
   - Performance metrics
+  - AI-powered analysis (Professional and Enterprise plans)
+
+### Subscription Plans
+- **Basic Plan ($49/month)**
+  - Core survey features
+  - Basic reporting
+  - Standard support
+
+- **Professional Plan ($99/month)**
+  - Everything in Basic
+  - Advanced analytics
+  - AI-powered analysis
+  - Priority support
+  - API access
+
+- **Enterprise Plan ($249/month)**
+  - Everything in Professional
+  - Custom integrations
+  - Dedicated support
+  - White-label reports
+  - Advanced team management
 
 ### Security Features
 - **Enhanced Authentication**
@@ -64,6 +86,20 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
 ### Backend & Infrastructure
 - Supabase
   - PostgreSQL database
+  - Row Level Security (RLS)
+  - Real-time subscriptions
+  - Storage for profile photos
+  - Database functions and triggers
+  - Subscription management
+  - Session tracking
+
+### API Features (Professional & Enterprise)
+- RESTful endpoints
+- Rate limiting
+- Authentication & authorization
+- Subscription validation
+- OpenAPI documentation
+- Webhook support
   - Row Level Security (RLS)
   - Real-time subscriptions
   - Storage for profile photos
@@ -116,9 +152,16 @@ VITE_OPENCAGE_API_KEY=your_opencage_api_key
 ## Database Setup
 
 1. Create a new Supabase project
-2. Run the migrations from the `supabase/migrations` folder
-3. Enable the required extensions in Supabase
-4. Configure Row Level Security policies
+2. Run the migrations from the `supabase/migrations` folder:
+   - User management
+   - Authentication
+   - Subscription plans
+   - Session tracking
+   - Storage configuration
+3. Enable required extensions:
+   - pgcrypto
+   - http
+   - storage
 
 ## Available Scripts
 
@@ -133,10 +176,11 @@ VITE_OPENCAGE_API_KEY=your_opencage_api_key
 nauticedge/
 ├── src/
 │   ├── components/
-│   │   ├── auth/         # Authentication components
-│   │   ├── dashboard/    # Dashboard components
-│   │   ├── profile/      # Profile management
-│   │   └── sections/     # Page sections
+│   │   ├── auth/          # Authentication components
+│   │   ├── dashboard/     # Dashboard components
+│   │   ├── profile/       # Profile management
+│   │   ├── billing/       # Subscription management
+│   │   └── sections/      # Page sections
 │   ├── hooks/           # Custom React hooks
 │   ├── lib/             # Library configurations
 │   ├── pages/           # Page components
@@ -151,6 +195,35 @@ nauticedge/
 ## Key Features Implementation
 
 ### Authentication System
+- Email/password authentication
+- Two-factor authentication (2FA)
+  - TOTP implementation
+  - QR code generation
+  - Recovery codes
+  - Rate limiting
+- Session management
+  - Device fingerprinting
+  - Location tracking
+  - Concurrent session control
+  - Automatic session cleanup
+
+### Subscription Management
+- Multiple subscription tiers
+  - Basic Plan
+  - Professional Plan
+  - Enterprise Plan
+- Plan upgrades/downgrades
+- Automatic billing periods
+- Feature access control
+- Usage tracking
+
+### API Access (Professional & Enterprise)
+- Secure endpoints
+- Rate limiting
+- Plan-based access control
+- Usage monitoring
+- Error handling
+- Logging system
 - Email/password authentication
 - Two-factor authentication (2FA)
   - TOTP implementation
@@ -196,8 +269,19 @@ nauticedge/
 - Backup recovery codes
 - Rate limiting for failed attempts
 - Device verification
+- TOTP-based authentication
+- QR code setup process
+- Backup recovery codes
+- Rate limiting for failed attempts
+- Device verification
 
 #### Session Security
+- Device fingerprinting
+- Location tracking
+- Concurrent session management
+- Automatic session cleanup
+- Session termination
+- IP-based security
 - Device fingerprinting
 - Location tracking
 - Concurrent session management
@@ -210,11 +294,20 @@ nauticedge/
 - Data encryption
 - Secure file storage
 - Access control policies
+- Rate limiting
+- Input validation
+- Row Level Security (RLS)
+- Data encryption
+- Secure file storage
+- Access control policies
 
 ## Database Schema
 
 ### Core Tables
 - `users_metadata` - Extended user information
+- `subscriptions` - User subscription plans
+- `payment_methods` - Stored payment methods
+- `billing_history` - Payment and invoice records
 - `user_sessions` - Active session management
 - `user_mfa` - Multi-factor authentication settings
 - `payment_methods` - Stored payment methods
@@ -223,9 +316,12 @@ nauticedge/
 ### Security Tables
 - `mfa_verification_attempts` - 2FA attempt tracking
 - `mfa_temp` - Temporary 2FA setup data
+- `user_sessions` - Session management
+- `api_keys` - API access management
 
 ### Views
 - `user_contact_info` - Consolidated user contact details
+- `subscription_status` - Current subscription information
 
 ## Contributing
 
