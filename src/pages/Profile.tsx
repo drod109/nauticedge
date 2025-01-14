@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase';
 import ActiveSessions from '../components/profile/ActiveSessions';
 import BillingSection from '../components/profile/BillingSection';
 import CompanySection from '../components/profile/CompanySection';
+import PersonalInfoModal from '../components/profile/PersonalInfoModal';
 import type { UserSession } from '../types/auth';
 
 const Profile = () => {
@@ -19,6 +20,7 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [editForm, setEditForm] = useState({
+    email: '',
     phone: '',
     location: '',
     company_name: '',
@@ -257,9 +259,11 @@ const Profile = () => {
         setUserData({
           ...user,
           ...metadata,
+          email: user.email
         });
         
         setEditForm({
+          email: user.email,
           phone: metadata?.phone || '',
           location: metadata?.location || '',
           company_name: metadata?.company_name || '',
@@ -320,20 +324,11 @@ const Profile = () => {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Personal Information</h2>
           <button 
-            onClick={() => setIsEditing(!isEditing)}
+            onClick={() => setIsEditing(true)}
             className="flex items-center text-sm text-blue-600 hover:text-blue-700"
           >
-            {isEditing ? (
-              <>
-                <Check className="h-4 w-4 mr-1" />
-                Save
-              </>
-            ) : (
-              <>
-                <Pencil className="h-4 w-4 mr-1" />
-                Edit
-              </>
-            )}
+            <Pencil className="h-4 w-4 mr-1" />
+            Edit
           </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -423,6 +418,18 @@ const Profile = () => {
           </div>
         )}
       </div>
+      
+      {/* Personal Info Modal */}
+      <PersonalInfoModal
+        isOpen={isEditing}
+        onClose={() => setIsEditing(false)}
+        onSave={handleEditSubmit}
+        editForm={editForm}
+        onChange={(field, value) => setEditForm(prev => ({ ...prev, [field]: value }))}
+        onDetectLocation={detectLocation}
+        isLoadingLocation={isLoadingLocation}
+        loading={loading}
+      />
 
       <ActiveSessions
         sessions={sessions}
@@ -435,10 +442,10 @@ const Profile = () => {
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         <Header />
         <main className="flex-1 overflow-y-auto">
-          <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto w-full py-8 px-4 sm:px-6 lg:px-8">
             <div className="bg-white rounded-lg shadow">
               {/* Profile Header */}
               <div className="relative px-8 pt-8 pb-4 flex justify-between items-end border-b border-gray-200">

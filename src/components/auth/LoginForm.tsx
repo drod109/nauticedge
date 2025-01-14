@@ -171,12 +171,28 @@ const LoginForm = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  const submitButton = e.currentTarget.form?.querySelector('button[type="submit"]');
+                  if (submitButton) {
+                    submitButton.click();
+                  }
+                }
+              }}
               className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Enter your password"
               required
             />
           </div>
         </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          {loading ? 'Signing in...' : 'Sign in'}
+        </button>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <input 
@@ -195,13 +211,6 @@ const LoginForm = () => {
             Forgot password?
           </button>
         </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          {loading ? 'Signing in...' : 'Sign in'}
-        </button>
         <p className="text-center text-sm text-gray-600">
           Don't have an account? <a href="/signup" className="text-blue-600 hover:text-blue-500">Sign up</a>
         </p>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -12,6 +12,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 
+const SIDEBAR_STATE_KEY = 'nauticedge_sidebar_collapsed';
+
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
   { icon: FileText, label: 'Surveys', href: '/dashboard/surveys' },
@@ -22,7 +24,16 @@ const menuItems = [
 ];
 
 const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const savedState = localStorage.getItem(SIDEBAR_STATE_KEY);
+    return savedState ? JSON.parse(savedState) : false;
+  });
+
+  const toggleCollapse = () => {
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    localStorage.setItem(SIDEBAR_STATE_KEY, JSON.stringify(newState));
+  };
 
   return (
     <div className={`relative h-screen bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}>
@@ -32,7 +43,7 @@ const Sidebar = () => {
       </div>
       
       <button 
-        onClick={() => setIsCollapsed(!isCollapsed)}
+        onClick={toggleCollapse}
         className="absolute -right-3 top-16 bg-white border border-gray-200 rounded-full p-1.5 hover:bg-gray-50"
       >
         {isCollapsed ? 
