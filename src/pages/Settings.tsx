@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Shield, Globe, Plug, Ruler, ChevronRight, X } from 'lucide-react';
+import { Shield, Globe, Plug, Ruler, ChevronRight, X, Key } from 'lucide-react';
 import Sidebar from '../components/dashboard/Sidebar';
 import Header from '../components/dashboard/Header';
 import MFAManagement from '../components/auth/MFAManagement';
+import APISection from '../components/settings/api/APISection';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('security');
@@ -66,65 +67,7 @@ const Settings = () => {
 
   const renderIntegrationsContent = () => (
     <div className="p-8">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Connected Services</h2>
-        <p className="text-gray-600 mb-4">Manage your connected third-party services</p>
-        <div className="space-y-4">
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <img src="https://www.google.com/favicon.ico" alt="Google" className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">Google Calendar</p>
-                  <p className="text-sm text-gray-500">Connected on March 15, 2024</p>
-                </div>
-              </div>
-              <button className="text-sm text-red-600 hover:text-red-700">Disconnect</button>
-            </div>
-          </div>
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <img src="https://www.dropbox.com/favicon.ico" alt="Dropbox" className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">Dropbox</p>
-                  <p className="text-sm text-gray-500">Not connected</p>
-                </div>
-              </div>
-              <button className="text-sm text-blue-600 hover:text-blue-700">Connect</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">API Access</h2>
-        <p className="text-gray-600 mb-4">Manage your API keys and webhooks</p>
-        <div className="space-y-4">
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-gray-900">API Keys</p>
-                <p className="text-sm text-gray-500">View and manage your API keys</p>
-              </div>
-              <ChevronRight className="h-5 w-5 text-gray-400" />
-            </div>
-          </div>
-          <div className="p-4 border border-gray-200 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-gray-900">Webhooks</p>
-                <p className="text-sm text-gray-500">Configure webhook endpoints</p>
-              </div>
-              <ChevronRight className="h-5 w-5 text-gray-400" />
-            </div>
-          </div>
-        </div>
-      </div>
+      <APISection />
     </div>
   );
 
