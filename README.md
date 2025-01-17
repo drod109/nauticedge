@@ -1,8 +1,17 @@
 # NauticEdge - Modern Marine Survey Platform
 
-![NauticEdge](https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=1200&h=400)
+![NauticEdge](https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=1200&h=400&blend=111827&blend-mode=multiply&sat=-100)
 
 NauticEdge is a comprehensive digital platform designed for marine surveyors, boat owners, and insurers. It streamlines the marine survey process with powerful digital tools and real-time collaboration features.
+
+## 🌓 Theme Support
+
+NauticEdge offers both light and dark themes to enhance user experience:
+
+- **Automatic Detection**: Automatically detects system theme preference
+- **Manual Toggle**: Easy theme switching with persistent preference
+- **Optimized UI**: Carefully designed color schemes for both themes
+- **Consistent Experience**: Maintains readability and aesthetics across themes
 
 ## Features
 
@@ -80,6 +89,8 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
 ### Frontend
 - React 18 with TypeScript
 - Tailwind CSS for styling
+  - Dark mode support with custom color palette
+  - Responsive design for all screen sizes
 - Lucide Icons
 - Vite for build tooling
 
@@ -108,6 +119,8 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
 ### Authentication & Security
 - Supabase Auth
 - Multi-factor authentication (TOTP)
+  - Dark theme support for all auth flows
+  - Responsive design for mobile devices
 - Session management
 - Device tracking
 - Location-based security
@@ -132,20 +145,20 @@ VITE_OPENCAGE_API_KEY=your_opencage_api_key
 ## Installation
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/nauticedge.git
-   cd nauticedge
-   ```
+```bash
+git clone https://github.com/your-username/nauticedge.git
+cd nauticedge
+```
 
 2. Install dependencies:
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
 3. Start the development server:
-   ```bash
-   npm run dev
-   ```
+```bash
+npm run dev
+```
 
 4. Open [http://localhost:5173](http://localhost:5173) in your browser
 
@@ -172,7 +185,7 @@ VITE_OPENCAGE_API_KEY=your_opencage_api_key
 
 ## Project Structure
 
-```
+```plaintext
 nauticedge/
 ├── src/
 │   ├── components/
@@ -180,9 +193,12 @@ nauticedge/
 │   │   ├── dashboard/     # Dashboard components
 │   │   ├── profile/       # Profile management
 │   │   ├── billing/       # Subscription management
+│   │   ├── sections/      # Landing page sections
+│   │   └── ThemeToggle.tsx # Theme switcher component
 │   │   └── sections/      # Page sections
 │   ├── hooks/           # Custom React hooks
 │   ├── lib/             # Library configurations
+│   │   └── theme.ts     # Theme management
 │   ├── pages/           # Page components
 │   ├── types/           # TypeScript definitions
 │   └── utils/           # Utility functions
@@ -195,6 +211,7 @@ nauticedge/
 ## Key Features Implementation
 
 ### Authentication System
+- Dark theme support for all auth flows
 - Email/password authentication
 - Two-factor authentication (2FA)
   - TOTP implementation
@@ -237,6 +254,7 @@ nauticedge/
   - Automatic session cleanup
 
 ### Profile Management
+- Dark theme support
 - Profile photo upload
   - Image storage in Supabase
   - Automatic cleanup of old photos
@@ -250,6 +268,7 @@ nauticedge/
   - Phone verification
 
 ### Billing System
+- Dark theme support
 - Subscription management
   - Multiple plan tiers
   - Plan upgrades/downgrades
@@ -264,6 +283,7 @@ nauticedge/
 ### Security Implementation
 
 #### Two-Factor Authentication
+- Dark theme support
 - TOTP-based authentication
 - QR code setup process
 - Backup recovery codes
@@ -304,14 +324,32 @@ nauticedge/
 ## Database Schema
 
 ### Core Tables
-- `users_metadata` - Extended user information
-- `subscriptions` - User subscription plans
-- `payment_methods` - Stored payment methods
-- `billing_history` - Payment and invoice records
-- `user_sessions` - Active session management
-- `user_mfa` - Multi-factor authentication settings
-- `payment_methods` - Stored payment methods
-- `billing_history` - Payment and invoice records
+```sql
+-- User related tables
+users_metadata (
+  id uuid PRIMARY KEY,
+  user_id uuid REFERENCES auth.users,
+  email text,
+  full_name text,
+  company_name text
+);
+
+-- Authentication tables
+user_mfa (
+  id uuid PRIMARY KEY,
+  user_id uuid REFERENCES auth.users,
+  secret text,
+  enabled boolean
+);
+
+-- Billing tables
+subscriptions (
+  id uuid PRIMARY KEY,
+  user_id uuid REFERENCES auth.users,
+  plan text,
+  status text
+);
+```
 
 ### Security Tables
 - `mfa_verification_attempts` - 2FA attempt tracking
@@ -351,6 +389,15 @@ nauticedge/
 
 For support, email support@nauticedge.io or join our Slack channel.
 
+## Accessibility
+
+NauticEdge is committed to accessibility:
+- WCAG 2.1 compliant
+- High contrast in both light and dark themes
+- Keyboard navigation support
+- Screen reader friendly
+- Responsive design for all devices
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
@@ -360,4 +407,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [React](https://reactjs.org/) for the frontend framework
 - [Tailwind CSS](https://tailwindcss.com/) for styling
 - [Lucide](https://lucide.dev/) for icons
-- [OpenCage](https://opencagedata.com/) for geocoding services
