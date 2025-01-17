@@ -124,6 +124,17 @@ const LoginForm = () => {
     window.location.href = '/dashboard';
   };
 
+  const handleAppleLogin = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple'
+      });
+      if (error) throw error;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to sign in with Apple');
+    }
+  };
+
   if (showMFAVerification) {
     return (
       <MFAVerification
@@ -140,33 +151,33 @@ const LoginForm = () => {
   }
 
   return (
-    <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Welcome back</h2>
+    <div className="w-full max-w-md p-8 bg-white dark:bg-dark-800 rounded-2xl shadow-xl border border-gray-200 dark:border-dark-700">
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Welcome back</h2>
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-600">{error}</p>
+        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Enter your email"
               required
             />
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password</label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
             <input
               type="password"
               value={password}
@@ -180,7 +191,7 @@ const LoginForm = () => {
                   }
                 }
               }}
-              className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Enter your password"
               required
             />
@@ -189,7 +200,7 @@ const LoginForm = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+          className="w-full bg-blue-600 dark:bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors disabled:opacity-50"
         >
           {loading ? 'Signing in...' : 'Sign in'}
         </button>
@@ -197,38 +208,38 @@ const LoginForm = () => {
           <div className="flex items-center">
             <input 
               type="checkbox" 
-              className="h-4 w-4 text-blue-600" 
+              className="h-4 w-4 text-blue-600 dark:text-blue-500 border-gray-300 dark:border-dark-600 rounded" 
               id="remember"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
             />
-            <label htmlFor="remember" className="ml-2 text-sm text-gray-600">Remember me</label>
+            <label htmlFor="remember" className="ml-2 text-sm text-gray-600 dark:text-gray-400">Remember me</label>
           </div>
           <button
             onClick={() => setShowForgotPassword(true)}
-            className="text-sm text-blue-600 hover:text-blue-500"
+            className="text-sm text-blue-600 dark:text-blue-500 hover:text-blue-500 dark:hover:text-blue-400"
           >
             Forgot password?
           </button>
         </div>
-        <p className="text-center text-sm text-gray-600">
-          Don't have an account? <a href="/signup" className="text-blue-600 hover:text-blue-500">Sign up</a>
+        <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+          Don't have an account? <a href="/signup" className="text-blue-600 dark:text-blue-500 hover:text-blue-500 dark:hover:text-blue-400">Sign up</a>
         </p>
       </form>
 
       <div className="mt-6">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
+            <div className="w-full border-t border-gray-300 dark:border-dark-600"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">Or continue with</span>
+            <span className="px-2 bg-white dark:bg-dark-800 text-gray-500 dark:text-gray-400">Or continue with</span>
           </div>
         </div>
 
         <button
           onClick={handleGoogleLogin}
-          className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 transition-colors"
+          className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg shadow-sm bg-white dark:bg-dark-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors"
         >
           <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
             <path
@@ -249,6 +260,15 @@ const LoginForm = () => {
             />
           </svg>
           Continue with Google
+        </button>
+        <button
+          onClick={handleAppleLogin}
+          className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg shadow-sm bg-white dark:bg-dark-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors"
+        >
+          <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.78 1.18-.19 2.31-.89 3.51-.84 1.54.07 2.7.6 3.44 1.51-3.03 1.81-2.52 5.87.22 7.22-.65 1.29-1.51 2.58-2.25 3.3ZM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.32 2.33-1.94 4.23-3.74 4.25Z"/>
+          </svg>
+          Continue with Apple
         </button>
       </div>
     </div>

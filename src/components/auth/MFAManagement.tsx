@@ -87,24 +87,24 @@ const MFAManagement: React.FC<MFAManagementProps> = ({ onClose }) => {
   }
 
   return (
-    <div className="p-8 max-w-2xl mx-auto">
+    <div className="p-8 max-w-2xl mx-auto text-gray-900 dark:text-white">
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
-          <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 mr-2" />
-          <p className="text-sm text-red-600">{error}</p>
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start">
+          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 mr-2" />
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         </div>
       )}
 
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="p-6 border-b border-gray-200">
+      <div className="bg-white dark:bg-dark-800 rounded-lg border border-gray-200 dark:border-dark-700 overflow-hidden">
+        <div className="p-6 border-b border-gray-200 dark:border-dark-700">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Shield className="h-5 w-5 text-blue-600" />
+              <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+                <Shield className="h-5 w-5 text-blue-600 dark:text-blue-500" />
               </div>
               <div>
-                <h3 className="text-lg font-medium text-gray-900">Two-Factor Authentication</h3>
-                <p className="text-sm text-gray-500">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Two-Factor Authentication</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {mfaData?.enabled
                     ? `Last verified ${mfaData.last_used_at 
                         ? new Date(mfaData.last_used_at).toLocaleDateString()
@@ -117,7 +117,7 @@ const MFAManagement: React.FC<MFAManagementProps> = ({ onClose }) => {
               <button
                 onClick={handleDisableMFA}
                 disabled={loading}
-                className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400 disabled:opacity-50"
               >
                 Disable
               </button>
@@ -125,7 +125,7 @@ const MFAManagement: React.FC<MFAManagementProps> = ({ onClose }) => {
               <button
                 onClick={() => setShowSetup(true)}
                 disabled={loading}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50"
               >
                 Enable
               </button>
@@ -134,22 +134,22 @@ const MFAManagement: React.FC<MFAManagementProps> = ({ onClose }) => {
         </div>
 
         {mfaData?.enabled && (
-          <div className="p-6 bg-gray-50">
-            <h4 className="text-sm font-medium text-gray-900 mb-4">Security Status</h4>
+          <div className="p-6 bg-gray-50 dark:bg-dark-700">
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Security Status</h4>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-700">MFA Status</p>
-                  <p className="text-sm text-gray-500">Two-factor authentication is enabled</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">MFA Status</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Two-factor authentication is enabled</p>
                 </div>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400">
                   Active
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Last Verification</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Last Verification</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     {mfaData.last_used_at
                       ? new Date(mfaData.last_used_at).toLocaleString()
                       : 'Never used'}
@@ -158,8 +158,8 @@ const MFAManagement: React.FC<MFAManagementProps> = ({ onClose }) => {
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Enabled On</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Enabled On</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     {mfaData.verified_at
                       ? new Date(mfaData.verified_at).toLocaleString()
                       : 'Unknown'}

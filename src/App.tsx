@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Navigation from './components/Navigation';
 import Hero from './components/Hero';
 import Features from './components/sections/Features';
@@ -15,8 +15,13 @@ import TestConnection from './components/auth/TestConnection';
 import SignUp from './pages/SignUp';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import { initializeTheme } from './lib/theme';
 
 function App() {
+  useEffect(() => {
+    initializeTheme();
+  }, []);
+
   // Simple route handling
   const path = window.location.pathname;
 
@@ -49,7 +54,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-dark-900 transition-colors">
       <TestConnection />
       <Navigation />
       <Hero />

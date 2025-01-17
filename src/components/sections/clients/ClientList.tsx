@@ -24,7 +24,7 @@ const ClientList = () => {
             <img
               src={client.logo}
               alt={client.name}
-              className="h-12 w-auto object-contain filter grayscale hover:grayscale-0 transition-all"
+              className="h-12 w-auto object-contain filter grayscale hover:grayscale-0 dark:opacity-75 dark:hover:opacity-100 dark:contrast-125 transition-all"
             />
           </div>
         ))}

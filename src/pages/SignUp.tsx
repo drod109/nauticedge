@@ -4,7 +4,7 @@ import { Ship } from 'lucide-react';
 
 const SignUp = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white dark:from-dark-900 dark:to-dark-950 flex">
       {/* Left Panel - Image */}
       <div className="hidden lg:block lg:w-1/2 relative">
         <div className="absolute inset-0">
@@ -39,10 +39,10 @@ const SignUp = () => {
       {/* Right Panel - Form */}
       <div className="flex-1 flex flex-col justify-center items-center p-4">
         <div className="w-full max-w-md">
-          <div className="flex items-center justify-center mb-8">
-            <Ship className="h-10 w-10 text-blue-600" />
-            <span className="ml-2 text-2xl font-bold text-gray-900">NauticEdge</span>
-          </div>
+          <a href="/" className="flex items-center justify-center mb-8 hover:opacity-80 transition-opacity">
+            <Ship className="h-10 w-10 text-blue-600 dark:text-blue-500" />
+            <span className="ml-2 text-2xl font-bold text-gray-900 dark:text-white">NauticEdge</span>
+          </a>
           <SignUpForm />
         </div>
       </div>

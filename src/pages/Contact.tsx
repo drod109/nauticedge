@@ -53,18 +53,18 @@ const Contact = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-dark-900 transition-colors">
       <Navigation />
       
       {/* Hero Section */}
-      <div className="relative py-24 bg-gradient-to-br from-blue-50 to-white">
+      <div className="relative py-24 bg-gradient-to-br from-blue-50 to-white dark:from-dark-900 dark:to-dark-950">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1497493292307-31c376b6e479?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
               Get in Touch
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               Have questions about NauticEdge? We're here to help. Reach out to our team
               and we'll respond as soon as possible.
             </p>
@@ -73,17 +73,17 @@ const Contact = () => {
       </div>
 
       {/* Contact Form Section */}
-      <div className="py-16 bg-white">
+      <div className="py-16 bg-white dark:bg-dark-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             {/* Contact Form */}
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-8">Send us a Message</h2>
+            <div className="bg-white dark:bg-dark-800 p-8 rounded-xl shadow-sm border border-gray-200 dark:border-dark-700">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Send us a Message</h2>
               
               {success ? (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-                  <h3 className="text-lg font-medium text-green-800 mb-2">Message Sent!</h3>
-                  <p className="text-green-600">
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 text-center">
+                  <h3 className="text-lg font-medium text-green-800 dark:text-green-400 mb-2">Message Sent!</h3>
+                  <p className="text-green-600 dark:text-green-400">
                     Thank you for reaching out. We'll get back to you shortly.
                   </p>
                 </div>
@@ -164,30 +164,30 @@ const Contact = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-8">Our Offices</h2>
               <div className="space-y-8">
                 {offices.map((office, index) => (
-                  <div key={index} className="bg-gray-50 rounded-lg p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">{office.city}</h3>
+                  <div key={index} className="bg-gray-50 dark:bg-dark-800 rounded-lg p-6">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{office.city}</h3>
                     <div className="space-y-4">
                       <div className="flex items-start space-x-3">
-                        <MapPin className="h-5 w-5 text-blue-600 mt-1" />
+                        <MapPin className="h-5 w-5 text-blue-600 dark:text-blue-500 mt-1" />
                         <div>
-                          <p className="text-gray-600">{office.address}</p>
-                          <p className="text-gray-600">{office.postal}</p>
+                          <p className="text-gray-600 dark:text-gray-400">{office.address}</p>
+                          <p className="text-gray-600 dark:text-gray-400">{office.postal}</p>
                         </div>
                       </div>
                       
                       <div className="flex items-center space-x-3">
-                        <Phone className="h-5 w-5 text-blue-600" />
-                        <p className="text-gray-600">{office.phone}</p>
+                        <Phone className="h-5 w-5 text-blue-600 dark:text-blue-500" />
+                        <p className="text-gray-600 dark:text-gray-400">{office.phone}</p>
                       </div>
                       
                       <div className="flex items-center space-x-3">
-                        <Mail className="h-5 w-5 text-blue-600" />
-                        <p className="text-gray-600">{office.email}</p>
+                        <Mail className="h-5 w-5 text-blue-600 dark:text-blue-500" />
+                        <p className="text-gray-600 dark:text-gray-400">{office.email}</p>
                       </div>
                       
                       <div className="flex items-center space-x-3">
-                        <Clock className="h-5 w-5 text-blue-600" />
-                        <p className="text-gray-600">{office.hours}</p>
+                        <Clock className="h-5 w-5 text-blue-600 dark:text-blue-500" />
+                        <p className="text-gray-600 dark:text-gray-400">{office.hours}</p>
                       </div>
                     </div>
                   </div>

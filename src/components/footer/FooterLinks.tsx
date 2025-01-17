@@ -52,13 +52,13 @@ const FooterLinks = () => {
     <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
       {sections.map((section) => (
         <div key={section.title}>
-          <h3 className="font-semibold text-gray-900 mb-4">{section.title}</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-4">{section.title}</h3>
           <ul className="space-y-2">
             {section.links.map((link) => (
               <li key={link.label}>
                 <a
                   href={link.href}
-                  className="text-gray-600 hover:text-blue-600 transition-colors"
+                  className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-500 transition-colors"
                 >
                   {link.label}
                 </a>
