@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Mail, Phone, Globe, User2 } from 'lucide-react';
+import { X, Mail, Phone, Globe, User2, BadgeCheck } from 'lucide-react';
 
 interface PersonalInfoModalProps {
   isOpen: boolean;
@@ -49,7 +49,7 @@ const PersonalInfoModal: React.FC<PersonalInfoModalProps> = ({
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">First Name</label>
                 <div className="relative">
-                  <User2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
+                  <BadgeCheck className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
                 <input
                   type="text"
                   value={editForm.first_name}
@@ -132,7 +132,7 @@ const PersonalInfoModal: React.FC<PersonalInfoModalProps> = ({
         <div className="p-6 border-t border-gray-200 flex justify-end space-x-4">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-dark-600 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700"
           >
             Cancel
           </button>

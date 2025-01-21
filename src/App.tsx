@@ -11,7 +11,6 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
-import TestConnection from './components/auth/TestConnection';
 import SignUp from './pages/SignUp';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -55,7 +54,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-dark-900 transition-colors">
-      <TestConnection />
       <Navigation />
       <Hero />
       <Features />

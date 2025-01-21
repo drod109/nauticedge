@@ -45,7 +45,7 @@ const CurrentPlan: React.FC<CurrentPlanProps> = ({ currentPlan, onPlanChange }) 
 
   return (
     <div className="mb-12">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Current Plan</h2>
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Current Plan</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {['basic', 'professional', 'enterprise'].map((plan) => (
           <div
@@ -70,7 +70,7 @@ const CurrentPlan: React.FC<CurrentPlanProps> = ({ currentPlan, onPlanChange }) 
             </div>
             {plan === currentPlan ? (
               <button
-                className="w-full py-2.5 px-4 rounded-lg font-medium bg-gray-100 text-gray-400 cursor-not-allowed"
+                className="w-full py-2.5 px-4 rounded-lg font-medium bg-gray-100 dark:bg-dark-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                 disabled
               >
                 Current Plan
@@ -78,7 +78,7 @@ const CurrentPlan: React.FC<CurrentPlanProps> = ({ currentPlan, onPlanChange }) 
             ) : (
               <button
                 onClick={() => handlePlanSelect(plan)}
-                className="w-full py-2.5 px-4 rounded-lg font-medium bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50 transition-colors"
+                className="w-full py-2.5 px-4 rounded-lg font-medium bg-white dark:bg-dark-800 border-2 border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
               >
                 {currentPlan === 'basic' && plan === 'professional' ? 'Upgrade' :
                  currentPlan === 'basic' && plan === 'enterprise' ? 'Upgrade' :

@@ -124,7 +124,7 @@ const Header: React.FC<HeaderProps> = ({ theme, onThemeChange }) => {
               editable={false}
               size="sm"
             />
-            <span className="text-sm font-medium">{userData?.full_name || 'Loading...'}</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-white">{userData?.full_name || 'Loading...'}</span>
           </button>
 
           {isDropdownOpen && (

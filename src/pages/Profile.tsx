@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Pencil, Mail, Phone, Globe, User2, Building2, CreditCard as BillingIcon, Check } from 'lucide-react';
+import { Theme, getInitialTheme, setTheme } from '../lib/theme';
 import Sidebar from '../components/dashboard/Sidebar';
 import Header from '../components/dashboard/Header';
 import ProfilePhoto from '../components/profile/ProfilePhoto.tsx';
@@ -12,6 +13,13 @@ import type { UserSession } from '../types/auth';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 
 const Profile = () => {
+  const [theme, setCurrentTheme] = useState<Theme>(getInitialTheme());
+
+  const handleThemeChange = (newTheme: Theme) => {
+    setTheme(newTheme);
+    setCurrentTheme(newTheme);
+  };
+
   const [activeTab, setActiveTab] = useState('personal');
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -470,7 +478,7 @@ const Profile = () => {
     <div className="flex h-screen bg-gray-50 dark:bg-dark-900">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden min-w-0 bg-gray-50 dark:bg-dark-900">
-        <Header />
+        <Header theme={theme} onThemeChange={handleThemeChange} />
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto w-full py-8 px-4 sm:px-6 lg:px-8">
             <div className="bg-white dark:bg-dark-800 rounded-lg shadow border border-gray-200 dark:border-dark-700">

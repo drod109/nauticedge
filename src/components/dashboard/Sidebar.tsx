@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -9,7 +9,8 @@ import {
   LogOut,
   Ship,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Menu
 } from 'lucide-react';
 
 const SIDEBAR_STATE_KEY = 'nauticedge_sidebar_collapsed';
@@ -32,12 +33,15 @@ const Sidebar = () => {
     }
     return window.innerWidth < 768;
   });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Handle initial mobile check and window resize
     const handleResize = () => {
       if (window.innerWidth < 768 && !isCollapsed) {
         setIsCollapsed(true);
+        setIsMobileMenuOpen(false);
         localStorage.setItem(SIDEBAR_STATE_KEY, 'true');
       }
     };
@@ -52,17 +56,38 @@ const Sidebar = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, [isCollapsed]);
 
+  useEffect(() => {
+    // Handle clicks outside sidebar to close mobile menu
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   const toggleCollapse = () => {
     const newState = !isCollapsed;
     setIsCollapsed(newState);
     localStorage.setItem(SIDEBAR_STATE_KEY, JSON.stringify(newState));
   };
 
-  return (
-    <div 
-      className={`fixed md:relative h-screen bg-white dark:bg-dark-800 border-r border-gray-200 dark:border-dark-700 flex flex-col transition-all duration-300 z-20 ${
-        isCollapsed ? 'w-16' : 'w-64'
-      }`}
+  return (<>
+    {/* Mobile Menu Button */}
+    <button
+      onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+      className="fixed top-4 left-4 p-2 rounded-lg bg-white dark:bg-dark-800 shadow-lg border border-gray-200 dark:border-dark-700 md:hidden z-30"
+    >
+      <Menu className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+    </button>
+
+    {/* Sidebar */}
+    <div
+      ref={sidebarRef}
+      className={`fixed md:relative h-screen bg-white dark:bg-dark-800 border-r border-gray-200 dark:border-dark-700 flex flex-col transition-all duration-300 z-20
+        ${isCollapsed ? 'w-16' : 'w-64'}
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
     >
       <div className={`p-6 flex items-center ${isCollapsed ? 'justify-center' : 'space-x-2'}`}>
         <a 
@@ -110,6 +135,15 @@ const Sidebar = () => {
         </button>
       </div>
     </div>
+
+    {/* Overlay for mobile */}
+    {isMobileMenuOpen && (
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
+        onClick={() => setIsMobileMenuOpen(false)}
+      />
+    )}
+  </>
   );
 };
 
