@@ -4,6 +4,7 @@ import Sidebar from '../components/dashboard/Sidebar';
 import Header from '../components/dashboard/Header';
 import MFAManagement from '../components/auth/MFAManagement';
 import APISection from '../components/settings/api/APISection';
+import ProtectedRoute from '../components/auth/ProtectedRoute';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('security');
@@ -230,6 +231,7 @@ const Settings = () => {
   );
 
   return (
+    <ProtectedRoute>
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
@@ -315,6 +317,7 @@ const Settings = () => {
         </main>
       </div>
     </div>
+    </ProtectedRoute>
   );
 };
 

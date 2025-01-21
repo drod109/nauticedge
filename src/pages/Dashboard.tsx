@@ -3,6 +3,7 @@ import Sidebar from '../components/dashboard/Sidebar';
 import Header from '../components/dashboard/Header';
 import DashboardContent from '../components/dashboard/DashboardContent';
 import { Theme, getInitialTheme, setTheme } from '../lib/theme';
+import ProtectedRoute from '../components/auth/ProtectedRoute';
 
 const Dashboard = () => {
   const [theme, setCurrentTheme] = useState<Theme>(getInitialTheme());
@@ -13,6 +14,7 @@ const Dashboard = () => {
   };
 
   return (
+    <ProtectedRoute>
     <div className="flex h-screen bg-gray-50 dark:bg-dark-900 transition-colors">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -22,6 +24,7 @@ const Dashboard = () => {
         </main>
       </div>
     </div>
+    </ProtectedRoute>
   );
 };
 

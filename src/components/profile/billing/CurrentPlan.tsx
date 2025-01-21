@@ -50,22 +50,22 @@ const CurrentPlan: React.FC<CurrentPlanProps> = ({ currentPlan, onPlanChange }) 
         {['basic', 'professional', 'enterprise'].map((plan) => (
           <div
             key={plan}
-            className={`relative p-6 rounded-xl border ${
+            className={`relative p-6 rounded-xl border dark:border-dark-700 ${
               plan === currentPlan
-                ? 'bg-gradient-to-br from-blue-50 to-white border-blue-200 shadow-lg'
-                : 'bg-white border-gray-200 hover:border-blue-200 hover:shadow-md transition-all'
+                ? 'bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-dark-800 border-blue-200 dark:border-blue-800 shadow-lg'
+                : 'bg-white dark:bg-dark-800 border-gray-200 dark:border-dark-700 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-md transition-all'
             }`}
           >
             {plan === currentPlan && (
-              <span className="absolute -top-3 -right-3 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+              <span className="absolute -top-3 -right-3 bg-blue-600 dark:bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">
                 Current Plan
               </span>
             )}
             <div className="mb-4">
-              <h3 className="text-xl font-bold text-gray-900 mb-2 capitalize">{plan}</h3>
-              <p className="text-3xl font-bold text-gray-900">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 capitalize">{plan}</h3>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">
                 ${plan === 'basic' ? '49' : plan === 'professional' ? '99' : '249'}
-                <span className="text-base font-normal text-gray-500">/month</span>
+                <span className="text-base font-normal text-gray-500 dark:text-gray-400">/month</span>
               </p>
             </div>
             {plan === currentPlan ? (

@@ -63,27 +63,27 @@ const BillingHistory: React.FC = () => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Billing History</h2>
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Billing History</h2>
       
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-600">{error}</p>
+        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         </div>
       )}
 
       <div className="overflow-x-auto">
         {loading ? (
           <div className="text-center py-8">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 dark:border-blue-500 border-r-transparent"></div>
           </div>
         ) : transactions.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             No billing history available
           </div>
         ) : (
           <table className="min-w-full">
             <thead>
-              <tr className="text-left text-sm text-gray-500">
+              <tr className="text-left text-sm text-gray-500 dark:text-gray-400">
                 <th className="pb-4">Date</th>
                 <th className="pb-4">Invoice</th>
                 <th className="pb-4">Description</th>
@@ -92,7 +92,7 @@ const BillingHistory: React.FC = () => {
                 <th className="pb-4 text-center">Download</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-200 dark:divide-dark-700">
               {transactions.map((transaction) => (
                 <tr key={transaction.id} className="text-sm">
                   <td className="py-4">
@@ -100,7 +100,7 @@ const BillingHistory: React.FC = () => {
                   </td>
                   <td className="py-4">{transaction.invoice_number}</td>
                   <td className="py-4">{transaction.description}</td>
-                  <td className="py-4">
+                  <td className="py-4 text-gray-900 dark:text-white">
                     ${transaction.amount.toLocaleString('en-US', {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2
@@ -114,7 +114,7 @@ const BillingHistory: React.FC = () => {
                   <td className="py-4 text-center">
                     <button
                       onClick={() => handleDownloadInvoice(transaction.invoice_number)}
-                      className="text-gray-500 hover:text-blue-600 transition-colors"
+                      className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-500 transition-colors"
                     >
                       <Download className="h-5 w-5" />
                     </button>

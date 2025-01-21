@@ -62,13 +62,13 @@ const Navigation = () => {
             <div className="mt-4 space-y-2">
               <a
                 href="/login"
-                className="block w-full px-3 py-2 text-center text-gray-900 hover:text-blue-600"
+                className="block w-full px-3 py-2 text-center border border-gray-300 dark:border-dark-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-dark-800 rounded-full hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors"
               >
                 Login
               </a>
               <a
                 href="/signup"
-                className="block w-full px-3 py-2 text-center bg-blue-600 text-white rounded-full hover:bg-blue-700"
+                className="block w-full px-3 py-2 text-center bg-blue-600 dark:bg-blue-500 text-white rounded-full hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
               >
                 Sign Up
               </a>

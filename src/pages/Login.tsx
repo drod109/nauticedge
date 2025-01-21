@@ -1,8 +1,38 @@
 import React from 'react';
 import LoginForm from '../components/auth/LoginForm';
 import { Ship } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase'; 
 
 const Login = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // Sign out any existing session when visiting login page
+        await supabase.auth.signOut();
+        
+        // Clear any stored auth data
+        localStorage.removeItem('sb-xvyetpiyuasltbarascj-auth-token');
+      } catch (error) {
+        console.error('Error during logout:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white dark:from-dark-900 dark:to-dark-950 flex items-center justify-center">
+        <div className="h-8 w-8 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white dark:from-dark-900 dark:to-dark-950 flex">
       {/* Left Panel - Form */}

@@ -16,40 +16,82 @@ const SignUpForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!acceptTerms) {
-      setError('You must accept the Terms and Privacy Policy to create an account');
-      return;
-    }
-    
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    
     setLoading(true);
     setError(null);
 
     try {
-      const fullName = `${firstName} ${lastName}`.trim();
+      // Validate form
+      if (!acceptTerms) {
+        throw new Error('You must accept the Terms and Privacy Policy to create an account');
+      }
       
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: {
-          data: {
-            full_name: fullName
+      if (password !== confirmPassword) {
+        throw new Error('Passwords do not match');
+      }
+
+      // Add retry logic for network issues
+      const maxRetries = 3;
+      let retryCount = 0;
+      let lastError = null;
+
+      while (retryCount < maxRetries) {
+        try {
+          const fullName = `${firstName} ${lastName}`.trim();
+
+          const { data, error: signUpError } = await supabase.auth.signUp({
+            email: email.trim(),
+            password,
+            options: {
+              emailRedirectTo: `${window.location.origin}/login`,
+              data: {
+                full_name: fullName
+              }
+            }
+          });
+
+          if (signUpError) throw signUpError;
+          if (!data.user) throw new Error('No user data returned');
+
+          // Check if user was created successfully
+          if (data.user.identities?.length === 0) {
+            throw new Error('This email is already registered. Please sign in instead.');
+          }
+
+          // Success - redirect to login
+          window.location.href = '/login';
+          return;
+        } catch (err) {
+          lastError = err;
+          if (err instanceof Error && !err.message.includes('network')) {
+            throw err; // Don't retry non-network errors
+          }
+          retryCount++;
+          if (retryCount < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)); // Exponential backoff
           }
         }
-      });
-
-      if (signUpError) throw signUpError;
-      if (!data.user) throw new Error('No user data returned');
-
-      // Redirect to login on success
-      window.location.href = '/login';
+      }
+      throw new Error('Failed to sign up after multiple attempts. Please check your connection and try again.');
     } catch (err) {
       console.error('Signup error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create account');
+      if (err instanceof Error) {
+        switch (err.name) {
+          case 'AuthApiError':
+            if (err.message.includes('already registered')) {
+              setError('This email is already registered. Please sign in instead.');
+            } else {
+              setError(err.message || 'Failed to create account. Please try again.');
+            }
+            break;
+          case 'AuthRetryableFetchError':
+            setError('Network error. Please check your connection and try again.');
+            break;
+          default:
+            setError(err.message || 'An unexpected error occurred. Please try again.');
+        }
+      } else {
+        setError('Failed to create account. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

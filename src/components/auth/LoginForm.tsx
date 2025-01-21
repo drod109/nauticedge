@@ -34,52 +34,107 @@ const LoginForm = () => {
     }
 
     try {
-      const locationInfo = await getLocationInfo();
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+      // Add retry logic for network issues
+      const maxRetries = 3;
+      let retryCount = 0;
+      let lastError = null;
+      let locationInfo;
+      
+      try {
+        locationInfo = await getLocationInfo();
+      } catch (err) {
+        // Default location info if geolocation fails
+        locationInfo = {
+          city: 'Unknown',
+          country: 'Unknown',
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+        };
+      }
 
-      if (signInError) throw signInError;
+      while (retryCount < maxRetries) {
+        try {
+          const { data, error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
 
-      if (data.user) {
-        setSessionId(data.session?.access_token || '');
-        setUserId(data.user.id);
+          if (signInError) {
+            if (signInError.message.includes('Invalid login credentials')) {
+              throw new Error('Invalid email or password');
+            }
+            throw signInError;
+          }
+
+          if (data.user) {
+            setSessionId(data.session?.access_token || '');
+            setUserId(data.user.id);
         
-        // Check if user has MFA enabled
-        const hasMFA = await checkMFAStatus();
-        if (hasMFA) {
-          setShowMFAVerification(true);
-          return;
-        }
+            // Check if user has MFA enabled
+            const hasMFA = await checkMFAStatus();
+            if (hasMFA) {
+              setShowMFAVerification(true);
+              return;
+            }
 
-        // Create new session record
-        const browserInfo = getBrowserInfo();
-        const { error: sessionError } = await supabase.rpc('create_user_session', {
-          p_user_id: data.user.id,
-          p_session_id: data.session?.access_token || '',
-          p_user_agent: navigator.userAgent,
-          p_device_info: {
-            type: browserInfo.isMobile ? 'mobile' : 'desktop',
-            browser: browserInfo.browser,
-            os: browserInfo.os
-          },
-          p_location: locationInfo
-        });
+            // Create new session record
+            const browserInfo = getBrowserInfo();
+            const { error: sessionError } = await supabase.rpc('create_user_session', {
+              p_user_id: data.user.id,
+              p_session_id: data.session?.access_token || data.user.id,
+              p_user_agent: navigator.userAgent,
+              p_device_info: {
+                type: browserInfo.isMobile ? 'mobile' : 'desktop',
+                browser: browserInfo.browser,
+                os: browserInfo.os
+              },
+              p_location: locationInfo
+            });
 
-        if (sessionError) {
-          // If session already exists, just redirect to dashboard
-          if (sessionError.code === '23505') {
+            if (sessionError) {
+              // If session already exists, just redirect to dashboard
+              if (sessionError.message?.includes('duplicate key value')) {
+                window.location.href = '/dashboard';
+                return;
+              }
+              throw sessionError;
+            }
+
             window.location.href = '/dashboard';
             return;
           }
-          throw sessionError;
+          throw new Error('No user data returned');
+        } catch (err) {
+          lastError = err;
+          if (err instanceof Error && err.name !== 'AuthRetryableFetchError') {
+            throw err; // Don't retry non-network errors
+          }
+          retryCount++;
+          if (retryCount < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+            continue;
+          }
         }
-
-        window.location.href = '/dashboard';
       }
+      throw lastError || new Error('Failed to sign in after multiple attempts');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred during sign in');
+      if (err instanceof Error) {
+        switch (err.name) {
+          case 'AuthRetryableFetchError':
+            setError('Network error. Please check your connection and try again.');
+            break;
+          case 'AuthApiError':
+            if (err.message.includes('Invalid login credentials')) {
+              setError('Invalid email or password');
+            } else {
+              setError(err.message || 'Failed to sign in. Please try again.');
+            }
+            break;
+          default:
+            setError(err.message || 'An unexpected error occurred. Please try again.');
+        }
+      } else {
+        setError('Failed to sign in. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

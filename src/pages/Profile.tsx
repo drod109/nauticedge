@@ -9,6 +9,7 @@ import BillingSection from '../components/profile/BillingSection';
 import CompanySection from '../components/profile/CompanySection';
 import PersonalInfoModal from '../components/profile/PersonalInfoModal';
 import type { UserSession } from '../types/auth';
+import ProtectedRoute from '../components/auth/ProtectedRoute';
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState('personal');
@@ -21,6 +22,8 @@ const Profile = () => {
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [editForm, setEditForm] = useState({
     email: '',
+    first_name: '',
+    last_name: '',
     phone: '',
     location: '',
     company_name: '',
@@ -147,39 +150,20 @@ const Profile = () => {
         throw new Error('User ID not found');
       }
 
-      // First check if metadata exists
-      const { data: existingMetadata } = await supabase
+      // Update user metadata
+      const { error: updateError } = await supabase
         .from('users_metadata')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+        .update({
+          first_name: editForm.first_name,
+          last_name: editForm.last_name,
+          full_name: `${editForm.first_name} ${editForm.last_name}`.trim(),
+          phone: editForm.phone,
+          location: editForm.location,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id);
 
-      // If metadata doesn't exist, create it first
-      if (!existingMetadata) {
-        const { error: insertError } = await supabase
-          .from('users_metadata')
-          .insert({
-            user_id: user.id,
-            phone: editForm.phone,
-            location: editForm.location,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          });
-
-        if (insertError) throw insertError;
-      } else {
-        // If metadata exists, update it
-        const { error: updateError } = await supabase
-          .from('users_metadata')
-          .update({
-            phone: editForm.phone,
-            location: editForm.location,
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', user.id);
-
-        if (updateError) throw updateError;
-      }
+      if (updateError) throw updateError;
 
       // Refresh user data after update
       await fetchUserData();
@@ -275,6 +259,8 @@ const Profile = () => {
         
         setEditForm({
           email: user.email,
+          first_name: metadata?.first_name || '',
+          last_name: metadata?.last_name || '',
           phone: metadata?.phone || '',
           location: metadata?.location || '',
           company_name: metadata?.company_name || '',
@@ -333,76 +319,105 @@ const Profile = () => {
       {/* Personal Information */}
       <div className="mb-12">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Personal Information</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Personal Information</h2>
           <button 
-            onClick={() => setIsEditing(true)}
-            className="flex items-center text-sm text-blue-600 hover:text-blue-700"
+            onClick={() => setIsEditing(true)} 
+            className="flex items-center text-sm text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
           >
             <Pencil className="h-4 w-4 mr-1" />
             Edit
           </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Full Name</label>
-            <input
-              type="text"
-              value={userData?.full_name || ''}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 cursor-not-allowed"
-              readOnly
-            />
+          <div className="grid grid-cols-2 gap-4 md:col-span-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">First Name</label>
+              <input
+                type="text"
+                value={isEditing ? editForm.first_name : (userData?.first_name || '')}
+                onChange={(e) => isEditing && setEditForm(prev => ({ ...prev, first_name: e.target.value }))}
+                className={`mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-md shadow-sm ${
+                  !isEditing 
+                    ? 'bg-gray-50 dark:bg-dark-700 cursor-not-allowed' 
+                    : 'bg-white dark:bg-dark-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                } text-gray-900 dark:text-white`}
+                readOnly={!isEditing}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</label>
+              <input
+                type="text"
+                value={isEditing ? editForm.last_name : (userData?.last_name || '')}
+                onChange={(e) => isEditing && setEditForm(prev => ({ ...prev, last_name: e.target.value }))}
+                className={`mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-md shadow-sm ${
+                  !isEditing 
+                    ? 'bg-gray-50 dark:bg-dark-700 cursor-not-allowed' 
+                    : 'bg-white dark:bg-dark-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                } text-gray-900 dark:text-white`}
+                readOnly={!isEditing}
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
             <div className="mt-1 relative rounded-md shadow-sm">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-gray-400" />
+                <Mail className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </div>
               <input
                 type="email"
                 value={userData?.email || ''}
-                className="block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed"
+                className="block w-full pl-10 px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-md bg-gray-50 dark:bg-dark-700 text-gray-900 dark:text-white cursor-not-allowed"
                 readOnly
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number</label>
             <div className="mt-1 relative rounded-md shadow-sm">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Phone className="h-5 w-5 text-gray-400" />
+                <Phone className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </div>
               <input
                 type="tel"
                 value={isEditing ? editForm.phone : (userData?.phone || 'Not set')}
                 onChange={(e) => isEditing && setEditForm(prev => ({ ...prev, phone: e.target.value }))}
-                className={`block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'focus:ring-blue-500 focus:border-blue-500'}`}
+                className={`block w-full pl-10 px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-md ${
+                  !isEditing 
+                    ? 'bg-gray-50 dark:bg-dark-700 cursor-not-allowed' 
+                    : 'bg-white dark:bg-dark-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                } text-gray-900 dark:text-white`}
                 readOnly={!isEditing}
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Location</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
             <div className="mt-1 relative rounded-md shadow-sm">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Globe className="h-5 w-5 text-gray-400" />
+                <Globe className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </div>
               <div className="flex w-full">
                 <input
                   type="text"
                   value={isEditing ? editForm.location : (userData?.location || 'Not set')}
                   onChange={(e) => isEditing && setEditForm(prev => ({ ...prev, location: e.target.value }))}
-                  className={`block w-full pl-10 px-3 py-2 border border-gray-300 rounded-l-md ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : 'focus:ring-blue-500 focus:border-blue-500'}`}
+                  className={`block w-full pl-10 px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-l-md ${
+                    !isEditing 
+                      ? 'bg-gray-50 dark:bg-dark-700 cursor-not-allowed' 
+                      : 'bg-white dark:bg-dark-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                  } text-gray-900 dark:text-white`}
                   readOnly={!isEditing}
                 />
                 {isEditing && (
                   <button
                     onClick={detectLocation}
                     disabled={isLoadingLocation}
-                    className="px-4 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="px-4 py-2 bg-gray-100 dark:bg-dark-700 border border-l-0 border-gray-300 dark:border-dark-600 rounded-r-md hover:bg-gray-200 dark:hover:bg-dark-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   >
                     {isLoadingLocation ? (
-                      <div className="h-5 w-5 border-2 border-gray-400 border-t-blue-600 rounded-full animate-spin"></div>
+                      <div className="h-5 w-5 border-2 border-gray-400 dark:border-gray-500 border-t-blue-600 dark:border-t-blue-500 rounded-full animate-spin"></div>
                     ) : (
                       'Detect'
                     )}
@@ -416,13 +431,13 @@ const Profile = () => {
           <div className="mt-6 flex justify-end space-x-4">
             <button
               onClick={() => setIsEditing(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
             >
               Cancel
             </button>
             <button
               onClick={handleEditSubmit}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600"
             >
               Save Changes
             </button>
@@ -451,15 +466,16 @@ const Profile = () => {
   );
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <ProtectedRoute>
+    <div className="flex h-screen bg-gray-50 dark:bg-dark-900">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0 bg-gray-50 dark:bg-dark-900">
         <Header />
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto w-full py-8 px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-lg shadow">
+            <div className="bg-white dark:bg-dark-800 rounded-lg shadow border border-gray-200 dark:border-dark-700">
               {/* Profile Header */}
-              <div className="relative px-8 pt-8 pb-4 flex justify-between items-end border-b border-gray-200">
+              <div className="relative px-8 pt-8 pb-4 flex justify-between items-end border-b border-gray-200 dark:border-dark-700">
                 <div className="flex items-end space-x-4">
                   <ProfilePhoto
                     userId={userData?.id}
@@ -469,21 +485,21 @@ const Profile = () => {
                     editable={true}
                   />
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900">{userData?.full_name || 'Loading...'}</h1>
-                    <p className="text-gray-600">{userData?.email || ''}</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{userData?.full_name || 'Loading...'}</h1>
+                    <p className="text-gray-600 dark:text-gray-400">{userData?.email || ''}</p>
                   </div>
                 </div>
               </div>
 
               {/* Tabs */}
-              <div className="px-8 pt-6 border-b border-gray-200">
+              <div className="px-8 pt-6 border-b border-gray-200 dark:border-dark-700">
                 <div className="flex space-x-8">
                   <button
                     onClick={() => setActiveTab('personal')}
                     className={`pb-4 text-sm font-medium flex items-center space-x-2 ${
                       activeTab === 'personal'
                         ? 'border-b-2 border-blue-600 text-blue-600'
-                        : 'text-gray-500 hover:text-gray-700'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                     }`}
                   >
                     <User2 className="h-4 w-4" />
@@ -494,7 +510,7 @@ const Profile = () => {
                     className={`pb-4 text-sm font-medium flex items-center space-x-2 ${
                       activeTab === 'billing'
                         ? 'border-b-2 border-blue-600 text-blue-600'
-                        : 'text-gray-500 hover:text-gray-700'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                     }`}
                   >
                     <BillingIcon className="h-4 w-4" />
@@ -505,7 +521,7 @@ const Profile = () => {
                     className={`pb-4 text-sm font-medium flex items-center space-x-2 ${
                       activeTab === 'company'
                         ? 'border-b-2 border-blue-600 text-blue-600'
-                        : 'text-gray-500 hover:text-gray-700'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                     }`}
                   >
                     <Building2 className="h-4 w-4" />
@@ -517,7 +533,7 @@ const Profile = () => {
               {/* Loading State */}
               {isLoading ? (
                 <div className="p-8 flex justify-center">
-                  <div className="h-8 w-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                  <div className="h-8 w-8 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-500 rounded-full animate-spin"></div>
                 </div>
               ) : (
                 <>
@@ -532,6 +548,7 @@ const Profile = () => {
         </main>
       </div>
     </div>
+    </ProtectedRoute>
   );
 };
 
