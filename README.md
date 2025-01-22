@@ -31,6 +31,17 @@ NauticEdge offers both light and dark themes to enhance user experience:
   - Photo and video documentation
   - Real-time updates and sync
   - Premium features for Professional and Enterprise plans
+  
+- **Invoice Management**
+  - Professional invoice builder
+  - Customizable invoice templates
+  - PDF generation and download
+  - Client information management
+  - Tax calculation
+  - Multiple items per invoice
+  - Invoice status tracking
+  - Email notifications
+  - Payment tracking
 
 - **Appointment Scheduling**
   - Interactive calendar interface
@@ -58,18 +69,25 @@ NauticEdge offers both light and dark themes to enhance user experience:
   - Core survey features
   - Basic reporting
   - Standard support
+  - Basic invoice features
 
 - **Professional Plan ($99/month)**
   - Everything in Basic
   - Advanced analytics
   - AI-powered analysis
   - Priority support
+  - Unlimited invoices
+  - Custom invoice templates
+  - Bulk invoice operations
   - API access
 
 - **Enterprise Plan ($249/month)**
   - Everything in Professional
   - Custom integrations
   - Dedicated support
+  - White-label invoices
+  - Advanced invoice analytics
+  - Custom invoice workflows
   - White-label reports
   - Advanced team management
   - Calendar integration
@@ -124,6 +142,7 @@ NauticEdge offers both light and dark themes to enhance user experience:
   - PostgreSQL database
   - Row Level Security (RLS)
   - Real-time subscriptions
+  - PDF generation
   - Storage for profile photos
   - Database functions and triggers
   - Subscription management
@@ -139,6 +158,7 @@ NauticEdge offers both light and dark themes to enhance user experience:
   - Row Level Security (RLS)
   - Real-time subscriptions
   - Storage for profile photos
+  - Invoice management
   - Database functions and triggers
 
 ### Authentication & Security
@@ -195,6 +215,7 @@ npm run dev
    - User management
    - Authentication
    - Subscription plans
+  - Invoice management
    - Session tracking
    - Storage configuration
 3. Enable required extensions:
@@ -224,6 +245,10 @@ nauticedge/
 │   │   │   ├── Calendar.tsx
 │   │   │   ├── Schedule.tsx
 │   │   │   └── UpcomingAppointments.tsx
+│   │   ├── invoice/       # Invoice components
+│   │   │   ├── InvoiceList.tsx
+│   │   │   ├── InvoiceBuilder.tsx
+│   │   │   └── CreateInvoiceModal.tsx
 │   │   ├── profile/       # Profile management
 │   │   ├── billing/       # Subscription management
 │   │   ├── sections/      # Landing page sections
@@ -323,6 +348,25 @@ nauticedge/
   - Secure card storage
   - Payment verification
 
+### Invoice System
+- Dark theme support
+- Professional invoice builder
+  - Company logo upload
+  - Client information
+  - Multiple line items
+  - Tax calculation
+  - Automatic totals
+- PDF generation
+  - Professional layout
+  - Automatic calculations
+  - Company branding
+  - Payment terms
+- Invoice management
+  - Status tracking
+  - Email notifications
+  - Payment tracking
+  - Search and filtering
+
 ### Security Implementation
 
 #### Two-Factor Authentication
@@ -375,6 +419,16 @@ users_metadata (
   email text,
   full_name text,
   company_name text
+);
+
+-- Invoice related tables
+invoices (
+  id uuid PRIMARY KEY,
+  user_id uuid REFERENCES auth.users,
+  invoice_number text,
+  client_name text,
+  amount numeric,
+  status text
 );
 
 -- Appointment tables

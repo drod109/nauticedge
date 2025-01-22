@@ -16,6 +16,8 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Registration from './pages/Registration';
 import Schedule from './pages/Schedule';
+import Invoices from './pages/Invoices';
+import InvoiceBuilder from './pages/InvoiceBuilder';
 import { initializeTheme } from './lib/theme';
 
 function App() {
@@ -60,6 +62,14 @@ function App() {
   
   if (path === '/schedule') {
     return <Schedule />;
+  }
+  
+  if (path === '/invoices') {
+    return <Invoices />;
+  }
+  
+  if (path === '/invoices/new') {
+    return <InvoiceBuilder />;
   }
 
   return (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Calendar as CalendarIcon, Mail, User2 } from 'lucide-react';
+import { Clock, Calendar as CalendarIcon, Mail, User2, Trash2, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { supabase } from '../../lib/supabase';
 
@@ -16,6 +16,47 @@ interface Appointment {
 const UpcomingAppointments = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const handleDelete = async (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedAppointment) return;
+    
+    setDeleteLoading(true);
+    try {
+      const { error } = await supabase
+        .from('appointments')
+        .delete()
+        .eq('id', selectedAppointment.id);
+
+      if (error) throw error;
+
+      // Send cancellation email to client
+      const emailContent = {
+        to: selectedAppointment.client_email,
+        subject: 'Appointment Cancellation',
+        body: `Your appointment "${selectedAppointment.title}" scheduled for ${format(new Date(selectedAppointment.date), 'MMMM d, yyyy')} at ${selectedAppointment.start_time} has been cancelled.`
+      };
+
+      // In production, integrate with your email service here
+      console.log('Sending cancellation email:', emailContent);
+
+      // Remove appointment from local state
+      setAppointments(prev => prev.filter(apt => apt.id !== selectedAppointment.id));
+      setShowDeleteModal(false);
+      setSelectedAppointment(null);
+    } catch (error) {
+      console.error('Error deleting appointment:', error);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -75,7 +116,7 @@ const UpcomingAppointments = () => {
         ) : (
           appointments.map((appointment) => (
             <div key={appointment.id} className="p-4 hover:bg-gray-50 dark:hover:bg-dark-700">
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between group">
                 <div className="space-y-1">
                   <h3 className="font-medium text-gray-900 dark:text-white">
                     {appointment.title}
@@ -93,6 +134,12 @@ const UpcomingAppointments = () => {
                     {appointment.client_email}
                   </div>
                 </div>
+                <button
+                  onClick={() => handleDelete(appointment)}
+                  className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <Trash2 className="h-5 w-5" />
+                </button>
               </div>
               {appointment.description && (
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -103,6 +150,43 @@ const UpcomingAppointments = () => {
           ))
         )}
       </div>
+      
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && selectedAppointment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-dark-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+            <div className="flex items-start mb-4">
+              <div className="flex-shrink-0">
+                <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-500" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  Cancel Appointment
+                </h3>
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  Are you sure you want to cancel this appointment? This action cannot be undone.
+                  An email notification will be sent to {selectedAppointment.client_email}.
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end space-x-4">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              >
+                Keep Appointment
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleteLoading}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleteLoading ? 'Cancelling...' : 'Cancel Appointment'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

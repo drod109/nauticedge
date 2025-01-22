@@ -6,6 +6,7 @@ import {
   Settings, 
   BarChart,
   CalendarDays,
+  Receipt,
   LogOut,
   Ship,
   ChevronLeft,
@@ -18,6 +19,7 @@ const SIDEBAR_STATE_KEY = 'nauticedge_sidebar_collapsed';
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
   { icon: FileText, label: 'Surveys', href: '/dashboard/surveys' },
+  { icon: Receipt, label: 'Invoices', href: '/invoices' },
   { icon: CalendarDays, label: 'Schedule', href: '/schedule' },
   { icon: Users, label: 'Clients', href: '/dashboard/clients' },
   { icon: BarChart, label: 'Analytics', href: '/dashboard/analytics' },

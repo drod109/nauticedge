@@ -182,9 +182,34 @@ const LoginForm = () => {
     }
   };
 
-  const handleGoogleLogin = () => {
-    // TODO: Implement Google authentication
-    window.location.href = '/dashboard';
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent'
+          }
+        }
+      });
+
+      if (error) throw error;
+      
+      // Let ProtectedRoute handle the redirection
+      if (data) {
+        window.location.href = '/dashboard';
+      }
+    } catch (err) {
+      console.error('Google login error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to sign in with Google');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAppleLogin = async () => {
@@ -302,6 +327,7 @@ const LoginForm = () => {
 
         <button
           onClick={handleGoogleLogin}
+          disabled={loading}
           className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg shadow-sm bg-white dark:bg-dark-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors"
         >
           <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
