@@ -7,15 +7,29 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
+  const [needsRegistration, setNeedsRegistration] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
-        if (!session) {
+        if (!session?.user) {
           // Redirect to login if no session exists
           window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+          return;
+        }
+
+        // Check if user has completed registration
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('company_name')
+          .eq('id', session.user.id)
+          .single();
+
+        // If no company name is set and not already on registration page
+        if (!profile?.company_name && window.location.pathname !== '/registration') {
+          window.location.href = '/registration';
           return;
         }
         

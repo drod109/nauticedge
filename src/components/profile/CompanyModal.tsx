@@ -32,8 +32,8 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-dark-800 rounded-xl shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-white dark:bg-dark-800 rounded-xl shadow-xl max-w-3xl w-full my-8">
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-dark-700">
           <div className="flex items-center space-x-2">
             <Building2 className="h-6 w-6 text-gray-400 dark:text-gray-500" />
@@ -47,7 +47,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-8rem)]">
+        <div className="p-6">
           <div className="space-y-6">
             {/* Basic Information */}
             <div>

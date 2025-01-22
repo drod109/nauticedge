@@ -77,7 +77,7 @@ const Sidebar = () => {
     {/* Mobile Menu Button */}
     <button
       onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-      className="fixed top-4 left-4 p-2 rounded-lg bg-white dark:bg-dark-800 shadow-lg border border-gray-200 dark:border-dark-700 md:hidden z-30"
+      className="fixed top-2 left-4 p-2 rounded-lg bg-white dark:bg-dark-800 shadow-lg border border-gray-200 dark:border-dark-700 md:hidden z-30"
     >
       <Menu className="h-6 w-6 text-gray-600 dark:text-gray-400" />
     </button>
@@ -128,7 +128,7 @@ const Sidebar = () => {
         </ul>
       </nav>
       
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-200 dark:border-dark-700 mt-auto">
         <button className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-4 py-2.5 w-full rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-dark-700 hover:text-red-600 dark:hover:text-red-500 transition-colors`}>
           <LogOut className="h-5 w-5 shrink-0" />
           {!isCollapsed && <span>Logout</span>}

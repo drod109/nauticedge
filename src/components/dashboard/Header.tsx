@@ -25,15 +25,16 @@ const Header: React.FC<HeaderProps> = ({ theme, onThemeChange }) => {
       if (user) {
         setUserId(user.id);
 
-        const { data: metadata } = await supabase
-          .from('users_metadata')
-          .select('full_name, photo_url')
-          .eq('user_id', user.id)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name, avatar_url')
+          .eq('id', user.id)
           .single();
 
         setUserData({
           ...user,
-          ...metadata
+          ...profile,
+          photo_url: profile?.avatar_url
         });
       }
     } catch (error) {
@@ -62,9 +63,9 @@ const Header: React.FC<HeaderProps> = ({ theme, onThemeChange }) => {
           'postgres_changes',
           {
             event: 'UPDATE',
-            schema: 'public',
-            table: 'users_metadata',
-            filter: `user_id=eq.${userId}` 
+            schema: 'public', 
+            table: 'profiles',
+            filter: `id=eq.${userId}`
           },
           () => {
             fetchUserData();
@@ -95,7 +96,7 @@ const Header: React.FC<HeaderProps> = ({ theme, onThemeChange }) => {
   return (
     <header className="h-16 bg-white dark:bg-dark-800 border-b border-gray-200 dark:border-dark-700 flex items-center justify-between px-6 transition-colors">
       <div className="flex items-center flex-1">
-        <div className="relative max-w-md w-full">
+        <div className="relative max-w-md w-full hidden md:block">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
           <input
             type="text"

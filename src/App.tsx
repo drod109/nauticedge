@@ -14,6 +14,7 @@ import Settings from './pages/Settings';
 import SignUp from './pages/SignUp';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Registration from './pages/Registration';
 import { initializeTheme } from './lib/theme';
 
 function App() {
@@ -50,6 +51,10 @@ function App() {
 
   if (path === '/contact') {
     return <Contact />;
+  }
+  
+  if (path === '/registration') {
+    return <Registration />;
   }
 
   return (

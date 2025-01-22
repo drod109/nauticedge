@@ -154,13 +154,10 @@ const Profile = () => {
   const handleEditSubmit = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.id) {
-        throw new Error('User ID not found');
-      }
+      if (!user) throw new Error('User not authenticated');
 
-      // Update user metadata
       const { error: updateError } = await supabase
-        .from('users_metadata')
+        .from('profiles')
         .update({
           first_name: editForm.first_name,
           last_name: editForm.last_name,
@@ -169,7 +166,7 @@ const Profile = () => {
           location: editForm.location,
           updated_at: new Date().toISOString()
         })
-        .eq('user_id', user.id);
+        .eq('id', user.id);
 
       if (updateError) throw updateError;
 
@@ -251,36 +248,37 @@ const Profile = () => {
   const fetchUserData = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (user) {
-        const { data: metadata } = await supabase
-          .from('users_metadata')
+        const { data: profile } = await supabase
+          .from('profiles')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('id', user.id)
           .single();
 
         setUserData({
           ...user,
-          ...metadata,
-          email: user.email
+          ...profile,
+          email: user.email,
+          photo_url: profile?.avatar_url
         });
         
         setEditForm({
           email: user.email,
           first_name: metadata?.first_name || '',
           last_name: metadata?.last_name || '',
-          phone: metadata?.phone || '',
-          location: metadata?.location || '',
-          company_name: metadata?.company_name || '',
-          company_position: metadata?.company_position || '',
-          registration_number: metadata?.registration_number || '',
-          tax_id: metadata?.tax_id || '',
-          company_address_line1: metadata?.company_address_line1 || '',
-          company_address_line2: metadata?.company_address_line2 || '',
-          company_city: metadata?.company_city || '',
-          company_state: metadata?.company_state || '',
-          company_postal_code: metadata?.company_postal_code || '',
-          company_country: metadata?.company_country || ''
+          phone: profile?.phone || '',
+          location: profile?.location || '',
+          company_name: profile?.company_name || '',
+          company_position: profile?.company_position || '',
+          registration_number: profile?.registration_number || '',
+          tax_id: profile?.tax_id || '',
+          company_address_line1: profile?.company_address_line1 || '',
+          company_address_line2: profile?.company_address_line2 || '',
+          company_city: profile?.company_city || '',
+          company_state: profile?.company_state || '',
+          company_postal_code: profile?.company_postal_code || '',
+          company_country: profile?.company_country || ''
         });
       }
     } catch (err) {
