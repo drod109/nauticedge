@@ -47,15 +47,6 @@ const LoginForm = () => {
       let lastError = null;
       let locationInfo;
 
-      // Check if user has completed registration
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('company_name')
-        .single();
-
-      // If no company name is set, user hasn't completed registration
-      const needsRegistration = !profile?.company_name;
-      
       try {
         locationInfo = await getLocationInfo();
       } catch (err) {
@@ -115,13 +106,8 @@ const LoginForm = () => {
               throw sessionError;
             }
 
-            // Redirect based on registration status
-            if (needsRegistration) {
-              // New user - redirect to registration
-              window.location.href = '/registration';
-            } else {
-              window.location.href = '/dashboard';
-            }
+            // Let ProtectedRoute handle the redirection
+            window.location.href = '/dashboard';
             return;
           }
           throw new Error('No user data returned');

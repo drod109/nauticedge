@@ -15,6 +15,15 @@ NauticEdge offers both light and dark themes to enhance user experience:
 
 ## Features
 
+### Registration Flow
+- **Multi-step Registration**
+  - Plan selection
+  - Payment information
+  - Company details
+- **Automatic Redirection**
+  - New users directed to registration after first login
+  - Existing users redirected to dashboard
+
 ### Core Features
 - **Digital Survey Tools**
   - Mobile-first survey capabilities
@@ -59,6 +68,7 @@ NauticEdge offers both light and dark themes to enhance user experience:
 ### Security Features
 - **Enhanced Authentication**
   - Email/password authentication
+  - First-time user registration flow
   - Two-factor authentication (2FA)
     - TOTP-based authentication
     - QR code setup
@@ -74,11 +84,16 @@ NauticEdge offers both light and dark themes to enhance user experience:
 - **Profile Management**
   - Profile photo upload
   - Company information
+    - Comprehensive company details
+    - Registration and tax information
+    - Address management
   - Personal details
   - Location detection
 
 - **Billing & Payments**
   - Multiple subscription tiers
+    - Plan selection during registration
+    - Seamless plan upgrades/downgrades
   - Secure payment processing
   - Invoice management
   - Payment history
@@ -89,6 +104,7 @@ NauticEdge offers both light and dark themes to enhance user experience:
 ### Frontend
 - React 18 with TypeScript
 - Tailwind CSS for styling
+  - Responsive multi-step forms
   - Dark mode support with custom color palette
   - Responsive design for all screen sizes
 - Lucide Icons
@@ -119,6 +135,7 @@ NauticEdge offers both light and dark themes to enhance user experience:
 ### Authentication & Security
 - Supabase Auth
 - Multi-factor authentication (TOTP)
+  - Registration flow security
   - Dark theme support for all auth flows
   - Responsive design for mobile devices
 - Session management
@@ -190,6 +207,9 @@ nauticedge/
 ├── src/
 │   ├── components/
 │   │   ├── auth/          # Authentication components
+│   │   │   ├── LoginForm.tsx
+│   │   │   ├── SignUpForm.tsx
+│   │   │   └── ProtectedRoute.tsx
 │   │   ├── dashboard/     # Dashboard components
 │   │   ├── profile/       # Profile management
 │   │   ├── billing/       # Subscription management
@@ -209,6 +229,16 @@ nauticedge/
 ```
 
 ## Key Features Implementation
+
+### Registration System
+- Multi-step registration process
+  - Plan selection interface
+  - Secure payment information collection
+  - Company details form
+- Automatic flow detection
+  - New user detection
+  - Registration requirement checks
+- Data validation and persistence
 
 ### Authentication System
 - Dark theme support for all auth flows

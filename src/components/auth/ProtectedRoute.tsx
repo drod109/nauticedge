@@ -7,7 +7,6 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
-  const [needsRegistration, setNeedsRegistration] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -24,7 +23,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         const { data: profile } = await supabase
           .from('profiles')
           .select('company_name')
-          .eq('id', session.user.id)
+          .eq('id', session?.user.id)
           .single();
 
         // If no company name is set and not already on registration page

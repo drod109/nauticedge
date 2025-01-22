@@ -56,9 +56,9 @@ const SignUpForm = () => {
           if (data.user.identities?.length === 0) {
             throw new Error('This email is already registered. Please sign in instead.');
           }
-          
-          // Success - redirect to registration
-          window.location.href = '/registration';
+
+          // Success - redirect to login
+          window.location.href = '/login';
           return;
         } catch (err) {
           lastError = err;
