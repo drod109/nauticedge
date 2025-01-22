@@ -15,6 +15,7 @@ import SignUp from './pages/SignUp';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Registration from './pages/Registration';
+import Schedule from './pages/Schedule';
 import { initializeTheme } from './lib/theme';
 
 function App() {
@@ -55,6 +56,10 @@ function App() {
   
   if (path === '/registration') {
     return <Registration />;
+  }
+  
+  if (path === '/schedule') {
+    return <Schedule />;
   }
 
   return (

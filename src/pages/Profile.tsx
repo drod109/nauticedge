@@ -78,7 +78,8 @@ const Profile = () => {
   const handlePhotoUpdate = (url: string) => {
     setUserData(prev => ({
       ...prev,
-      photo_url: url
+      photo_url: url,
+      avatar_url: url // Keep both fields in sync
     }));
   };
 
@@ -260,7 +261,7 @@ const Profile = () => {
           ...user,
           ...profile,
           email: user.email,
-          photo_url: profile?.avatar_url
+          photo_url: profile?.avatar_url || null
         });
         
         setEditForm({

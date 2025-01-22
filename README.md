@@ -32,6 +32,14 @@ NauticEdge offers both light and dark themes to enhance user experience:
   - Real-time updates and sync
   - Premium features for Professional and Enterprise plans
 
+- **Appointment Scheduling**
+  - Interactive calendar interface
+  - Real-time availability management
+  - Client appointment booking
+  - Location tracking for appointments
+  - Email notifications
+  - Upcoming appointments overview
+
 - **Client Management**
   - Client profiles and history
   - Document storage
@@ -64,6 +72,7 @@ NauticEdge offers both light and dark themes to enhance user experience:
   - Dedicated support
   - White-label reports
   - Advanced team management
+  - Calendar integration
 
 ### Security Features
 - **Enhanced Authentication**
@@ -211,6 +220,10 @@ nauticedge/
 │   │   │   ├── SignUpForm.tsx
 │   │   │   └── ProtectedRoute.tsx
 │   │   ├── dashboard/     # Dashboard components
+│   │   ├── schedule/      # Scheduling components
+│   │   │   ├── Calendar.tsx
+│   │   │   ├── Schedule.tsx
+│   │   │   └── UpcomingAppointments.tsx
 │   │   ├── profile/       # Profile management
 │   │   ├── billing/       # Subscription management
 │   │   ├── sections/      # Landing page sections
@@ -364,6 +377,24 @@ users_metadata (
   company_name text
 );
 
+-- Appointment tables
+appointments (
+  id uuid PRIMARY KEY,
+  user_id uuid REFERENCES auth.users,
+  title text,
+  date date,
+  start_time time,
+  end_time time,
+  client_email text,
+  address_line1 text,
+  address_line2 text,
+  city text,
+  state text,
+  postal_code text,
+  country text,
+  description text
+);
+
 -- Authentication tables
 user_mfa (
   id uuid PRIMARY KEY,
@@ -411,6 +442,8 @@ subscriptions (
   - Location tracking
   - Concurrent session management
   - Automatic session cleanup
+  - Appointment validation
+  - Schedule conflict prevention
 - Regular security audits
 - Compliance with maritime industry standards
 - Automated backup systems
@@ -425,6 +458,7 @@ NauticEdge is committed to accessibility:
 - WCAG 2.1 compliant
 - High contrast in both light and dark themes
 - Keyboard navigation support
+- Accessible calendar interface
 - Screen reader friendly
 - Responsive design for all devices
 

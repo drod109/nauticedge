@@ -46,14 +46,15 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
         .from('profile-photos')
         .getPublicUrl(fileName);
 
-      // Update user metadata with new photo URL
+      // Update user profile with new photo URL
       const { error: updateError } = await supabase
-        .from('users_metadata')
+        .from('profiles')
         .update({ 
-          photo_url: publicUrl,
+          avatar_url: publicUrl,
           updated_at: new Date().toISOString()
         })
-        .eq('user_id', userId);
+        .eq('id', userId)
+        .single();
 
       if (updateError) throw updateError;
 

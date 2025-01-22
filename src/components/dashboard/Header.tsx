@@ -34,7 +34,8 @@ const Header: React.FC<HeaderProps> = ({ theme, onThemeChange }) => {
         setUserData({
           ...user,
           ...profile,
-          photo_url: profile?.avatar_url
+          photo_url: profile?.avatar_url || null,
+          full_name: profile?.full_name || ''
         });
       }
     } catch (error) {
@@ -53,12 +54,12 @@ const Header: React.FC<HeaderProps> = ({ theme, onThemeChange }) => {
 
     document.addEventListener('mousedown', handleClickOutside);
     
-    // Subscribe to realtime changes for user metadata
+    // Subscribe to realtime changes for user profile
     const setupSubscription = () => {
       if (!userId) return;
 
       subscriptionRef.current = supabase
-        .channel('user_metadata_changes')
+        .channel('profile_changes')
         .on(
           'postgres_changes',
           {
@@ -67,7 +68,13 @@ const Header: React.FC<HeaderProps> = ({ theme, onThemeChange }) => {
             table: 'profiles',
             filter: `id=eq.${userId}`
           },
-          () => {
+          (payload) => {
+            // Update local state immediately when profile changes
+            setUserData(prev => ({
+              ...prev,
+              photo_url: payload.new.avatar_url || null,
+              full_name: payload.new.full_name || ''
+            }));
             fetchUserData();
           }
         )
