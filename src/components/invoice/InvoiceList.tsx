@@ -51,7 +51,7 @@ const InvoiceList = () => {
     try {
       setDownloadingId(invoice.id);
       
-      // Get full invoice details including items
+      // Get full invoice details including items and company info
       const { data: invoiceDetails, error } = await supabase
         .from('invoices')
         .select('*')
@@ -60,6 +60,27 @@ const InvoiceList = () => {
 
       if (error) throw error;
 
+      // Get user's company info if not included in invoice
+      if (!invoiceDetails.company_info) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', invoiceDetails.user_id)
+          .single();
+
+        if (profile) {
+          invoiceDetails.company_info = {
+            name: profile.company_name || '',
+            address_line1: profile.company_address_line1 || '',
+            address_line2: profile.company_address_line2 || '',
+            city: profile.company_city || '',
+            state: profile.company_state || '',
+            postal_code: profile.company_postal_code || '',
+            country: profile.company_country || '',
+            tax_id: profile.tax_id || ''
+          };
+        }
+      }
       // Generate and download PDF
       await generateInvoicePDF(invoiceDetails);
     } catch (error) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Upload } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -16,10 +16,32 @@ interface InvoiceBuilderProps {
 }
 
 const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => {
+  const [userData, setUserData] = useState<any>(null);
   const [logo, setLogo] = useState<string | null>(null);
   const [items, setItems] = useState<InvoiceItem[]>([
     { description: '', quantity: 1, rate: 0, tax: 0, amount: 0 }
   ]);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        setUserData(profile);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
   const [formData, setFormData] = useState({
     invoiceTo: '',
     phone: '',
@@ -113,26 +135,50 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const invoiceData = {
-        user_id: user.id,
-        logo_url: logo,
-        invoice_to: formData.invoiceTo,
-        phone: formData.phone,
-        email: formData.email,
-        address: formData.address,
-        invoice_number: formData.invoiceNumber,
-        invoice_date: formData.invoiceDate,
-        due_date: formData.dueDate,
-        items,
-        subtotal: calculateSubtotal(),
-        tax_total: calculateTotalTax(),
-        total: calculateTotal(),
-        status: 'draft'
+      // Get company info for PDF generation
+      const companyInfo = {
+        name: userData?.company_name || '',
+        address_line1: userData?.company_address_line1 || '',
+        address_line2: userData?.company_address_line2 || '',
+        city: userData?.company_city || '',
+        state: userData?.company_state || '',
+        postal_code: userData?.company_postal_code || '',
+        country: userData?.company_country || '',
+        tax_id: userData?.tax_id || ''
       };
+      // Validate required fields
+      if (!formData.invoiceTo || !formData.email || !formData.dueDate) {
+        throw new Error('Please fill in all required fields');
+      }
 
-      onSave(invoiceData);
+      // Insert invoice into database
+      const { error } = await supabase
+        .from('invoices')
+        .insert([{
+          user_id: user.id,
+          invoice_number: formData.invoiceNumber,
+          client_name: formData.invoiceTo,
+          client_email: formData.email,
+          client_phone: formData.phone,
+          client_address: formData.address,
+          amount: calculateTotal(),
+          issue_date: formData.invoiceDate,
+          due_date: formData.dueDate,
+          items: items,
+          company_info: companyInfo,
+          logo_url: logo,
+          notes: '',
+          status: 'draft'
+        }]);
+
+      if (error) throw error;
+
+      // Redirect to invoices list after successful save
+      window.location.href = '/invoices';
+
     } catch (error) {
       console.error('Error creating invoice:', error);
+      alert('Failed to save invoice. Please try again.');
     }
   };
 
@@ -167,7 +213,21 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
       {/* Client & Invoice Info */}
       <div className="grid grid-cols-2 gap-8 mb-8">
         <div>
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Invoice To:</h2>
+          <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">From:</h2>
+          <div className="space-y-4 mb-8">
+            <div className="text-gray-600 dark:text-gray-400">
+              <p className="font-medium">{userData?.company_name || 'Company Name Not Set'}</p>
+              <p>{userData?.company_address_line1 || 'Address Not Set'}</p>
+              {userData?.company_address_line2 && <p>{userData?.company_address_line2}</p>}
+              <p>
+                {userData?.company_city || 'City Not Set'}, {userData?.company_state || 'State Not Set'} {userData?.company_postal_code || 'Postal Code Not Set'}
+              </p>
+              <p>{userData?.company_country || 'Country Not Set'}</p>
+              <p>Tax ID: {userData?.tax_id || 'Not Set'}</p>
+            </div>
+          </div>
+          
+          <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Bill To:</h2>
           <div className="space-y-4">
             <input
               type="text"
@@ -201,7 +261,8 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
         </div>
         <div>
           <div className="space-y-4">
-            <div>
+            <div className="flex items-center space-x-4">
+              <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Invoice No.
               </label>
@@ -211,8 +272,10 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
                 onChange={(e) => setFormData(prev => ({ ...prev, invoiceNumber: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
+              </div>
             </div>
-            <div>
+            <div className="flex items-center space-x-4">
+              <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Invoice Date
               </label>
@@ -222,17 +285,18 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
                 onChange={(e) => setFormData(prev => ({ ...prev, invoiceDate: e.target.value }))}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Due Date
-              </label>
-              <input
-                type="date"
-                value={formData.dueDate}
-                onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Due Date
+                </label>
+                <input
+                  type="date"
+                  value={formData.dueDate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
             </div>
           </div>
         </div>

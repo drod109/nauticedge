@@ -50,6 +50,25 @@ NauticEdge offers both light and dark themes to enhance user experience:
   - Location tracking for appointments
   - Email notifications
   - Upcoming appointments overview
+  
+- **Invoice Management**
+  - Professional invoice builder
+  - Customizable invoice templates
+  - PDF generation and download
+  - Client information management
+  - Tax calculation
+  - Multiple items per invoice
+  - Invoice status tracking
+  - Email notifications
+  - Payment tracking
+
+- **Appointment Scheduling**
+  - Interactive calendar interface
+  - Real-time availability management
+  - Client appointment booking
+  - Location tracking for appointments
+  - Email notifications
+  - Upcoming appointments overview
 
 - **Client Management**
   - Client profiles and history
@@ -70,12 +89,16 @@ NauticEdge offers both light and dark themes to enhance user experience:
   - Basic reporting
   - Standard support
   - Basic invoice features
+  - Basic invoice features
 
 - **Professional Plan ($99/month)**
   - Everything in Basic
   - Advanced analytics
   - AI-powered analysis
   - Priority support
+  - Unlimited invoices
+  - Custom invoice templates
+  - Bulk invoice operations
   - Unlimited invoices
   - Custom invoice templates
   - Bulk invoice operations
@@ -88,8 +111,12 @@ NauticEdge offers both light and dark themes to enhance user experience:
   - White-label invoices
   - Advanced invoice analytics
   - Custom invoice workflows
+  - White-label invoices
+  - Advanced invoice analytics
+  - Custom invoice workflows
   - White-label reports
   - Advanced team management
+  - Calendar integration
   - Calendar integration
 
 ### Security Features
@@ -245,6 +272,10 @@ nauticedge/
 │   │   │   ├── Calendar.tsx
 │   │   │   ├── Schedule.tsx
 │   │   │   └── UpcomingAppointments.tsx
+│   │   ├── invoice/       # Invoice components
+│   │   │   ├── InvoiceList.tsx
+│   │   │   ├── InvoiceBuilder.tsx
+│   │   │   └── CreateInvoiceModal.tsx
 │   │   ├── invoice/       # Invoice components
 │   │   │   ├── InvoiceList.tsx
 │   │   │   ├── InvoiceBuilder.tsx
@@ -448,6 +479,33 @@ appointments (
   country text,
   description text
 );
+-- Invoice related tables
+invoices (
+  id uuid PRIMARY KEY,
+  user_id uuid REFERENCES auth.users,
+  invoice_number text,
+  client_name text,
+  amount numeric,
+  status text
+);
+
+-- Appointment tables
+appointments (
+  id uuid PRIMARY KEY,
+  user_id uuid REFERENCES auth.users,
+  title text,
+  date date,
+  start_time time,
+  end_time time,
+  client_email text,
+  address_line1 text,
+  address_line2 text,
+  city text,
+  state text,
+  postal_code text,
+  country text,
+  description text
+);
 
 -- Authentication tables
 user_mfa (
@@ -496,6 +554,8 @@ subscriptions (
   - Location tracking
   - Concurrent session management
   - Automatic session cleanup
+  - Appointment validation
+  - Schedule conflict prevention
   - Appointment validation
   - Schedule conflict prevention
 - Regular security audits

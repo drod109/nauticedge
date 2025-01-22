@@ -14,40 +14,95 @@ interface Invoice {
   invoice_number: string;
   client_name: string;
   client_email: string;
+ client_phone?: string;
+ client_address?: string;
   issue_date: string;
   due_date: string;
   items: InvoiceItem[];
   notes?: string;
   amount: number;
+  logo_url?: string;
+ company_info?: {
+   name: string;
+   address_line1: string;
+   address_line2?: string;
+   city: string;
+   state: string;
+   postal_code: string;
+   country: string;
+   tax_id: string;
+ };
 }
 
 export const generateInvoicePDF = async (invoice: Invoice) => {
+  // Create new PDF document with company branding
   // Create new PDF document
   const doc = new jsPDF();
   
   // Set font
   doc.setFont('helvetica');
   
-  // Add company logo/header
+  // Add logo if available
+  if (invoice.logo_url) {
+    try {
+      const img = new Image();
+      img.src = invoice.logo_url;
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+      doc.addImage(img, 'PNG', 20, 20, 40, 40, undefined, 'FAST');
+    } catch (error) {
+      console.error('Error loading logo:', error);
+    }
+  }
+  
+  // Add INVOICE header
   doc.setFontSize(24);
   doc.setTextColor(44, 62, 80);
-  doc.text('INVOICE', 20, 20);
+  doc.text('INVOICE', 170, 30, { align: 'right' });
+
+  // Add company information if available
+  if (invoice.company_info) {
+    doc.setFontSize(12);
+    doc.setTextColor(52, 73, 94);
+    const startY = invoice.logo_url ? 70 : 40;
+    doc.text('From:', 20, startY);
+    doc.text(invoice.company_info.name, 20, startY + 7);
+    doc.setFontSize(10);
+    doc.text(invoice.company_info.address_line1, 20, startY + 13);
+    if (invoice.company_info.address_line2) {
+      doc.text(invoice.company_info.address_line2, 20, startY + 18);
+    }
+    doc.text(`${invoice.company_info.city}, ${invoice.company_info.state} ${invoice.company_info.postal_code}`, 20, startY + 23);
+    doc.text(invoice.company_info.country, 20, startY + 28);
+    doc.text(`Tax ID: ${invoice.company_info.tax_id}`, 20, startY + 33);
+  }
   
-  // Add invoice details
+  // Add invoice details on the right
   doc.setFontSize(10);
   doc.setTextColor(52, 73, 94);
   
-  // Invoice number and dates
-  doc.text(`Invoice Number: ${invoice.invoice_number}`, 20, 40);
-  doc.text(`Issue Date: ${format(new Date(invoice.issue_date), 'MMM dd, yyyy')}`, 20, 45);
-  doc.text(`Due Date: ${format(new Date(invoice.due_date), 'MMM dd, yyyy')}`, 20, 50);
+  const rightColumnX = 120;
+  doc.text(`Invoice No: ${invoice.invoice_number}`, rightColumnX, 40);
+  doc.text(`Invoice Date: ${format(new Date(invoice.issue_date), 'MMM dd, yyyy')}`, rightColumnX, 45);
+  doc.text(`Due Date: ${format(new Date(invoice.due_date), 'MMM dd, yyyy')}`, rightColumnX, 50);
   
   // Client information
-  doc.text('Bill To:', 20, 65);
+  doc.text('Bill To:', 20, 90);
   doc.setFontSize(12);
-  doc.text(invoice.client_name, 20, 72);
+  doc.text(invoice.client_name, 20, 97);
   doc.setFontSize(10);
-  doc.text(invoice.client_email, 20, 78);
+  doc.text(invoice.client_email, 20, 103);
+  if (invoice.client_phone) {
+    doc.text(invoice.client_phone, 20, 108);
+  }
+  if (invoice.client_address) {
+    const addressLines = doc.splitTextToSize(invoice.client_address, 80);
+    addressLines.forEach((line: string, index: number) => {
+      doc.text(line, 20, 113 + (index * 5));
+    });
+  }
   
   // Items table
   const tableColumn = ['Description', 'Qty', 'Rate', 'Tax %', 'Amount'];
@@ -61,7 +116,7 @@ export const generateInvoicePDF = async (invoice: Invoice) => {
   
   // Add items table
   (doc as any).autoTable({
-    startY: 90,
+    startY: 130,
     head: [tableColumn],
     body: tableRows,
     theme: 'grid',

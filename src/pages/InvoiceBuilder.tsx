@@ -13,16 +13,6 @@ const InvoiceBuilderPage = () => {
     setCurrentTheme(newTheme);
   };
 
-  const handleSave = async (invoiceData: any) => {
-    try {
-      // Save invoice and redirect to invoices list
-      console.log('Saving invoice:', invoiceData);
-      window.location.href = '/invoices';
-    } catch (error) {
-      console.error('Error saving invoice:', error);
-    }
-  };
-
   const handleCancel = () => {
     // Redirect back to invoices list
     window.location.href = '/invoices';
@@ -35,7 +25,7 @@ const InvoiceBuilderPage = () => {
         <div className="flex-1 flex flex-col overflow-hidden">
           <Header theme={theme} onThemeChange={handleThemeChange} />
           <main className="flex-1 overflow-y-auto p-6">
-            <InvoiceBuilder onSave={handleSave} onCancel={handleCancel} />
+            <InvoiceBuilder onCancel={handleCancel} />
           </main>
         </div>
       </div>
