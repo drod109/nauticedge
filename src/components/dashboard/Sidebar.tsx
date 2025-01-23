@@ -87,7 +87,7 @@ const Sidebar = () => {
     {/* Sidebar */}
     <div
       ref={sidebarRef}
-      className={`fixed md:relative h-screen bg-white dark:bg-dark-800 border-r border-gray-200 dark:border-dark-700 flex flex-col transition-all duration-300 z-20
+      className={`fixed md:relative h-screen glass-effect border-r border-gray-200 dark:border-dark-700 flex flex-col transition-all duration-300 z-20
         ${isCollapsed ? 'w-16' : 'w-64'}
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
     >
@@ -119,10 +119,10 @@ const Sidebar = () => {
             <li key={item.label}>
               <a
                 href={item.href}
-                className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-4 py-2.5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-dark-700 hover:text-blue-600 dark:hover:text-blue-500 transition-colors`}
+                className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-4 py-2.5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-50/80 dark:hover:bg-dark-700/80 hover:text-blue-600 dark:hover:text-blue-500 transition-all duration-200 group`}
                 title={isCollapsed ? item.label : ''}
               >
-                <item.icon className="h-5 w-5 shrink-0" />
+                <item.icon className="h-5 w-5 shrink-0 transition-transform group-hover:scale-110" />
                 {!isCollapsed && <span>{item.label}</span>}
               </a>
             </li>

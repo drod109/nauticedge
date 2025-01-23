@@ -249,7 +249,6 @@ const Profile = () => {
   const fetchUserData = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -257,17 +256,29 @@ const Profile = () => {
           .eq('id', user.id)
           .single();
 
+        // Update userData state with all profile data
         setUserData({
           ...user,
           ...profile,
           email: user.email,
-          photo_url: profile?.avatar_url || null
+          photo_url: profile?.avatar_url || null,
+          company_name: profile?.company_name || '',
+          company_position: profile?.company_position || '',
+          registration_number: profile?.registration_number || '',
+          tax_id: profile?.tax_id || '',
+          company_address_line1: profile?.company_address_line1 || '',
+          company_address_line2: profile?.company_address_line2 || '',
+          company_city: profile?.company_city || '',
+          company_state: profile?.company_state || '',
+          company_postal_code: profile?.company_postal_code || '',
+          company_country: profile?.company_country || ''
         });
         
+        // Update editForm state with all profile data
         setEditForm({
           email: user.email,
-          first_name: metadata?.first_name || '',
-          last_name: metadata?.last_name || '',
+          first_name: profile?.first_name || '',
+          last_name: profile?.last_name || '',
           phone: profile?.phone || '',
           location: profile?.location || '',
           company_name: profile?.company_name || '',

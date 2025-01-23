@@ -127,15 +127,15 @@ const DashboardContent = () => {
       )}
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-in">
         <div className="bg-white dark:bg-dark-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-dark-700">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Active Surveys</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">18</p>
+              <p className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-400">18</p>
             </div>
-            <div className="h-12 w-12 bg-purple-50 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
-              <ClipboardList className="h-6 w-6 text-purple-600 dark:text-purple-500" />
+            <div className="h-12 w-12 bg-gradient-to-br from-purple-100 to-purple-50 dark:from-purple-900/30 dark:to-purple-900/10 rounded-lg flex items-center justify-center transform transition-transform hover:scale-110">
+              <ClipboardList className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
           </div>
         </div>
@@ -144,10 +144,10 @@ const DashboardContent = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Pending Surveys</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">24</p>
+              <p className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-400">24</p>
             </div>
-            <div className="h-12 w-12 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-              <Clock className="h-6 w-6 text-blue-600 dark:text-blue-500" />
+            <div className="h-12 w-12 bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-900/10 rounded-lg flex items-center justify-center transform transition-transform hover:scale-110">
+              <Clock className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
         </div>
@@ -156,10 +156,10 @@ const DashboardContent = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Completed This Month</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">156</p>
+              <p className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-green-400">156</p>
             </div>
-            <div className="h-12 w-12 bg-green-50 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
-              <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-500" />
+            <div className="h-12 w-12 bg-gradient-to-br from-green-100 to-green-50 dark:from-green-900/30 dark:to-green-900/10 rounded-lg flex items-center justify-center transform transition-transform hover:scale-110">
+              <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
           </div>
         </div>
@@ -168,26 +168,26 @@ const DashboardContent = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Urgent Reviews</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">5</p>
+              <p className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-red-400">5</p>
             </div>
-            <div className="h-12 w-12 bg-red-50 dark:bg-red-900/20 rounded-lg flex items-center justify-center">
-              <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-500" />
+            <div className="h-12 w-12 bg-gradient-to-br from-red-100 to-red-50 dark:from-red-900/30 dark:to-red-900/10 rounded-lg flex items-center justify-center transform transition-transform hover:scale-110">
+              <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Payment Status */}
-      <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-gray-200 dark:border-dark-700">
+      <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-gray-200 dark:border-dark-700 mt-6 animate-in" style={{ animationDelay: '0.1s' }}>
         <div className="p-6 border-b border-gray-200 dark:border-dark-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Payment Status</h2>
         </div>
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="p-4 rounded-lg border border-gray-200 dark:border-dark-700 bg-white dark:bg-dark-800">
+            <div className="p-4 rounded-lg border border-gray-200 dark:border-dark-700 bg-gradient-to-br from-white to-gray-50 dark:from-dark-800 dark:to-dark-900 hover-card">
               <div className="relative">
                 <div className="absolute -top-2 -left-2">
-                  <div className="h-8 w-8 bg-green-50 dark:bg-green-900/20 rounded-full flex items-center justify-center">
+                  <div className="h-8 w-8 bg-gradient-to-br from-green-100 to-green-50 dark:from-green-900/30 dark:to-green-900/10 rounded-full flex items-center justify-center transform transition-transform group-hover:scale-110">
                     <DollarSign className="h-5 w-5 text-green-600 dark:text-green-500" />
                   </div>
                 </div>
@@ -197,10 +197,10 @@ const DashboardContent = () => {
                 </div>
               </div>
             </div>
-            <div className="p-4 rounded-lg border border-gray-200 dark:border-dark-700 bg-white dark:bg-dark-800">
+            <div className="p-4 rounded-lg border border-gray-200 dark:border-dark-700 bg-gradient-to-br from-white to-gray-50 dark:from-dark-800 dark:to-dark-900 hover-card">
               <div className="relative">
                 <div className="absolute -top-2 -left-2">
-                  <div className="h-8 w-8 bg-yellow-50 dark:bg-yellow-900/20 rounded-full flex items-center justify-center">
+                  <div className="h-8 w-8 bg-gradient-to-br from-yellow-100 to-yellow-50 dark:from-yellow-900/30 dark:to-yellow-900/10 rounded-full flex items-center justify-center transform transition-transform group-hover:scale-110">
                     <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-500" />
                   </div>
                 </div>
@@ -210,10 +210,10 @@ const DashboardContent = () => {
                 </div>
               </div>
             </div>
-            <div className="p-4 rounded-lg border border-gray-200 dark:border-dark-700 bg-white dark:bg-dark-800">
+            <div className="p-4 rounded-lg border border-gray-200 dark:border-dark-700 bg-gradient-to-br from-white to-gray-50 dark:from-dark-800 dark:to-dark-900 hover-card">
               <div className="relative">
                 <div className="absolute -top-2 -left-2">
-                  <div className="h-8 w-8 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center">
+                  <div className="h-8 w-8 bg-gradient-to-br from-red-100 to-red-50 dark:from-red-900/30 dark:to-red-900/10 rounded-full flex items-center justify-center transform transition-transform group-hover:scale-110">
                     <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-500" />
                   </div>
                 </div>
@@ -270,13 +270,13 @@ const DashboardContent = () => {
       </div>
 
       {/* Recent Surveys */}
-      <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-gray-200 dark:border-dark-700">
+      <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-gray-200 dark:border-dark-700 mt-6 animate-in" style={{ animationDelay: '0.2s' }}>
         <div className="p-6 border-b border-gray-200 dark:border-dark-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Surveys</h2>
         </div>
         <div className="divide-y divide-gray-200 dark:divide-dark-700">
           {recentSurveys.map((survey, index) => (
-            <div key={index} className="p-4 flex items-center">
+            <div key={index} className="p-4 flex items-center hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors">
               <div className="flex-1 min-w-0 flex items-center space-x-3">
                 <div className="flex-shrink-0">
                   <FileText className="h-6 w-6 text-gray-400 dark:text-gray-500" />

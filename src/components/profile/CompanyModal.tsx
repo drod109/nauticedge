@@ -32,167 +32,180 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-dark-800 rounded-xl shadow-xl max-w-3xl w-full my-8">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-dark-700">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-0 sm:p-4 overflow-y-auto">
+      <div className="bg-white dark:bg-dark-800 rounded-none sm:rounded-xl shadow-xl w-full max-w-3xl h-full sm:h-auto sm:max-h-[90vh]">
+        <div className="sticky top-0 z-10 bg-white dark:bg-dark-800 flex items-center justify-between p-6 border-b border-gray-200 dark:border-dark-700 rounded-t-none sm:rounded-t-xl">
           <div className="flex items-center space-x-2">
-            <Building2 className="h-6 w-6 text-gray-400 dark:text-gray-500" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Edit Company Information</h3>
+            <div className="h-10 w-10 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
+              <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-500" />
+            </div>
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Edit Company Information</h3>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Update your company details</p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 transition-colors"
           >
             <X className="h-6 w-6" />
           </button>
         </div>
 
-        <div className="p-6">
-          <div className="space-y-6">
-            {/* Basic Information */}
-            <div>
-              <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Basic Information</h4>
+        <div className="p-6 space-y-6 max-h-[calc(100vh-16rem)] overflow-y-auto scrollbar-hide">
+          {/* Basic Information */}
+          <div>
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Basic Information</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Company Name
+                </label>
+                <input
+                  type="text"
+                  value={editForm.company_name}
+                  onChange={(e) => onChange('company_name', e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="Enter company name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Position
+                </label>
+                <input
+                  type="text"
+                  value={editForm.company_position}
+                  onChange={(e) => onChange('company_position', e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="Enter your position"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Registration Number
+                </label>
+                <input
+                  type="text"
+                  value={editForm.registration_number}
+                  onChange={(e) => onChange('registration_number', e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="Enter registration number"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Tax ID
+                </label>
+                <input
+                  type="text"
+                  value={editForm.tax_id}
+                  onChange={(e) => onChange('tax_id', e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="Enter tax ID"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Address Information */}
+          <div>
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Address Information</h4>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Address Line 1
+                </label>
+                <input
+                  type="text"
+                  value={editForm.company_address_line1}
+                  onChange={(e) => onChange('company_address_line1', e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="Street address, P.O. box, company name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Address Line 2
+                </label>
+                <input
+                  type="text"
+                  value={editForm.company_address_line2}
+                  onChange={(e) => onChange('company_address_line2', e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="Apartment, suite, unit, building, floor, etc."
+                />
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Company Name
+                    City
                   </label>
                   <input
                     type="text"
-                    value={editForm.company_name}
-                    onChange={(e) => onChange('company_name', e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    value={editForm.company_city}
+                    onChange={(e) => onChange('company_city', e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    placeholder="Enter city"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Position
+                    State / Province
                   </label>
                   <input
                     type="text"
-                    value={editForm.company_position}
-                    onChange={(e) => onChange('company_position', e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    value={editForm.company_state}
+                    onChange={(e) => onChange('company_state', e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    placeholder="Enter state/province"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Registration Number
+                    Postal Code
                   </label>
                   <input
                     type="text"
-                    value={editForm.registration_number}
-                    onChange={(e) => onChange('registration_number', e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    value={editForm.company_postal_code}
+                    onChange={(e) => onChange('company_postal_code', e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    placeholder="Enter postal code"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Tax ID
+                    Country
                   </label>
                   <input
                     type="text"
-                    value={editForm.tax_id}
-                    onChange={(e) => onChange('tax_id', e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    value={editForm.company_country}
+                    onChange={(e) => onChange('company_country', e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    placeholder="Enter country"
                   />
-                </div>
-              </div>
-            </div>
-
-            {/* Address Information */}
-            <div>
-              <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Address Information</h4>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Address Line 1
-                  </label>
-                  <input
-                    type="text"
-                    value={editForm.company_address_line1}
-                    onChange={(e) => onChange('company_address_line1', e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Street address, P.O. box, company name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Address Line 2
-                  </label>
-                  <input
-                    type="text"
-                    value={editForm.company_address_line2}
-                    onChange={(e) => onChange('company_address_line2', e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Apartment, suite, unit, building, floor, etc."
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      City
-                    </label>
-                    <input
-                      type="text"
-                      value={editForm.company_city}
-                      onChange={(e) => onChange('company_city', e.target.value)}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      State / Province
-                    </label>
-                    <input
-                      type="text"
-                      value={editForm.company_state}
-                      onChange={(e) => onChange('company_state', e.target.value)}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Postal Code
-                    </label>
-                    <input
-                      type="text"
-                      value={editForm.company_postal_code}
-                      onChange={(e) => onChange('company_postal_code', e.target.value)}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Country
-                    </label>
-                    <input
-                      type="text"
-                      value={editForm.company_country}
-                      onChange={(e) => onChange('company_country', e.target.value)}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="p-6 border-t border-gray-200 dark:border-dark-700 flex justify-end space-x-4">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-dark-600 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onSave}
-            disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50"
-          >
-            {loading ? 'Saving...' : 'Save Changes'}
-          </button>
+        <div className="sticky bottom-0 z-10 bg-white dark:bg-dark-800 border-t border-gray-200 dark:border-dark-700 p-4 rounded-b-none sm:rounded-b-xl">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-4">
+            <button
+              onClick={onClose}
+              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-dark-600 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onSave}
+              disabled={loading}
+              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50"
+            >
+              {loading ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
