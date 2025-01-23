@@ -2,18 +2,18 @@ interface LocationInfo {
   city: string;
   country: string;
   timezone: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export async function getLocationInfo(): Promise<LocationInfo> {
   try {
-    // First get IP-based location as fallback
-    const ipResponse = await fetch('https://ipapi.co/json/');
-    const ipData = await ipResponse.json();
-    
     const fallbackLocation = {
-      city: ipData.city || 'Unknown City',
-      country: ipData.country_name || 'Unknown Country',
-      timezone: ipData.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
+      city: 'Unknown City',
+      country: 'Unknown Country',
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      latitude: undefined,
+      longitude: undefined
     };
 
     // Try to get more accurate location using browser geolocation
@@ -39,9 +39,11 @@ export async function getLocationInfo(): Promise<LocationInfo> {
         if (data.results && data.results[0]?.components) {
           const components = data.results[0].components;
           return {
-            city: components.city || components.town || components.village || fallbackLocation.city,
-            country: components.country || fallbackLocation.country,
-            timezone: data.results[0].annotations?.timezone?.name || fallbackLocation.timezone
+            city: components.city || components.town || components.village || components.county || 'Unknown City',
+            country: components.country || 'Unknown Country',
+            timezone: data.results[0].annotations?.timezone?.name || fallbackLocation.timezone,
+            latitude,
+            longitude
           };
         }
       } catch (error) {
@@ -55,7 +57,9 @@ export async function getLocationInfo(): Promise<LocationInfo> {
     return {
       city: 'Unknown City',
       country: 'Unknown Country',
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      latitude: undefined,
+      longitude: undefined
     };
   }
 }

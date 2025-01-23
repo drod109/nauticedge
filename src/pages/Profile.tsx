@@ -321,6 +321,19 @@ const Profile = () => {
     initializeProfile();
   }, [fetchUserData, fetchSessions]);
 
+  const handleEditPersonalInfo = () => {
+    // Initialize form with current user data
+    setEditForm(prev => ({
+      ...prev,
+      first_name: userData?.first_name || '',
+      last_name: userData?.last_name || '',
+      email: userData?.email || '',
+      phone: userData?.phone || '',
+      location: userData?.location || ''
+    }));
+    setIsEditing(true);
+  };
+
   const renderPersonalContent = () => (
     <div className="p-8">
       {/* Personal Information */}
@@ -328,7 +341,7 @@ const Profile = () => {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Personal Information</h2>
           <button 
-            onClick={() => setIsEditing(true)} 
+            onClick={handleEditPersonalInfo}
             className="flex items-center text-sm text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
           >
             <Pencil className="h-4 w-4 mr-1" />

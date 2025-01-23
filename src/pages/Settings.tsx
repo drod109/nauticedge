@@ -1,24 +1,30 @@
 import React, { useState } from 'react';
-import { Shield, Globe, Plug, Ruler, ChevronRight, X, Key } from 'lucide-react';
+import { X, Shield, Globe, Plug, Ruler, ChevronRight, Key } from 'lucide-react';
 import Sidebar from '../components/dashboard/Sidebar';
 import Header from '../components/dashboard/Header';
+import ActiveSessionsList from '../components/settings/security/ActiveSessionsList';
+import LoginHistoryList from '../components/settings/security/LoginHistoryList';
 import MFAManagement from '../components/auth/MFAManagement';
 import APISection from '../components/settings/api/APISection';
 import { Theme, getInitialTheme, setTheme } from '../lib/theme';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
+import SessionsModal from '../components/settings/security/SessionsModal';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('security');
   const [showMFAManagement, setShowMFAManagement] = useState(false);
-  const [theme, setTheme] = useState<Theme>(getInitialTheme());
+  const [theme, setCurrentTheme] = useState<Theme>(getInitialTheme());
+  const [showSessionsModal, setShowSessionsModal] = useState(false);
+  const [sessionsModalTab, setSessionsModalTab] = useState<'sessions' | 'history'>('sessions');
 
   const handleThemeChange = (newTheme: Theme) => {
-    setCurrentTheme(newTheme);
     setTheme(newTheme);
+    setCurrentTheme(newTheme);
   };
 
   const renderSecurityContent = () => (
     <div className="p-8">
+      {/* MFA Section */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Two-Factor Authentication</h2>
         <p className="text-gray-600 dark:text-gray-400 mb-4">Add an extra layer of security to your account</p>
@@ -40,31 +46,38 @@ const Settings = () => {
         </div>
       </div>
 
+      {/* Active Sessions Section */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Login Sessions</h2>
         <p className="text-gray-600 dark:text-gray-400 mb-4">Manage your active sessions and devices</p>
         <div className="space-y-4">
-          <div className="p-4 border border-gray-200 dark:border-dark-600 bg-white dark:bg-dark-800 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-gray-900 dark:text-white">Active Sessions</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">View and manage your active login sessions</p>
-              </div>
-              <ChevronRight className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+          <button
+            onClick={() => {
+              setSessionsModalTab('sessions');
+              setShowSessionsModal(true);
+            }}
+            className="w-full p-4 border border-gray-200 dark:border-dark-600 bg-white dark:bg-dark-800 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors text-left mb-4"
+          >
+            <div>
+              <p className="font-medium text-gray-900 dark:text-white">Active Sessions</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">View and manage your active login sessions</p>
             </div>
-          </div>
-          <div className="p-4 border border-gray-200 dark:border-dark-600 bg-white dark:bg-dark-800 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-gray-900 dark:text-white">Login History</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Review your recent login activity</p>
-              </div>
-              <ChevronRight className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+          </button>
+          <button
+            onClick={() => {
+              setSessionsModalTab('history');
+              setShowSessionsModal(true);
+            }}
+            className="w-full p-4 border border-gray-200 dark:border-dark-600 bg-white dark:bg-dark-800 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors text-left"
+          >
+            <div>
+              <p className="font-medium text-gray-900 dark:text-white">Login History</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Review your recent login activity</p>
             </div>
-          </div>
+          </button>
         </div>
       </div>
-
+      
       <div>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Password</h2>
         <p className="text-gray-600 dark:text-gray-400 mb-4">Manage your account password</p>
@@ -215,13 +228,13 @@ const Settings = () => {
             <div className="bg-white dark:bg-dark-800 rounded-lg shadow border border-gray-200 dark:border-dark-700">
               <div className="px-8 pt-6">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Account Settings</h1>
-                <div className="flex space-x-8 border-b border-gray-200 dark:border-dark-700">
+                <div className="flex flex-wrap sm:flex-nowrap gap-4 sm:gap-0 px-0 sm:px-8 -mx-0 sm:-mx-8 pb-4 sm:pb-px border-b border-gray-200 dark:border-dark-700">
                   <button
                     onClick={() => setActiveTab('security')}
-                    className={`pb-4 text-sm font-medium flex items-center space-x-2 ${
+                    className={`w-full sm:w-auto text-sm font-medium flex items-center space-x-2 px-4 py-2 sm:py-0 sm:px-0 rounded-lg sm:rounded-none sm:pb-4 sm:mr-8 ${
                       activeTab === 'security'
-                        ? 'border-b-2 border-blue-600 text-blue-600'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 sm:bg-transparent sm:border-b-2 sm:border-blue-600'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-700 sm:hover:bg-transparent sm:dark:hover:bg-transparent'
                     }`}
                   >
                     <Shield className="h-4 w-4" />
@@ -229,10 +242,10 @@ const Settings = () => {
                   </button>
                   <button
                     onClick={() => setActiveTab('integrations')}
-                    className={`pb-4 text-sm font-medium flex items-center space-x-2 ${
+                    className={`w-full sm:w-auto text-sm font-medium flex items-center space-x-2 px-4 py-2 sm:py-0 sm:px-0 rounded-lg sm:rounded-none sm:pb-4 sm:mr-8 ${
                       activeTab === 'integrations'
-                        ? 'border-b-2 border-blue-600 text-blue-600'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 sm:bg-transparent sm:border-b-2 sm:border-blue-600'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-700 sm:hover:bg-transparent sm:dark:hover:bg-transparent'
                     }`}
                   >
                     <Plug className="h-4 w-4" />
@@ -240,10 +253,10 @@ const Settings = () => {
                   </button>
                   <button
                     onClick={() => setActiveTab('languages')}
-                    className={`pb-4 text-sm font-medium flex items-center space-x-2 ${
+                    className={`w-full sm:w-auto text-sm font-medium flex items-center space-x-2 px-4 py-2 sm:py-0 sm:px-0 rounded-lg sm:rounded-none sm:pb-4 sm:mr-8 ${
                       activeTab === 'languages'
-                        ? 'border-b-2 border-blue-600 text-blue-600'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 sm:bg-transparent sm:border-b-2 sm:border-blue-600'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-700 sm:hover:bg-transparent sm:dark:hover:bg-transparent'
                     }`}
                   >
                     <Globe className="h-4 w-4" />
@@ -251,10 +264,10 @@ const Settings = () => {
                   </button>
                   <button
                     onClick={() => setActiveTab('measurement')}
-                    className={`pb-4 text-sm font-medium flex items-center space-x-2 ${
+                    className={`w-full sm:w-auto text-sm font-medium flex items-center space-x-2 px-4 py-2 sm:py-0 sm:px-0 rounded-lg sm:rounded-none sm:pb-4 ${
                       activeTab === 'measurement'
-                        ? 'border-b-2 border-blue-600 text-blue-600'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 sm:bg-transparent sm:border-b-2 sm:border-blue-600'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-700 sm:hover:bg-transparent sm:dark:hover:bg-transparent'
                     }`}
                   >
                     <Ruler className="h-4 w-4" />
@@ -290,6 +303,14 @@ const Settings = () => {
           )}
         </main>
       </div>
+      
+      {/* Sessions Modal */}
+      <SessionsModal
+        isOpen={showSessionsModal}
+        onClose={() => setShowSessionsModal(false)}
+        activeTab={sessionsModalTab}
+        onTabChange={setSessionsModalTab}
+      />
     </div>
     </ProtectedRoute>
   );

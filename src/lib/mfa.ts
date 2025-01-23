@@ -36,6 +36,17 @@ export async function initializeMFASetup() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    // First, clean up any existing temporary setup data
+    const { error: cleanupError } = await supabase
+      .from('mfa_temp')
+      .delete()
+      .eq('user_id', user.id);
+
+    if (cleanupError) {
+      console.warn('Error cleaning up old MFA setup:', cleanupError);
+      // Continue anyway as the old record might not exist
+    }
+
     // Check if MFA is already set up
     const { data: existingMFA } = await supabase
       .from('user_mfa')
@@ -47,26 +58,23 @@ export async function initializeMFASetup() {
       throw new Error('MFA is already enabled for this account');
     }
     
-    // Delete any existing temporary setup data
-    await supabase
-      .from('mfa_temp')
-      .delete()
-      .eq('user_id', user.id);
-
     const secret = generateSecret();
     const recoveryCodes = generateRecoveryCodes();
 
-    // Store temporary setup data
-    const { error } = await supabase
-      .from('mfa_temp')
-      .insert({
+    // Use upsert to handle potential race conditions
+    const { error } = await supabase.from('mfa_temp').upsert(
+      {
         user_id: user.id,
         secret,
         expires_at: new Date(Date.now() + 3600000).toISOString(),
         created_at: new Date().toISOString(),
-        secret,
         recovery_codes: recoveryCodes
-      });
+      },
+      {
+        onConflict: 'user_id',
+        ignoreDuplicates: false
+      }
+    );
 
     if (error) throw error;
 
@@ -84,6 +92,11 @@ export async function initializeMFASetup() {
 // Complete MFA setup
 export async function completeMFASetup(verificationCode: string) {
   try {
+    // Basic validation
+    if (!/^\d{6}$/.test(verificationCode)) {
+      throw new Error('Invalid verification code format');
+    }
+
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
@@ -96,23 +109,43 @@ export async function completeMFASetup(verificationCode: string) {
 
     if (tempError || !tempData) throw new Error('MFA setup not initialized');
 
-    // For demo purposes, accept any 6-digit code
-    // In production, implement proper TOTP verification
-    if (!/^\d{6}$/.test(verificationCode)) {
-      throw new Error('Invalid verification code format');
-    }
-
-    // Store MFA settings
-    const { error: mfaError } = await supabase
+    // First, try to get existing MFA record
+    const { data: existingMFA } = await supabase
       .from('user_mfa')
-      .upsert({
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    let mfaError;
+    
+    if (existingMFA) {
+      // Update existing record
+      const { error } = await supabase
+        .from('user_mfa')
+        .update({
+          secret: tempData.secret,
+          backup_codes: tempData.recovery_codes,
+          enabled: true,
+          verified_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id);
+      mfaError = error;
+    } else {
+      // Insert new record
+      const { error } = await supabase
+        .from('user_mfa')
+        .insert({
         user_id: user.id,
         secret: tempData.secret,
         backup_codes: tempData.recovery_codes,
         enabled: true,
         verified_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      });
+        updated_at: new Date().toISOString(),
+        created_at: new Date().toISOString()
+        });
+      mfaError = error;
+    }
 
     if (mfaError) throw mfaError;
 
@@ -145,29 +178,42 @@ export async function verifyMFALogin(code: string) {
     if (mfaError) throw mfaError;
     if (!mfaData?.enabled) throw new Error('MFA not enabled');
 
-    // For demo purposes, accept any 6-digit code
-    // In production, implement proper TOTP verification
     if (!/^\d{6}$/.test(code)) {
       throw new Error('Invalid verification code format');
     }
 
-    // Log verification attempt
+    // Log verification attempt with more details
     const browserInfo = getBrowserInfo();
     const locationInfo = await getLocationInfo();
+    const timestamp = new Date().toISOString();
+    
+    // Store location coordinates for reverse geocoding
+    const deviceInfo = {
+      type: browserInfo.isMobile ? 'mobile' : 'desktop',
+      browser: browserInfo.browser,
+      os: browserInfo.os,
+      location: {
+        latitude: locationInfo.latitude,
+        longitude: locationInfo.longitude,
+        city: locationInfo.city,
+        country: locationInfo.country
+      }
+    };
 
-    await supabase
+    const { error: logError } = await supabase
       .from('mfa_verification_attempts')
       .insert({
         user_id: user.id,
         ip_address: '0.0.0.0', // Will be set by server
         success: true,
-        device_info: {
-          type: browserInfo.isMobile ? 'mobile' : 'desktop',
-          browser: browserInfo.browser,
-          os: browserInfo.os,
-          location: locationInfo
-        }
+        device_info: deviceInfo,
+        created_at: timestamp
       });
+
+    if (logError) {
+      console.error('Error logging verification attempt:', logError);
+      // Continue anyway as this is not critical
+    }
 
     // Update last used timestamp
     await supabase

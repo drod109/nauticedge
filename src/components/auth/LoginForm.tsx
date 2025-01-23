@@ -26,6 +26,21 @@ const LoginForm = () => {
     setLoading(true);
     setError(null);
     
+    // Basic validation
+    if (!email.trim() || !password.trim()) {
+      setError('Please enter both email and password');
+      setLoading(false);
+      return;
+    }
+
+    // Email format validation
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    if (!emailRegex.test(email.trim())) {
+      setError('Please enter a valid email address');
+      setLoading(false);
+      return;
+    }
+    
     // Handle remember me preference
     if (rememberMe) {
       rememberEmail(email);
@@ -67,7 +82,7 @@ const LoginForm = () => {
 
           if (signInError) {
             if (signInError.message.includes('Invalid login credentials')) {
-              throw new Error('Invalid email or password');
+              throw new Error('The email or password you entered is incorrect');
             }
             throw signInError;
           }
@@ -131,17 +146,19 @@ const LoginForm = () => {
             setError('Network error. Please check your connection and try again.');
             break;
           case 'AuthApiError':
-            if (err.message.includes('Invalid login credentials')) {
-              setError('Invalid email or password');
+            if (err.message.includes('Email not confirmed')) {
+              setError('Please verify your email address before logging in');
+            } else if (err.message.includes('Invalid login credentials')) {
+              setError('The email or password you entered is incorrect');
             } else {
               setError(err.message || 'Failed to sign in. Please try again.');
             }
             break;
           default:
-            setError(err.message || 'An unexpected error occurred. Please try again.');
+            setError('An unexpected error occurred. Please try again later.');
         }
       } else {
-        setError('Failed to sign in. Please try again.');
+        setError('Unable to sign in at this time. Please try again later.');
       }
     } finally {
       setLoading(false);
@@ -186,40 +203,102 @@ const LoginForm = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
+      // Get the current URL for proper redirection
+      const redirectTo = new URL('/dashboard', window.location.origin).toString();
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo,
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent'
+            prompt: 'select_account',
+            response_type: 'code',
+            scope: 'email profile'
           }
         }
       });
-
+      
       if (error) throw error;
       
-      // Let ProtectedRoute handle the redirection
-      if (data) {
-        window.location.href = '/dashboard';
+      // Handle the OAuth redirect
+      if (data.url) {
+        // Store the current URL to redirect back after auth
+        sessionStorage.setItem('preAuthPath', window.location.pathname);
+        
+        // Redirect to Google OAuth
+        window.location.href = data.url;
+        return;
       }
+      
+      // If we get here without a URL, something went wrong
+      throw new Error('No authentication URL returned');
     } catch (err) {
       console.error('Google login error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to sign in with Google');
+      let errorMessage = 'Failed to sign in with Google';
+      
+      if (err instanceof Error) {
+        // Handle specific error cases
+        if (err.message.includes('popup_closed_by_user')) {
+          errorMessage = 'Login cancelled. Please try again.';
+        } else if (err.message.includes('network')) {
+          errorMessage = 'Network error. Please check your connection.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAppleLogin = async () => {
+  const handleGithubLogin = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'apple'
+      setLoading(true);
+      setError(null);
+
+      const redirectTo = new URL('/dashboard', window.location.origin).toString();
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo,
+          queryParams: {
+            response_type: 'code',
+            scope: 'user:email'
+          }
+        }
       });
+
       if (error) throw error;
+
+      if (data.url) {
+        sessionStorage.setItem('preAuthPath', window.location.pathname);
+        window.location.href = data.url;
+        return;
+      }
+
+      throw new Error('No authentication URL returned');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sign in with Apple');
+      console.error('GitHub login error:', err);
+      let errorMessage = 'Failed to sign in with GitHub';
+
+      if (err instanceof Error) {
+        if (err.message.includes('popup_closed_by_user')) {
+          errorMessage = 'Login cancelled. Please try again.';
+        } else if (err.message.includes('network')) {
+          errorMessage = 'Network error. Please check your connection.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -243,7 +322,10 @@ const LoginForm = () => {
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Welcome back</h2>
       {error && (
         <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          <div className="flex items-center">
+            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mr-2" />
+            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          </div>
         </div>
       )}
 
@@ -351,13 +433,14 @@ const LoginForm = () => {
           Continue with Google
         </button>
         <button
-          onClick={handleAppleLogin}
+          onClick={handleGithubLogin}
+          disabled={loading}
           className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg shadow-sm bg-white dark:bg-dark-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors"
         >
           <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.78 1.18-.19 2.31-.89 3.51-.84 1.54.07 2.7.6 3.44 1.51-3.03 1.81-2.52 5.87.22 7.22-.65 1.29-1.51 2.58-2.25 3.3ZM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.32 2.33-1.94 4.23-3.74 4.25Z"/>
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
           </svg>
-          Continue with Apple
+          Continue with GitHub
         </button>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield } from 'lucide-react';
+import { Shield, X } from 'lucide-react';
 import { verifyMFALogin } from '../../lib/mfa';
 
 interface MFAVerificationProps {
@@ -36,18 +36,23 @@ const MFAVerification: React.FC<MFAVerificationProps> = ({ onVerify, onCancel })
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-[#1b2838] rounded-xl shadow-2xl max-w-md w-full my-8">
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-dark-800 rounded-xl shadow-2xl max-w-md w-full">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-dark-700">
           <div className="flex items-center space-x-3">
-            <div className="h-10 w-10 bg-blue-900/20 rounded-full flex items-center justify-center">
+            <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
               <Shield className="h-5 w-5 text-blue-500" />
             </div>
             <div>
-              <h2 className="text-lg font-medium text-white">Two-Factor Authentication</h2>
-              <p className="mt-1 text-sm text-gray-400">Enter the verification code from your authenticator app</p>
+              <p className="font-medium text-gray-900 dark:text-white">Two-factor authentication is enabled</p>
             </div>
           </div>
+          <button
+            onClick={onCancel} 
+            className="text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400 transition-colors"
+          >
+            <X className="h-6 w-6" />
+          </button>
         </div>
 
         {error && (
@@ -61,7 +66,7 @@ const MFAVerification: React.FC<MFAVerificationProps> = ({ onVerify, onCancel })
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Verification Code
             </label>
             <input
@@ -70,23 +75,23 @@ const MFAVerification: React.FC<MFAVerificationProps> = ({ onVerify, onCancel })
               placeholder="Enter 6-digit code"
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-              className="w-full px-4 py-2.5 bg-[#2a3f5a] border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors hover:bg-[#344863]"
+              className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
               autoFocus
             />
           </div>
 
-          <div className="mt-6 flex justify-end space-x-4">
+          <div className="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-4">
             <button
               type="button"
               onClick={onCancel}
-              className="px-5 py-2.5 text-sm font-medium text-gray-300 hover:text-white bg-[#2a3f5a] rounded-lg hover:bg-[#344863] transition-colors focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-[#1b2838]"
+              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-dark-600 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={code.length !== 6 || loading || remainingAttempts === 0}
-              className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-[#1b2838]"
+              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors"
             >
               {loading ? 'Verifying...' : 'Verify'}
             </button>
