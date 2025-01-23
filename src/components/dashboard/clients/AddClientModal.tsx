@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Mail, Phone, MapPin } from 'lucide-react';
+import { X, Mail, Phone, MapPin, User2 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { formatPhoneNumber } from '../../../utils/phone';
 
