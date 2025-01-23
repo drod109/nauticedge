@@ -46,8 +46,8 @@ export async function initializeMFASetup() {
     if (existingMFA?.enabled) {
       throw new Error('MFA is already enabled for this account');
     }
-
-    // Delete any existing temporary setup
+    
+    // Delete any existing temporary setup data
     await supabase
       .from('mfa_temp')
       .delete()
@@ -62,6 +62,9 @@ export async function initializeMFASetup() {
       .insert({
         user_id: user.id,
         secret,
+        expires_at: new Date(Date.now() + 3600000).toISOString(),
+        created_at: new Date().toISOString(),
+        secret,
         recovery_codes: recoveryCodes
       });
 
@@ -73,7 +76,7 @@ export async function initializeMFASetup() {
       otpauthUrl: `otpauth://totp/NauticEdge:${user.email}?secret=${secret}&issuer=NauticEdge`
     };
   } catch (error) {
-    console.error('Error initializing MFA setup:', error);
+    console.error('Error in initializeMFASetup:', error);
     throw error;
   }
 }

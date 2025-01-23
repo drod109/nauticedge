@@ -4,7 +4,8 @@ import Hero from './components/Hero';
 import Features from './components/sections/Features';
 import Solutions from './components/sections/Solutions';
 import Pricing from './components/sections/Pricing';
-import Clients from './components/sections/clients/Clients';
+import ClientsSection from './components/sections/clients/Clients';
+import ClientsPage from './pages/Clients';
 import Testimonials from './components/sections/testimonials/Testimonials';
 import Footer from './components/footer/Footer';
 import Login from './pages/Login';
@@ -60,6 +61,10 @@ function App() {
     return <Registration />;
   }
   
+  if (path === '/dashboard/clients') {
+    return <ClientsPage />;
+  }
+
   if (path === '/schedule') {
     return <Schedule />;
   }
@@ -72,13 +77,20 @@ function App() {
     return <InvoiceBuilder />;
   }
 
+  if (path === '/dashboard/clients') {
+    return <Clients />;
+  }
+  
+  if (path === '/dashboard/clients') {
+    return <Clients />;
+  }
+
   return (
     <div className="min-h-screen bg-white dark:bg-dark-900 transition-colors">
       <Navigation />
       <Hero />
       <Features />
-      <Solutions />
-      <Clients />
+      <ClientsSection />
       <Testimonials />
       <Pricing />
       <Footer />
