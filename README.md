@@ -1,38 +1,52 @@
 # NauticEdge - Modern Marine Survey Platform
 
-![NauticEdge](https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=1200&h=400)
+![NauticEdge](https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&q=80&w=1200&h=400)
 
 NauticEdge is a comprehensive digital platform designed for marine surveyors, boat owners, and insurers. It streamlines the marine survey process with powerful digital tools and real-time collaboration features.
 
-## 🚀 Features
+## 🌟 Key Features
 
-### Core Features
+### Survey Management
 - **Digital Survey Tools**
   - Mobile-first survey capabilities
   - Offline data capture
   - Photo and video documentation
   - Real-time updates and sync
-  
-- **Client Management**
-  - Comprehensive client profiles
+  - Custom templates
+  - Version control
+  - Automated backups
+
+### Client Management
+- **Comprehensive Client Profiles**
+  - Contact information management
+  - Survey history tracking
   - Document storage
   - Communication tools
   - Automated notifications
+  - Custom fields
+  - Activity logs
 
-- **Invoice Management**
-  - Professional invoice builder
-  - Customizable templates
+### Invoice Management
+- **Professional Invoice System**
+  - Custom invoice builder
+  - Multiple templates
   - PDF generation
   - Payment tracking
   - Tax calculation
   - Email notifications
+  - Bulk operations
+  - Payment history
 
-- **Appointment Scheduling**
+### Appointment Scheduling
+- **Advanced Calendar System**
   - Interactive calendar interface
   - Real-time availability
   - Location tracking
   - Email notifications
-  - Upcoming appointments overview
+  - Conflict detection
+  - Recurring appointments
+  - Calendar sync
+  - Mobile notifications
 
 ### Security Features
 - **Enhanced Authentication**
@@ -54,16 +68,34 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
     - TOTP-based authentication
     - QR code setup
     - Recovery codes
+    - Rate limiting
   - Session management
     - Device recognition
     - Location tracking
     - Concurrent session control
+    - Session termination
+    - IP-based security
+    - Automatic cleanup
 
 - **Profile Management**
   - Profile photo upload
+    - Secure storage
+    - Image optimization
+    - Avatar integration
   - Company information
+    - Comprehensive company details
+    - Registration info
+    - Tax information
+    - Address management
   - Personal details
-  - Location detection
+    - Contact information
+    - Location detection
+    - Timezone management
+  - Session tracking
+    - Active sessions monitoring
+    - Device fingerprinting
+    - Location tracking
+    - Session termination
 
 ### Subscription Plans
 - **Basic Plan ($49/month)**
@@ -71,6 +103,8 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - Basic reporting
   - Standard support
   - 5GB storage
+  - Email notifications
+  - Basic analytics
 
 - **Professional Plan ($99/month)**
   - Everything in Basic
@@ -79,6 +113,9 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - 50GB storage
   - API access
   - Team collaboration
+  - Custom templates
+  - Bulk operations
+  - Advanced reporting
 
 - **Enterprise Plan ($249/month)**
   - Everything in Professional
@@ -87,24 +124,63 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - Unlimited storage
   - White-label reports
   - Advanced team management
+  - Custom workflows
+  - SLA guarantee
+  - Priority features
 
 ## 🛠️ Tech Stack
 
 ### Frontend
 - React 18 with TypeScript
+  - Custom hooks
+  - Context API
+  - Error boundaries
+  - Suspense
+  - Concurrent features
 - Tailwind CSS for styling
-  - Responsive design
   - Dark mode support
+  - Custom animations
+  - Responsive design
+  - Custom components
 - Lucide Icons
 - Vite for build tooling
+  - Hot module replacement
+  - Optimized builds
+  - Environment variables
+  - TypeScript support
 
 ### Backend & Infrastructure
 - Supabase
   - PostgreSQL database
   - Row Level Security (RLS)
   - Real-time subscriptions
-  - Storage for profile photos
-  - Authentication & authorization
+  - Storage system
+  - Authentication
+  - Database functions
+  - Triggers
+  - Policies
+  - Webhooks
+
+### Security Features
+- **Comprehensive Authentication**
+  - Multi-factor authentication (TOTP)
+  - OAuth2 providers
+  - Session management
+  - Device tracking
+  - Location monitoring
+  - Rate limiting
+  - Brute force protection
+  - Password policies
+
+### API Features (Professional & Enterprise)
+- RESTful endpoints
+- Rate limiting
+- Authentication
+- OpenAPI docs
+- Webhook support
+- Custom integrations
+- Monitoring
+- Analytics
 
 ## 📋 Prerequisites
 
@@ -112,12 +188,15 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
 - npm 9 or higher
 - Supabase account
 - OpenCage API key (for location services)
+- OAuth provider credentials
+  - Google
+  - Facebook
+  - GitHub
 
 ## 🔧 Environment Setup
 
 1. Create a `.env` file in the root directory:
-
-```env
+```bash
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_OPENCAGE_API_KEY=your_opencage_api_key
@@ -189,16 +268,48 @@ nauticedge/
 ├── src/
 │   ├── components/
 │   │   ├── auth/          # Authentication components
+│   │   │   ├── LoginForm.tsx
+│   │   │   ├── SignUpForm.tsx
+│   │   │   ├── MFASetup.tsx
+│   │   │   └── ProtectedRoute.tsx
 │   │   ├── dashboard/     # Dashboard components
+│   │   │   ├── Header.tsx
+│   │   │   ├── Sidebar.tsx
+│   │   │   └── DashboardContent.tsx
 │   │   ├── invoice/       # Invoice components
+│   │   │   ├── InvoiceList.tsx
+│   │   │   ├── InvoiceBuilder.tsx
+│   │   │   └── CreateInvoiceModal.tsx
 │   │   ├── profile/       # Profile components
+│   │   │   ├── ProfilePhoto.tsx
+│   │   │   ├── CompanySection.tsx
+│   │   │   └── BillingSection.tsx
 │   │   ├── schedule/      # Scheduling components
+│   │   │   ├── Calendar.tsx
+│   │   │   └── UpcomingAppointments.tsx
 │   │   └── sections/      # Landing page sections
+│   │       ├── Hero.tsx
+│   │       ├── Features.tsx
+│   │       └── Pricing.tsx
 │   ├── hooks/            # Custom React hooks
+│   │   ├── useAuth.ts
+│   │   ├── useAPI.ts
+│   │   └── useSubscription.ts
 │   ├── lib/              # Library configurations
+│   │   ├── supabase.ts
+│   │   ├── theme.ts
+│   │   └── mfa.ts
 │   ├── pages/            # Page components
+│   │   ├── Dashboard.tsx
+│   │   ├── Profile.tsx
+│   │   └── Settings.tsx
 │   ├── types/            # TypeScript definitions
+│   │   ├── auth.ts
+│   │   └── supabase.ts
 │   └── utils/            # Utility functions
+│       ├── auth.ts
+│       ├── browser.ts
+│       └── location.ts
 ├── supabase/
 │   └── migrations/       # Database migrations
 └── public/              # Static assets
@@ -216,28 +327,86 @@ nauticedge/
   - Fallback authentication
   - Session persistence
   - Token refresh handling
-- Session management and tracking
-- Device fingerprinting
-- Location-based security
-- Rate limiting
-- Input validation
-- Data encryption
+- Advanced Session Management
+  - Device fingerprinting
+  - Location tracking
+  - Active session monitoring
+  - Remote session termination
+  - Concurrent session control
+  - Session timeout policies
+  - Suspicious activity detection
+- Data Protection
+  - Row Level Security (RLS)
+  - Data encryption
+  - Secure file storage
+  - Access control policies
+  - Input validation
+  - SQL injection prevention
+  - XSS protection
+  - CSRF protection
 
-## 🌐 API Access (Professional & Enterprise)
+## 🔌 API Integration
 
+### API Features
 - RESTful endpoints
 - Rate limiting
 - Authentication & authorization
 - OpenAPI documentation
 - Webhook support
+  - Custom events
+  - Retry logic
+  - Error handling
+  - Delivery tracking
 
-## 🎨 Accessibility
+### API Security
+- API key management
+- Request signing
+- Rate limiting
+- IP whitelisting
+- Audit logging
+- Error handling
+- Input validation
 
-- WCAG 2.1 compliant
-- High contrast in light/dark themes
-- Keyboard navigation support
-- Screen reader friendly
+## 📱 Mobile Support
+
 - Responsive design
+- Touch-optimized UI
+- Offline capabilities
+- Push notifications
+- Mobile-first features
+- Cross-device sync
+- Progressive loading
+
+## 🎨 UI/UX Features
+
+- Dark/Light theme
+- Responsive layouts
+- Animated transitions
+- Loading states
+- Error handling
+- Form validation
+- Toast notifications
+- Modal dialogs
+
+## 🔄 Real-time Features
+
+- Live updates
+- Collaborative editing
+- Status indicators
+- Activity feeds
+- Notifications
+- Data synchronization
+- Presence indicators
+
+## 📊 Analytics & Reporting
+
+- Custom dashboards
+- Export options
+- Data visualization
+- Trend analysis
+- Performance metrics
+- Usage statistics
+- Custom reports
 
 ## 🤝 Contributing
 
