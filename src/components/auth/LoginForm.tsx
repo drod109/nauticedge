@@ -204,7 +204,6 @@ const LoginForm = () => {
       setLoading(true);
       setError(null);
 
-      // Get the current URL for proper redirection
       const redirectTo = new URL('/dashboard', window.location.origin).toString();
 
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -216,6 +215,42 @@ const LoginForm = () => {
             prompt: 'select_account',
             response_type: 'code',
             scope: 'email profile'
+          }
+        }
+      });
+      
+      if (error) throw error;
+      
+      if (data.url) {
+        sessionStorage.setItem('preAuthPath', window.location.pathname);
+        window.location.href = data.url;
+        return;
+      }
+      
+      throw new Error('No authentication URL returned');
+    } catch (err) {
+      console.error('Google login error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to sign in with Google');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFacebookLogin = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Get the current URL for proper redirection
+      const redirectTo = new URL('/dashboard', window.location.origin).toString();
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'facebook',
+        options: {
+          redirectTo,
+          queryParams: {
+            response_type: 'code',
+            scope: 'email,public_profile'
           }
         }
       });
@@ -431,6 +466,17 @@ const LoginForm = () => {
             />
           </svg>
           Continue with Google
+        </button>
+
+        <button
+          onClick={handleFacebookLogin}
+          disabled={loading}
+          className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg shadow-sm bg-white dark:bg-dark-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors"
+        >
+          <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="#1877F2">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          Continue with Facebook
         </button>
         <button
           onClick={handleGithubLogin}

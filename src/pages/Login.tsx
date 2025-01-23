@@ -8,21 +8,27 @@ const Login = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const init = async () => {
       try {
-        // Sign out any existing session when visiting login page
-        await supabase.auth.signOut();
-        
-        // Clear any stored auth data
+        // Check if there's an active session first
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (session) {
+          // Only attempt to sign out if there's an active session
+          await supabase.auth.signOut();
+        }
+
+        // Clear any stored auth data regardless of session status
         localStorage.removeItem('sb-xvyetpiyuasltbarascj-auth-token');
       } catch (error) {
         console.error('Error during logout:', error);
+        // Continue even if there's an error - we still want to show the login page
       } finally {
         setLoading(false);
       }
     };
 
-    checkAuth();
+    init();
   }, []);
 
   if (loading) {
