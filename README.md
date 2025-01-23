@@ -37,6 +37,19 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
 ### Security Features
 - **Enhanced Authentication**
   - Email/password authentication
+  - Multi-provider OAuth2 Authentication
+    - Google Authentication
+      - Profile synchronization
+      - Automatic account linking
+      - Offline access support
+    - Facebook Authentication
+      - Public profile access
+      - Email verification
+      - Profile data import
+    - GitHub Authentication
+      - Email verification
+      - Username synchronization
+      - Avatar integration
   - Two-factor authentication (2FA)
     - TOTP-based authentication
     - QR code setup
@@ -110,6 +123,38 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_OPENCAGE_API_KEY=your_opencage_api_key
 ```
 
+2. Configure OAuth Providers:
+
+   a. Google OAuth Setup:
+   - Create a project in Google Cloud Console
+   - Configure OAuth consent screen
+   - Create OAuth 2.0 Client ID
+   - Add authorized redirect URIs:
+     ```
+     https://<your-domain>/auth/callback
+     ```
+   - Copy Client ID and Secret to Supabase Auth settings
+
+   b. Facebook OAuth Setup:
+   - Create a new app in Facebook Developers Console
+   - Add Facebook Login product
+   - Configure OAuth settings:
+     - Valid OAuth Redirect URIs
+     - Permissions: email, public_profile
+   - Copy App ID and Secret to Supabase Auth settings
+
+   c. GitHub OAuth Setup:
+   - Register new OAuth application in GitHub
+   - Set homepage URL and callback URL
+   - Request scopes: user:email
+   - Copy Client ID and Secret to Supabase Auth settings
+
+3. Enable providers in Supabase:
+   - Navigate to Authentication > Providers
+   - Enable and configure each provider
+   - Add respective Client IDs and Secrets
+   - Set redirect URLs
+
 ## 🚀 Installation
 
 1. Clone the repository:
@@ -162,6 +207,15 @@ nauticedge/
 ## 🔒 Security Features
 
 - Two-factor authentication (TOTP)
+- Comprehensive OAuth2 Integration
+  - Multiple provider support
+  - Secure authentication flow
+  - Profile synchronization
+  - Automatic account linking
+  - Configurable scopes
+  - Fallback authentication
+  - Session persistence
+  - Token refresh handling
 - Session management and tracking
 - Device fingerprinting
 - Location-based security
