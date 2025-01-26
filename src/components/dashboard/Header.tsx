@@ -101,7 +101,7 @@ const Header: React.FC<HeaderProps> = ({ theme, onThemeChange }) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 h-16 glass-effect border-b border-gray-200 dark:border-dark-700 flex items-center justify-between px-6 transition-colors">
+    <header className="sticky top-0 z-40 h-16 glass-effect border-b border-gray-200 dark:border-dark-700 flex items-center justify-between px-6 transition-colors">
       <div className="flex items-center flex-1">
         <div className="relative max-w-md w-full hidden md:block">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />

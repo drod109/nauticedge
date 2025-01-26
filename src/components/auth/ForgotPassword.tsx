@@ -25,60 +25,33 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack }) => {
     setError(null);
 
     try {
-      // Basic email validation
       const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
       if (!emailRegex.test(email)) {
         throw new Error('Please enter a valid email address');
       }
 
-      // First get user from auth
-      const { data: { user }, error: userError } = await supabase.auth.signInWithOtp({
+      // Try to send password reset email
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
         email,
-        options: {
-          shouldCreateUser: false,
-          emailRedirectTo: `${window.location.origin}/login`
-        }
-      });
+        { redirectTo: `${window.location.origin}/login` }
+      );
 
-      if (userError || !user?.id) {
+      if (resetError) {
+        if (resetError.message.includes('Email not found')) {
+          throw new Error('No account found with this email address');
+        }
+        throw resetError;
+      }
+
+      // Show success message
+      alert('Password reset instructions have been sent to your email');
+      window.location.href = '/login';
+      return;
+
+    } catch (err) {
+      if (err instanceof Error && err.message === 'No account found with this email address') {
         throw new Error('No account found with this email address');
       }
-
-      // Get profile using user ID
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('phone')
-        .eq('id', user?.id)
-        .single();
-
-      if (profileError || !profile?.phone) {
-        // If no phone number is found, still allow password reset via email
-        const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-          email,
-          { redirectTo: `${window.location.origin}/login` }
-        );
-
-        if (resetError) throw resetError;
-
-        // Show success message and redirect
-        alert('Password reset instructions have been sent to your email');
-        window.location.href = '/login';
-        return;
-      }
-
-      // Mask phone number for display
-      if (profile.phone) {
-        const maskedPhone = profile.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
-        setPhone(maskedPhone);
-      }
-
-      // Send verification code via SMS
-      // In production, integrate with a real SMS service
-      console.log('Sending verification code to', profile.phone);
-      
-      // For demo purposes, move to verification step
-      setStep('verify');
-    } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);

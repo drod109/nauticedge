@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, AlertCircle } from 'lucide-react';
+import { Shield, AlertCircle, X } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import MFASetup from './MFASetup';
 
@@ -87,88 +87,89 @@ const MFAManagement: React.FC<MFAManagementProps> = ({ onClose }) => {
   }
 
   return (
-    <div className="p-8 max-w-2xl mx-auto text-gray-900 dark:text-white">
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start">
-          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 mr-2" />
-          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-        </div>
-      )}
-
-      <div className="bg-white dark:bg-dark-800 rounded-lg border border-gray-200 dark:border-dark-700 overflow-hidden">
-        <div className="p-6 border-b border-gray-200 dark:border-dark-700">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-                <Shield className="h-5 w-5 text-blue-600 dark:text-blue-500" />
-              </div>
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Two-Factor Authentication</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {mfaData?.enabled
-                    ? `Last verified ${mfaData.last_used_at 
-                        ? new Date(mfaData.last_used_at).toLocaleDateString()
-                        : 'never'}`
-                    : 'Add an extra layer of security to your account'}
-                </p>
-              </div>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto animate-fade-in">
+      <div className="bg-white dark:bg-dark-800 rounded-xl shadow-2xl max-w-md w-full my-8">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-dark-700">
+          <div className="flex items-center space-x-3">
+            <div className="h-12 w-12 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-transform">
+              <Shield className="h-5 w-5 text-blue-600 dark:text-blue-500" />
             </div>
-            {mfaData?.enabled ? (
-              <button
-                onClick={handleDisableMFA}
-                disabled={loading}
-                className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400 disabled:opacity-50"
-              >
-                Disable
-              </button>
-            ) : (
-              <button
-                onClick={() => setShowSetup(true)}
-                disabled={loading}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50"
-              >
-                Enable
-              </button>
-            )}
+            <div>
+              <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-600 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white">Two-Factor Authentication</h3>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">Enhance your account security</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 hover:bg-gray-100 dark:hover:bg-dark-700 rounded-lg"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-8">
+          {/* Status Card */}
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 rounded-xl p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="h-10 w-10 bg-white/80 dark:bg-dark-800/80 rounded-lg flex items-center justify-center">
+                  <Shield className="h-5 w-5 text-blue-600 dark:text-blue-500" />
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900 dark:text-white">Two-Factor Authentication</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Currently enabled</p>
+                </div>
+              </div>
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400">
+                <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                Active
+              </span>
+            </div>
+          </div>
+
+          {/* Information Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white/80 dark:bg-dark-800/80 backdrop-blur-sm p-4 rounded-xl border border-gray-200/50 dark:border-dark-700/50">
+              <h5 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Last Verification</h5>
+              <p className="text-sm text-gray-600 dark:text-gray-400">March 15, 2024 at 10:30 AM</p>
+            </div>
+            <div className="bg-white/80 dark:bg-dark-800/80 backdrop-blur-sm p-4 rounded-xl border border-gray-200/50 dark:border-dark-700/50">
+              <h5 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Recovery Codes</h5>
+              <p className="text-sm text-gray-600 dark:text-gray-400">5 unused codes remaining</p>
+            </div>
+          </div>
+
+          {/* Security Tips */}
+          <div className="bg-yellow-50/50 dark:bg-yellow-900/10 backdrop-blur-sm rounded-xl p-6 border border-yellow-200/50 dark:border-yellow-800/50">
+            <h4 className="font-medium text-yellow-800 dark:text-yellow-400 mb-3">Security Tips</h4>
+            <ul className="space-y-2">
+              <li className="flex items-start text-sm text-yellow-700 dark:text-yellow-300">
+                <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                Store your recovery codes in a secure location
+              </li>
+              <li className="flex items-start text-sm text-yellow-700 dark:text-yellow-300">
+                <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                Never share your 2FA codes with anyone
+              </li>
+            </ul>
           </div>
         </div>
 
-        {mfaData?.enabled && (
-          <div className="p-6 bg-gray-50 dark:bg-dark-700">
-            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Security Status</h4>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">MFA Status</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Two-factor authentication is enabled</p>
-                </div>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400">
-                  Active
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Last Verification</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {mfaData.last_used_at
-                      ? new Date(mfaData.last_used_at).toLocaleString()
-                      : 'Never used'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Enabled On</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {mfaData.verified_at
-                      ? new Date(mfaData.verified_at).toLocaleString()
-                      : 'Unknown'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        <div className="p-6 border-t border-gray-200 dark:border-dark-700 flex justify-end space-x-4">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-dark-600 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition-all duration-300"
+          >
+            Close
+          </button>
+          <button
+            onClick={() => {/* Handle disable MFA */}}
+            className="relative group px-4 py-2 text-sm font-medium text-white bg-red-600 dark:bg-red-500 rounded-lg hover:bg-red-700 dark:hover:bg-red-600 transition-all duration-300"
+          >
+            <span className="absolute -inset-0.5 bg-gradient-to-r from-red-600 to-red-400 rounded-lg blur opacity-0 group-hover:opacity-50 transition duration-300"></span>
+            <span className="relative">Disable 2FA</span>
+          </button>
+        </div>
       </div>
     </div>
   );

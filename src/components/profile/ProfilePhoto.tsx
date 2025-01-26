@@ -80,16 +80,18 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
       <img
         src={photoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=random`}
         alt={fullName}
-        className={`${dimensions} rounded-full ${editable ? 'border-4 border-white' : ''} object-cover shadow-md`}
+        className={`${dimensions} rounded-full ${
+          editable ? 'ring-4 ring-white dark:ring-dark-800 group-hover:ring-blue-200 dark:group-hover:ring-blue-900/30' : ''
+        } object-cover shadow-lg transition-all duration-300 group-hover:shadow-xl`}
       />
       {editable && <label 
         htmlFor={`photo-upload-${userId}`}
-        className={`absolute ${buttonPosition} bg-white rounded-full ${buttonPadding} shadow-sm hover:shadow transition-shadow cursor-pointer`}
+        className={`absolute ${buttonPosition} bg-white dark:bg-dark-800 rounded-full ${buttonPadding} shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group-hover:scale-110 hover:bg-blue-50 dark:hover:bg-blue-900/20`}
       >
         {uploadingPhoto ? (
-          <div className={`${iconSize} border-2 border-gray-400 border-t-blue-600 rounded-full animate-spin`} />
+          <div className={`${iconSize} border-2 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin`} />
         ) : (
-          <Camera className={`${iconSize} text-gray-600`} />
+          <Camera className={`${iconSize} text-blue-600 dark:text-blue-400`} />
         )}
       </label>}
       {editable && <input
@@ -100,6 +102,11 @@ const ProfilePhoto: React.FC<ProfilePhotoProps> = ({
         onChange={handlePhotoUpload}
         disabled={uploadingPhoto}
       />}
+      {uploadingPhoto && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20 dark:bg-black/40 backdrop-blur-sm rounded-full">
+          <div className="text-xs text-white">Uploading...</div>
+        </div>
+      )}
     </div>
   );
 };

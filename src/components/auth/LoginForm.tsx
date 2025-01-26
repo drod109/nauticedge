@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Lock, Shield, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Shield, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import MFAVerification from './MFAVerification';
 import ForgotPassword from './ForgotPassword';
 import { supabase } from '../../lib/supabase';

@@ -498,15 +498,15 @@ const Profile = () => {
 
   return (
     <ProtectedRoute>
-    <div className="flex h-screen bg-gray-50 dark:bg-dark-900">
+    <div className="flex min-h-screen">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden min-w-0 bg-gray-50 dark:bg-dark-900">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         <Header theme={theme} onThemeChange={handleThemeChange} />
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto w-full py-8 px-4 sm:px-6 lg:px-8">
-            <div className="bg-white dark:bg-dark-800 rounded-lg shadow border border-gray-200 dark:border-dark-700">
+            <div className="bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200/50 dark:border-dark-700/50 hover:shadow-xl transition-all duration-300">
               {/* Profile Header */}
-              <div className="relative px-8 pt-8 pb-4 flex justify-between items-end border-b border-gray-200 dark:border-dark-700">
+              <div className="relative px-8 pt-8 pb-4 flex justify-between items-end border-b border-gray-200/50 dark:border-dark-700/50">
                 <div className="flex items-end space-x-4">
                   <ProfilePhoto
                     userId={userData?.id}
@@ -516,21 +516,24 @@ const Profile = () => {
                     editable={true}
                   />
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{userData?.full_name || 'Loading...'}</h1>
-                    <p className="text-gray-600 dark:text-gray-400">{userData?.email || ''}</p>
+                    <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-600 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white animate-gradient">{userData?.full_name || 'Loading...'}</h1>
+                    <p className="text-gray-600 dark:text-gray-400 flex items-center">
+                      <Mail className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" />
+                      {userData?.email || ''}
+                    </p>
                   </div>
                 </div>
               </div>
 
-              {/* Tabs */}
-              <div className="px-8 pt-6 border-b border-gray-200 dark:border-dark-700">
+              {/* Tabs Navigation */}
+              <div className="sticky top-0 z-10 bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm px-8 pt-6 border-b border-gray-200/50 dark:border-dark-700/50">
                 <div className="flex space-x-8">
                   <button
                     onClick={() => setActiveTab('personal')}
                     className={`pb-4 text-sm font-medium flex items-center space-x-2 ${
                       activeTab === 'personal'
-                        ? 'border-b-2 border-blue-600 text-blue-600'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                        ? 'border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-b-2 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
                     <User2 className="h-4 w-4" />
@@ -540,8 +543,8 @@ const Profile = () => {
                     onClick={() => setActiveTab('billing')}
                     className={`pb-4 text-sm font-medium flex items-center space-x-2 ${
                       activeTab === 'billing'
-                        ? 'border-b-2 border-blue-600 text-blue-600'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                        ? 'border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-b-2 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
                     <BillingIcon className="h-4 w-4" />
@@ -551,8 +554,8 @@ const Profile = () => {
                     onClick={() => setActiveTab('company')}
                     className={`pb-4 text-sm font-medium flex items-center space-x-2 ${
                       activeTab === 'company'
-                        ? 'border-b-2 border-blue-600 text-blue-600'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                        ? 'border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-b-2 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
                     <Building2 className="h-4 w-4" />
@@ -561,10 +564,15 @@ const Profile = () => {
                 </div>
               </div>
 
-              {/* Loading State */}
+              {/* Content Area */}
+              <div className="relative">
               {isLoading ? (
-                <div className="p-8 flex justify-center">
-                  <div className="h-8 w-8 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-500 rounded-full animate-spin"></div>
+                <div className="p-8 flex flex-col items-center justify-center space-y-4">
+                  <div className="relative">
+                    <div className="h-12 w-12 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-500 rounded-full animate-spin"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/90 to-transparent dark:via-dark-800/90 animate-pulse"></div>
+                  </div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 animate-pulse">Loading profile data...</p>
                 </div>
               ) : (
                 <>
@@ -574,6 +582,7 @@ const Profile = () => {
                   {activeTab === 'company' && renderCompanyContent()}
                 </>
               )}
+              </div>
             </div>
           </div>
         </main>
