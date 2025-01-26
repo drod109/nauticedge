@@ -3,15 +3,15 @@ import { Menu, X, Ship, ChevronDown } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const navItems = [
-  { label: 'Features', href: '#features' },
-  { label: 'Solutions', href: '#solutions' },
-  { label: 'Pricing', href: '#pricing' },
+  { label: 'Features', href: '/#features' },
+  { label: 'Solutions', href: '/solutions' },
+  { label: 'Pricing', href: '/#pricing' },
   {
     label: 'Resources',
     children: [
       { label: 'Documentation', href: '/docs' },
       { label: 'API Reference', href: '/api' },
-      { label: 'Blog', href: '/blog' }
+      { label: 'Blog', href: '/blog' },
     ]
   }
 ];

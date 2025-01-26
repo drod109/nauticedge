@@ -12,9 +12,9 @@ const sections: LinkSection[] = [
   {
     title: 'Product',
     links: [
-      { label: 'Features', href: '#features' },
-      { label: 'Solutions', href: '#solutions' },
-      { label: 'Pricing', href: '#pricing' },
+      { label: 'Features', href: '/#features' },
+      { label: 'Solutions', href: '/solutions' },
+      { label: 'Pricing', href: '/#pricing' },
       { label: 'Updates', href: '#' }
     ]
   },
@@ -22,17 +22,17 @@ const sections: LinkSection[] = [
     title: 'Company',
     links: [
       { label: 'About', href: '/about' },
-      { label: 'Careers', href: '#' },
-      { label: 'Blog', href: '#' },
-      { label: 'Press', href: '#' }
+      { label: 'Careers', href: '/careers' },
+      { label: 'Blog', href: '/blog' },
+      { label: 'Press', href: '/press' }
     ]
   },
   {
     title: 'Resources',
     links: [
       { label: 'Documentation', href: '/docs' },
-      { label: 'Help Center', href: '#' },
-      { label: 'Community', href: '#' },
+      { label: 'Help Center', href: '/help' },
+      { label: 'Community', href: '/community' },
       { label: 'Contact', href: '/contact' }
     ]
   },

@@ -17,10 +17,17 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
+import Blog from './pages/Blog';
 import Security from './pages/Security';
 import Compliance from './pages/Compliance';
+import Careers from './pages/Careers';
 import Documentation from './pages/Documentation';
+import APIReference from './pages/APIReference';
+import Press from './pages/Press';
 import Cookies from './pages/Cookies';
+import HelpCenter from './pages/HelpCenter';
+import Community from './pages/Community';
+import SolutionsPage from './pages/SolutionsPage';
 import Registration from './pages/Registration';
 import Schedule from './pages/Schedule';
 import Invoices from './pages/Invoices';
@@ -70,6 +77,10 @@ function App() {
   if (path === '/terms') {
     return <Terms />;
   }
+  
+  if (path === '/blog') {
+    return <Blog />;
+  }
 
   if (path === '/security') {
     return <Security />;
@@ -79,8 +90,32 @@ function App() {
     return <Compliance />;
   }
   
+  if (path === '/careers') {
+    return <Careers />;
+  }
+  
   if (path === '/docs') {
     return <Documentation />;
+  }
+  
+  if (path === '/api') {
+    return <APIReference />;
+  }
+  
+  if (path === '/press') {
+    return <Press />;
+  }
+
+  if (path === '/help') {
+    return <HelpCenter />;
+  }
+
+  if (path === '/community') {
+    return <Community />;
+  }
+  
+  if (path === '/solutions') {
+    return <SolutionsPage />;
   }
   
   if (path === '/cookies') {
