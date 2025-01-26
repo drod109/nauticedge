@@ -1,10 +1,11 @@
 import React from 'react';
-import { X, Building2 } from 'lucide-react';
+import { X, Building2, Check } from 'lucide-react';
 
 interface CompanyModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: () => void;
+  error?: string | null;
   editForm: {
     company_name: string;
     company_position: string;
@@ -26,6 +27,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
   onClose,
   onSave,
   editForm,
+  error,
   onChange,
   loading = false
 }) => {
@@ -33,8 +35,8 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-0 sm:p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-dark-800 rounded-none sm:rounded-xl shadow-xl w-full max-w-3xl h-full sm:h-auto sm:max-h-[90vh]">
-        <div className="sticky top-0 z-10 bg-white dark:bg-dark-800 flex items-center justify-between p-6 border-b border-gray-200 dark:border-dark-700 rounded-t-none sm:rounded-t-xl">
+      <div className="bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm rounded-none sm:rounded-xl shadow-xl w-full max-w-3xl h-full sm:h-auto sm:max-h-[90vh]">
+        <div className="sticky top-0 z-10 bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm flex items-center justify-between p-6 border-b border-gray-200 dark:border-dark-700 rounded-t-none sm:rounded-t-xl">
           <div className="flex items-center space-x-2">
             <div className="h-10 w-10 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
               <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-500" />
@@ -46,13 +48,19 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 transition-colors"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 p-2 hover:bg-gray-100 dark:hover:bg-dark-700 rounded-lg transition-colors"
           >
             <X className="h-6 w-6" />
           </button>
         </div>
 
         <div className="p-6 space-y-6 max-h-[calc(100vh-16rem)] overflow-y-auto scrollbar-hide">
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            </div>
+          )}
+
           {/* Basic Information */}
           <div>
             <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Basic Information</h4>
@@ -65,7 +73,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
                   type="text"
                   value={editForm.company_name}
                   onChange={(e) => onChange('company_name', e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
                   placeholder="Enter company name"
                 />
               </div>
@@ -77,7 +85,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
                   type="text"
                   value={editForm.company_position}
                   onChange={(e) => onChange('company_position', e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
                   placeholder="Enter your position"
                 />
               </div>
@@ -89,7 +97,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
                   type="text"
                   value={editForm.registration_number}
                   onChange={(e) => onChange('registration_number', e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
                   placeholder="Enter registration number"
                 />
               </div>
@@ -101,7 +109,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
                   type="text"
                   value={editForm.tax_id}
                   onChange={(e) => onChange('tax_id', e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
                   placeholder="Enter tax ID"
                 />
               </div>
@@ -120,7 +128,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
                   type="text"
                   value={editForm.company_address_line1}
                   onChange={(e) => onChange('company_address_line1', e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
                   placeholder="Street address, P.O. box, company name"
                 />
               </div>
@@ -132,7 +140,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
                   type="text"
                   value={editForm.company_address_line2}
                   onChange={(e) => onChange('company_address_line2', e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
                   placeholder="Apartment, suite, unit, building, floor, etc."
                 />
               </div>
@@ -145,7 +153,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
                     type="text"
                     value={editForm.company_city}
                     onChange={(e) => onChange('company_city', e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
                     placeholder="Enter city"
                   />
                 </div>
@@ -157,7 +165,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
                     type="text"
                     value={editForm.company_state}
                     onChange={(e) => onChange('company_state', e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
                     placeholder="Enter state/province"
                   />
                 </div>
@@ -169,7 +177,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
                     type="text"
                     value={editForm.company_postal_code}
                     onChange={(e) => onChange('company_postal_code', e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
                     placeholder="Enter postal code"
                   />
                 </div>
@@ -181,7 +189,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
                     type="text"
                     value={editForm.company_country}
                     onChange={(e) => onChange('company_country', e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
                     placeholder="Enter country"
                   />
                 </div>
@@ -190,20 +198,30 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
           </div>
         </div>
 
-        <div className="sticky bottom-0 z-10 bg-white dark:bg-dark-800 border-t border-gray-200 dark:border-dark-700 p-4 rounded-b-none sm:rounded-b-xl">
+        <div className="sticky bottom-0 z-10 bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm border-t border-gray-200 dark:border-dark-700 p-4 rounded-b-none sm:rounded-b-xl">
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-4">
             <button
               onClick={onClose}
-              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-dark-600 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700"
+              className="w-full sm:w-auto px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-dark-600 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition-all duration-300"
             >
               Cancel
             </button>
             <button
               onClick={onSave}
               disabled={loading}
-              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50"
+              className="relative group w-full sm:w-auto"
             >
-              {loading ? 'Saving...' : 'Save Changes'}
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg blur opacity-60 group-hover:opacity-100 transition duration-300"></div>
+              <div className="relative px-4 py-2.5 bg-white dark:bg-dark-800 rounded-lg leading-none flex items-center justify-center space-x-2">
+                {loading ? (
+                  <div className="h-5 w-5 border-2 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <span className="text-blue-600 dark:text-blue-400">Save Changes</span>
+                    <Check className="h-5 w-5 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" />
+                  </>
+                )}
+              </div>
             </button>
           </div>
         </div>

@@ -238,7 +238,7 @@ const DashboardContent = () => {
             ))}
           </div>
           
-          <div className="overflow-x-auto rounded-xl border border-gray-200/50 dark:border-dark-700/50">
+          <div className="overflow-x-auto scrollbar-hide rounded-xl border border-gray-200/50 dark:border-dark-700/50">
             <table className="min-w-full">
               <thead>
                 <tr className="text-left text-sm font-medium text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-dark-700/50">

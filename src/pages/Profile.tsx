@@ -239,6 +239,7 @@ const Profile = () => {
       isEditing={isEditingCompany}
       editForm={editForm}
       userData={userData}
+      error={error}
       onEdit={() => setIsEditingCompany(!isEditingCompany)}
       onCancel={() => setIsEditingCompany(false)}
       onSave={handleCompanyEditSubmit}
@@ -480,6 +481,7 @@ const Profile = () => {
       <PersonalInfoModal
         isOpen={isEditing}
         onClose={() => setIsEditing(false)}
+        error={error}
         onSave={handleEditSubmit}
         editForm={editForm}
         onChange={(field, value) => setEditForm(prev => ({ ...prev, [field]: value }))}
@@ -498,16 +500,16 @@ const Profile = () => {
 
   return (
     <ProtectedRoute>
-    <div className="flex min-h-screen">
+    <div className="flex h-screen bg-gray-50 dark:bg-dark-900">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+      <div className="flex-1 flex flex-col min-w-0">
         <Header theme={theme} onThemeChange={handleThemeChange} />
-        <main className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto w-full py-8 px-4 sm:px-6 lg:px-8">
+        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-dark-900">
+          <div className="max-w-7xl mx-auto w-full py-4 sm:py-8 px-3 sm:px-6 lg:px-8">
             <div className="bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200/50 dark:border-dark-700/50 hover:shadow-xl transition-all duration-300">
               {/* Profile Header */}
-              <div className="relative px-8 pt-8 pb-4 flex justify-between items-end border-b border-gray-200/50 dark:border-dark-700/50">
-                <div className="flex items-end space-x-4">
+              <div className="relative px-4 sm:px-8 pt-6 sm:pt-8 pb-4 flex flex-col sm:flex-row sm:justify-between sm:items-end border-b border-gray-200/50 dark:border-dark-700/50">
+                <div className="flex flex-col sm:flex-row sm:items-end space-y-4 sm:space-y-0 sm:space-x-4">
                   <ProfilePhoto
                     userId={userData?.id}
                     photoUrl={userData?.photo_url}
@@ -516,7 +518,7 @@ const Profile = () => {
                     editable={true}
                   />
                   <div>
-                    <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-600 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white animate-gradient">{userData?.full_name || 'Loading...'}</h1>
+                    <h1 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-600 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white animate-gradient">{userData?.full_name || 'Loading...'}</h1>
                     <p className="text-gray-600 dark:text-gray-400 flex items-center">
                       <Mail className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" />
                       {userData?.email || ''}
@@ -526,8 +528,8 @@ const Profile = () => {
               </div>
 
               {/* Tabs Navigation */}
-              <div className="sticky top-0 z-10 bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm px-8 pt-6 border-b border-gray-200/50 dark:border-dark-700/50">
-                <div className="flex space-x-8">
+              <div className="sticky top-0 z-10 bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm px-4 sm:px-8 pt-4 sm:pt-6 border-b border-gray-200/50 dark:border-dark-700/50 overflow-x-auto">
+                <div className="flex space-x-4 sm:space-x-8 min-w-max">
                   <button
                     onClick={() => setActiveTab('personal')}
                     className={`pb-4 text-sm font-medium flex items-center space-x-2 ${
