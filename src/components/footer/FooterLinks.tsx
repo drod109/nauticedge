@@ -30,7 +30,7 @@ const sections: LinkSection[] = [
   {
     title: 'Resources',
     links: [
-      { label: 'Documentation', href: '#' },
+      { label: 'Documentation', href: '/docs' },
       { label: 'Help Center', href: '#' },
       { label: 'Community', href: '#' },
       { label: 'Contact', href: '/contact' }
@@ -39,10 +39,10 @@ const sections: LinkSection[] = [
   {
     title: 'Legal',
     links: [
-      { label: 'Privacy', href: '#' },
-      { label: 'Terms', href: '#' },
-      { label: 'Security', href: '#' },
-      { label: 'Compliance', href: '#' }
+      { label: 'Privacy', href: '/privacy' },
+      { label: 'Terms', href: '/terms' },
+      { label: 'Security', href: '/security' },
+      { label: 'Compliance', href: '/compliance' }
     ]
   }
 ];

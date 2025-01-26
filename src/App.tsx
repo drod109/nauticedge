@@ -15,6 +15,12 @@ import Settings from './pages/Settings';
 import SignUp from './pages/SignUp';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import Security from './pages/Security';
+import Compliance from './pages/Compliance';
+import Documentation from './pages/Documentation';
+import Cookies from './pages/Cookies';
 import Registration from './pages/Registration';
 import Schedule from './pages/Schedule';
 import Invoices from './pages/Invoices';
@@ -55,6 +61,30 @@ function App() {
 
   if (path === '/contact') {
     return <Contact />;
+  }
+  
+  if (path === '/privacy') {
+    return <Privacy />;
+  }
+  
+  if (path === '/terms') {
+    return <Terms />;
+  }
+
+  if (path === '/security') {
+    return <Security />;
+  }
+  
+  if (path === '/compliance') {
+    return <Compliance />;
+  }
+  
+  if (path === '/docs') {
+    return <Documentation />;
+  }
+  
+  if (path === '/cookies') {
+    return <Cookies />;
   }
   
   if (path === '/registration') {
