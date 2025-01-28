@@ -34,15 +34,15 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-0 sm:p-4 overflow-y-auto">
-      <div className="bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm rounded-none sm:rounded-xl shadow-xl w-full max-w-3xl h-full sm:h-auto sm:max-h-[90vh]">
-        <div className="sticky top-0 z-10 bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm flex items-center justify-between p-6 border-b border-gray-200 dark:border-dark-700 rounded-t-none sm:rounded-t-xl">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-0 sm:p-4">
+      <div className="bg-white dark:bg-dark-800 w-full h-full sm:h-auto sm:max-w-3xl sm:m-0 sm:rounded-2xl shadow-2xl flex flex-col max-h-[100dvh] sm:max-h-[90dvh] animate-fade-in">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-dark-700">
           <div className="flex items-center space-x-2">
-            <div className="h-10 w-10 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
+            <div className="h-12 w-12 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-transform">
               <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-500" />
             </div>
             <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Edit Company Information</h3>
+              <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-600 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white">Edit Company Information</h3>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Update your company details</p>
             </div>
           </div>
@@ -54,7 +54,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
           </button>
         </div>
 
-        <div className="p-6 space-y-6 max-h-[calc(100vh-16rem)] overflow-y-auto scrollbar-hide">
+        <div className="flex-1 p-6 space-y-8 overflow-y-auto scrollbar-hide">
           {error && (
             <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
               <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
@@ -64,7 +64,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
           {/* Basic Information */}
           <div>
             <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Basic Information</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Company Name
@@ -120,7 +120,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
           <div>
             <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Address Information</h4>
             <div className="space-y-4">
-              <div>
+              <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Address Line 1
                 </label>
@@ -132,7 +132,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
                   placeholder="Street address, P.O. box, company name"
                 />
               </div>
-              <div>
+              <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Address Line 2
                 </label>
@@ -144,7 +144,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
                   placeholder="Apartment, suite, unit, building, floor, etc."
                 />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     City
@@ -198,29 +198,29 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
           </div>
         </div>
 
-        <div className="sticky bottom-0 z-10 bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm border-t border-gray-200 dark:border-dark-700 p-4 rounded-b-none sm:rounded-b-xl">
+        <div className="sticky bottom-0 z-10 bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm border-t border-gray-200 dark:border-dark-700 p-6 sm:rounded-b-2xl">
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-4">
             <button
               onClick={onClose}
-              className="w-full sm:w-auto px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-dark-600 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition-all duration-300"
+              className="w-full sm:w-auto px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-dark-600 rounded-xl hover:bg-gray-50 dark:hover:bg-dark-700 transition-all duration-300"
             >
               Cancel
             </button>
             <button
               onClick={onSave}
               disabled={loading}
-              className="relative group w-full sm:w-auto"
+              className="relative w-full sm:w-auto group overflow-hidden rounded-xl"
             >
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg blur opacity-60 group-hover:opacity-100 transition duration-300"></div>
-              <div className="relative px-4 py-2.5 bg-white dark:bg-dark-800 rounded-lg leading-none flex items-center justify-center space-x-2">
-                {loading ? (
-                  <div className="h-5 w-5 border-2 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  <>
-                    <span className="text-blue-600 dark:text-blue-400">Save Changes</span>
-                    <Check className="h-5 w-5 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" />
-                  </>
-                )}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-400 group-hover:scale-105 transition-transform duration-300"></div>
+              <div className="relative w-full px-8 py-3 leading-none flex items-center justify-center space-x-2">
+              {loading ? (
+                <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <>
+                  <span className="text-white">Save Changes</span>
+                  <Check className="h-5 w-5 text-white transform group-hover:scale-110 transition-transform" />
+                </>
+              )}
               </div>
             </button>
           </div>

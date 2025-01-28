@@ -10,12 +10,21 @@ const Login = () => {
   useEffect(() => {
     const init = async () => {
       try {
+        // Get the current URL and create a URL object
+        const currentUrl = new URL(window.location.href);
+        const redirectPath = currentUrl.searchParams.get('redirect') || '/dashboard';
+
         // Check if there's an active session first
         const { data: { session } } = await supabase.auth.getSession();
 
         if (session) {
           // Only attempt to sign out if there's an active session
           await supabase.auth.signOut();
+          // After signing out, construct the login URL properly
+          const loginUrl = new URL('/login', window.location.origin);
+          loginUrl.searchParams.set('redirect', redirectPath);
+          window.location.href = loginUrl.toString();
+          return;
         }
 
         // Clear any stored auth data regardless of session status

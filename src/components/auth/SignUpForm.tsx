@@ -263,7 +263,7 @@ const SignUpForm = () => {
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-dark-600 bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
+                className="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                 placeholder="First name"
                 required
               />
@@ -277,7 +277,7 @@ const SignUpForm = () => {
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-dark-600 bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
+                className="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                 placeholder="Last name"
                 required
               />
@@ -293,7 +293,7 @@ const SignUpForm = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-dark-600 bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
+              className="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
               placeholder="Enter your email"
               required
             />
@@ -308,7 +308,7 @@ const SignUpForm = () => {
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-dark-600 bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
+              className="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
               placeholder="Create a password"
               required
               minLength={6}
@@ -334,7 +334,7 @@ const SignUpForm = () => {
               type={showConfirmPassword ? "text" : "password"}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-dark-600 bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
+              className="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
               placeholder="Confirm your password"
               required
               minLength={6}
@@ -366,24 +366,24 @@ const SignUpForm = () => {
         </div>
 
         <div className="relative group">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg blur opacity-60 group-hover:opacity-100 transition duration-300"></div>
-          <div className="relative w-full px-7 py-4 bg-white dark:bg-dark-800 rounded-lg leading-none flex items-center justify-center space-x-2">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={loading || !acceptTerms}
-              className="relative w-full flex items-center justify-center space-x-2 disabled:opacity-50"
-            >
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={loading || !acceptTerms}
+            className="relative w-full group"
+          >
+            <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 to-blue-400 group-hover:from-blue-400 group-hover:to-blue-600 rounded-lg"></span>
+            <div className="relative w-full px-7 py-4 rounded-lg leading-none flex items-center justify-center space-x-2">
               {loading ? (
                 <div className="h-5 w-5 border-2 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin"></div>
               ) : (
                 <>
-                  <span className="text-blue-700 dark:text-blue-300">Create Account</span>
-                  <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform" />
+                  <span className="text-white">Create Account</span>
+                  <ArrowRight className="h-5 w-5 text-white group-hover:translate-x-1 transition-transform" />
                 </>
               )}
+            </div>
           </button>
-          </div>
         </div>
 
         <div className="relative">
@@ -405,10 +405,8 @@ const SignUpForm = () => {
               key={provider.name}
               onClick={provider.onClick}
               disabled={loading}
-              className="group relative w-full"
+              className="w-full px-6 py-3 text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 border border-gray-300 dark:border-dark-600 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors flex items-center justify-center"
             >
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-gray-600 to-gray-400 rounded-lg blur opacity-30 group-hover:opacity-100 transition duration-300"></div>
-              <div className="relative w-full px-7 py-4 bg-white dark:bg-dark-800 rounded-lg leading-none flex items-center justify-center space-x-2">
                 {provider.icon === 'google' && (
                   <svg className="h-5 w-5 mr-2 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
                     <path
@@ -440,7 +438,6 @@ const SignUpForm = () => {
                   </svg>
                 )}
                 <span className="text-gray-700 dark:text-gray-300">Continue with {provider.name}</span>
-              </div>
             </button>
           ))}
         </div>
