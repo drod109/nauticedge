@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Building2, Check } from 'lucide-react';
+import { usePreventScroll } from '../../hooks/usePreventScroll';
 
 interface CompanyModalProps {
   isOpen: boolean;
@@ -31,11 +32,16 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
   onChange,
   loading = false
 }) => {
+  usePreventScroll(isOpen);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-0 sm:p-4">
-      <div className="bg-white dark:bg-dark-800 w-full h-full sm:h-auto sm:max-w-3xl sm:m-0 sm:rounded-2xl shadow-2xl flex flex-col max-h-[100dvh] sm:max-h-[90dvh] animate-fade-in">
+    <div 
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 overflow-y-auto"
+    >
+      <div className="min-h-full flex items-center justify-center p-0 sm:p-4">
+        <div className="bg-white dark:bg-dark-800 w-full sm:max-w-3xl rounded-none sm:rounded-2xl shadow-2xl flex flex-col max-h-[100dvh] sm:max-h-[90dvh] my-auto animate-fade-in">
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-dark-700">
           <div className="flex items-center space-x-2">
             <div className="h-12 w-12 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-transform">
@@ -226,6 +232,7 @@ const CompanyModal: React.FC<CompanyModalProps> = ({
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

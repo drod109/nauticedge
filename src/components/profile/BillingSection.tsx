@@ -11,7 +11,7 @@ interface BillingSectionProps {
 
 const BillingSection = ({ currentPlan, onAddPaymentMethod, onPlanChange }: BillingSectionProps) => {
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       {/* Current Plan */}
       <CurrentPlan currentPlan={currentPlan} onPlanChange={onPlanChange} />
 

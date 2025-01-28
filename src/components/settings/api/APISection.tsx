@@ -6,9 +6,9 @@ const APISection = () => {
   const [activeTab, setActiveTab] = useState<'keys' | 'webhooks'>('keys');
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       {/* Tabs */}
-      <div className="mb-8 border-b border-gray-200">
+      <div className="mb-4 sm:mb-8 border-b border-gray-200">
         <div className="flex space-x-8">
           <button
             onClick={() => setActiveTab('keys')}
