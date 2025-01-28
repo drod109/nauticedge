@@ -4,7 +4,7 @@ import Sidebar from '../components/dashboard/Sidebar';
 import Header from '../components/dashboard/Header';
 import ActiveSessionsList from '../components/settings/security/ActiveSessionsList';
 import LoginHistoryList from '../components/settings/security/LoginHistoryList';
-import MFAManagement from '../components/auth/MFAManagement';
+import SecuritySection from '../components/settings/security/SecuritySection';
 import APISection from '../components/settings/api/APISection';
 import { Theme, getInitialTheme, setTheme } from '../lib/theme';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
@@ -12,7 +12,6 @@ import SessionsModal from '../components/settings/security/SessionsModal';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('security');
-  const [showMFAManagement, setShowMFAManagement] = useState(false);
   const [theme, setCurrentTheme] = useState<Theme>(getInitialTheme());
   const [showSessionsModal, setShowSessionsModal] = useState(false);
   const [sessionsModalTab, setSessionsModalTab] = useState<'sessions' | 'history'>('sessions');
@@ -23,67 +22,7 @@ const Settings = () => {
   };
 
   const renderSecurityContent = () => (
-    <div className="p-8">
-      {/* MFA Section */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Two-Factor Authentication</h2>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">Add an extra layer of security to your account</p>
-        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-dark-700 rounded-lg border border-gray-200 dark:border-dark-600">
-          <div className="flex items-center space-x-4">
-            <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-              <Shield className="h-5 w-5 text-blue-600 dark:text-blue-500" />
-            </div>
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">Two-factor authentication is enabled</p>
-            </div>
-          </div>
-          <button 
-            onClick={() => setShowMFAManagement(true)} 
-            className="text-sm text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
-          >
-            Manage
-          </button>
-        </div>
-      </div>
-
-      {/* Active Sessions Section */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Login Sessions</h2>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">Manage your active sessions and devices</p>
-        <div className="space-y-4">
-          <button
-            onClick={() => {
-              setSessionsModalTab('sessions');
-              setShowSessionsModal(true);
-            }}
-            className="w-full p-4 border border-gray-200 dark:border-dark-600 bg-white dark:bg-dark-800 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors text-left mb-4"
-          >
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">Active Sessions</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">View and manage your active login sessions</p>
-            </div>
-          </button>
-          <button
-            onClick={() => {
-              setSessionsModalTab('history');
-              setShowSessionsModal(true);
-            }}
-            className="w-full p-4 border border-gray-200 dark:border-dark-600 bg-white dark:bg-dark-800 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors text-left"
-          >
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">Login History</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Review your recent login activity</p>
-            </div>
-          </button>
-        </div>
-      </div>
-      
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Password</h2>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">Manage your account password</p>
-        <button className="text-sm text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400">Change password</button>
-      </div>
-    </div>
+    <SecuritySection />
   );
 
   const renderIntegrationsContent = () => (
@@ -283,24 +222,6 @@ const Settings = () => {
               {activeTab === 'measurement' && renderMeasurementUnitsContent()}
             </div>
           </div>
-          
-          {/* MFA Management Modal */}
-          {showMFAManagement && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white dark:bg-dark-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-                <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-dark-700">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">Manage Two-Factor Authentication</h3>
-                  <button
-                    onClick={() => setShowMFAManagement(false)}
-                    className="text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400"
-                  >
-                    <X className="h-6 w-6" />
-                  </button>
-                </div>
-                <MFAManagement onClose={() => setShowMFAManagement(false)} />
-              </div>
-            </div>
-          )}
         </main>
       </div>
       

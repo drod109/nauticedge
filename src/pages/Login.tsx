@@ -10,28 +10,27 @@ const Login = () => {
   useEffect(() => {
     const init = async () => {
       try {
-        // Get the current URL and create a URL object
         const currentUrl = new URL(window.location.href);
         const redirectPath = currentUrl.searchParams.get('redirect') || '/dashboard';
 
-        // Check if there's an active session first
         const { data: { session } } = await supabase.auth.getSession();
 
         if (session) {
-          // Only attempt to sign out if there's an active session
-          await supabase.auth.signOut();
-          // After signing out, construct the login URL properly
-          const loginUrl = new URL('/login', window.location.origin);
-          loginUrl.searchParams.set('redirect', redirectPath);
-          window.location.href = loginUrl.toString();
-          return;
+          try {
+            await supabase.auth.signOut();
+          } catch (signOutError) {
+            // Ignore session_not_found errors during sign out
+            if (!signOutError.message?.includes('session_not_found')) {
+              console.error('Error during sign out:', signOutError);
+            }
+          }
         }
 
-        // Clear any stored auth data regardless of session status
-        localStorage.removeItem('sb-xvyetpiyuasltbarascj-auth-token');
+        // Clear any stored auth data
+        localStorage.removeItem('sb-' + import.meta.env.VITE_SUPABASE_PROJECT_ID + '-auth-token');
       } catch (error) {
-        console.error('Error during logout:', error);
-        // Continue even if there's an error - we still want to show the login page
+        // Log error but don't throw - we want to show login page regardless
+        console.error('Error during initialization:', error);
       } finally {
         setLoading(false);
       }

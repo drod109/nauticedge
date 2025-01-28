@@ -15,9 +15,14 @@ const Footer = lazy(() => import('./components/footer/Footer'));
 const Login = lazy(() => import('./pages/Login'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Profile = lazy(() => import('./pages/Profile'));
+const AddPaymentMethod = lazy(() => import('./pages/AddPaymentMethod'));
 const Settings = lazy(() => import('./pages/Settings'));
 const SignUp = lazy(() => import('./pages/SignUp'));
 const About = lazy(() => import('./pages/About'));
+const ChangePassword = lazy(() => import('./pages/ChangePassword'));
+const Sessions = lazy(() => import('./pages/Sessions'));
+const LoginHistory = lazy(() => import('./pages/LoginHistory'));
+const TwoFactorAuth = lazy(() => import('./pages/TwoFactorAuth'));
 const Contact = lazy(() => import('./pages/Contact'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const Terms = lazy(() => import('./pages/Terms'));
@@ -68,9 +73,29 @@ function App() {
     if (path === '/profile') {
       return <Profile />;
     }
+    
+    if (path === '/add-payment-method') {
+      return <AddPaymentMethod />;
+    }
 
     if (path === '/settings') {
       return <Settings />;
+    }
+    
+    if (path === '/settings/2fa') {
+      return <TwoFactorAuth />;
+    }
+    
+    if (path === '/settings/sessions') {
+      return <Sessions />;
+    }
+    
+    if (path === '/settings/login-history') {
+      return <LoginHistory />;
+    }
+    
+    if (path === '/settings/change-password') {
+      return <ChangePassword />;
     }
 
     if (path === '/signup') {

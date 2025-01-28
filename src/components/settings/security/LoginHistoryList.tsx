@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Smartphone, Laptop, Monitor, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { Smartphone, Laptop, Monitor, AlertCircle, CheckCircle2, XCircle, History } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { formatDistanceToNow, format } from 'date-fns';
+
+const MAX_LOGIN_HISTORY = 50; // Maximum number of login history entries to store
 
 interface LoginAttempt {
   id: string;
@@ -22,27 +24,10 @@ const LoginHistoryList = () => {
   const [attempts, setAttempts] = useState<LoginAttempt[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [locationLoading, setLocationLoading] = useState<{ [key: string]: boolean }>({});
-  const [locations, setLocations] = useState<{ [key: string]: { city: string; country: string } }>({});
 
   useEffect(() => {
     fetchLoginHistory();
   }, []);
-
-  const fetchLocationDetails = async (attempt: LoginAttempt) => {
-    if (!attempt.device_info?.location?.city || !attempt.device_info?.location?.country) {
-      return;
-    }
-
-    // Use the stored location data directly
-    setLocations(prev => ({
-      ...prev,
-      [attempt.id]: {
-        city: attempt.device_info.location.city,
-        country: attempt.device_info.location.country
-      }
-    }));
-  };
 
   const fetchLoginHistory = async () => {
     try {
@@ -52,19 +37,27 @@ const LoginHistoryList = () => {
       const { data, error: fetchError } = await supabase
         .from('mfa_verification_attempts')
         .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(50);
+        .eq('user_id', user.id);
 
       if (fetchError) throw fetchError;
       
-      // Fetch location details for each attempt
-      if (data) {
-        data.forEach(attempt => {
-          fetchLocationDetails(attempt);
-        });
+      // Sort and limit login history entries
+      const sortedAttempts = (data || [])
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .slice(0, MAX_LOGIN_HISTORY);
+
+      setAttempts(sortedAttempts);
+
+      // Clean up old entries if we have more than the maximum
+      if (data && data.length > MAX_LOGIN_HISTORY) {
+        const oldAttempts = data.slice(MAX_LOGIN_HISTORY);
+        for (const attempt of oldAttempts) {
+          await supabase
+            .from('mfa_verification_attempts')
+            .delete()
+            .eq('id', attempt.id);
+        }
       }
-      setAttempts(data || []);
     } catch (err) {
       console.error('Error fetching login history:', err);
       setError('Failed to load login history');
@@ -93,9 +86,9 @@ const LoginHistoryList = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-4">
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
           <div className="flex items-start">
             <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 mr-2" />
             <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
@@ -103,71 +96,66 @@ const LoginHistoryList = () => {
         </div>
       )}
 
-      <div className="overflow-hidden border border-gray-200 dark:border-dark-700 divide-y divide-gray-200 dark:divide-dark-700">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-700">
-          <thead className="bg-gray-50 dark:bg-dark-700">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Date & Time
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Device
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Location
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Status
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-dark-800">
-            {attempts.map((attempt) => (
-              <tr key={attempt.id} className="hover:bg-gray-50 dark:hover:bg-dark-700">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                  <div>{format(new Date(attempt.created_at), 'MMM d, yyyy')}</div>
-                  <div className="text-gray-500 dark:text-gray-400">
-                    {format(new Date(attempt.created_at), 'HH:mm:ss')}
+      <div className="grid grid-cols-1 gap-4">
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-4">
+          <p className="text-sm text-blue-700 dark:text-blue-400">
+            For security purposes, we store up to {MAX_LOGIN_HISTORY} most recent login attempts.
+            Older entries are automatically removed.
+          </p>
+        </div>
+
+        {attempts.map((attempt) => (
+          <div
+            key={attempt.id}
+            className="group bg-white dark:bg-dark-800 rounded-xl border border-gray-200/50 dark:border-dark-700/50 p-6 hover:shadow-lg transition-all duration-300"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${
+                  attempt.success
+                    ? 'bg-green-100 dark:bg-green-900/20'
+                    : 'bg-red-100 dark:bg-red-900/20'
+                }`}>
+                  {getDeviceIcon(attempt.device_info?.type || 'desktop')}
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {attempt.device_info?.browser} on {attempt.device_info?.os}
+                    </p>
+                    {attempt.success ? (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400">
+                        <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
+                        Success
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400">
+                        <XCircle className="h-3.5 w-3.5 mr-1" />
+                        Failed
+                      </span>
+                    )}
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      {getDeviceIcon(attempt.device_info?.type || 'desktop')}
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        {attempt.device_info?.browser}
-                      </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {attempt.device_info?.os}
-                      </div>
-                    </div>
+                  <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                    <span>{format(new Date(attempt.created_at), 'MMM d, yyyy HH:mm:ss')}</span>
+                    <span>•</span>
+                    <span>{attempt.location?.city}, {attempt.location?.country}</span>
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                  {attempt.device_info?.location?.city && attempt.device_info?.location?.country
-                    ? `${attempt.device_info.location.city}, ${attempt.device_info.location.country}`
-                    : 'Location unavailable'
-                  }
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {attempt.success ? (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400">
-                      <CheckCircle className="h-4 w-4 mr-1" />
-                      Success
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400">
-                      <XCircle className="h-4 w-4 mr-1" />
-                      Failed
-                    </span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+        {attempts.length === 0 && (
+          <div className="text-center py-12">
+            <div className="h-16 w-16 bg-gray-100 dark:bg-dark-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+              <History className="h-8 w-8 text-gray-400 dark:text-gray-500" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Login History</h3>
+            <p className="text-gray-500 dark:text-gray-400">
+              Your login activity will appear here
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

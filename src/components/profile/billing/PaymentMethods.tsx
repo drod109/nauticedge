@@ -92,13 +92,13 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({ onAddPaymentMethod }) =
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Payment Methods</h2>
           <p className="text-gray-600 dark:text-gray-400 mb-4">Manage your payment methods</p>
         </div>
-        <button
-          onClick={() => setShowModal(true)}
+        <a
+          href="/add-payment-method"
           className="flex items-center text-sm text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
         >
           <Plus className="h-4 w-4 mr-1" />
           Add New Card
-        </button>
+        </a>
       </div>
 
       {error && (
@@ -152,16 +152,6 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({ onAddPaymentMethod }) =
           ))
         )}
       </div>
-
-      {showModal && (
-        <AddPaymentMethodModal
-          onClose={() => setShowModal(false)}
-          onSuccess={() => {
-            setShowModal(false);
-            fetchPaymentMethods();
-          }}
-        />
-      )}
     </div>
   );
 };
