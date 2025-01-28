@@ -147,24 +147,25 @@ const TwoFactorAuth = () => {
         <div className="flex-1 flex flex-col overflow-hidden">
           <Header theme={theme} onThemeChange={handleThemeChange} />
           <main className="flex-1 overflow-y-auto">
-            <div className="max-w-4xl mx-auto w-full py-8 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-full mx-auto w-full py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
               <div className="mb-8">
-                <nav className="flex items-center space-x-3 text-sm">
+                <nav className="flex items-center text-sm">
                   <a 
                     href="/settings"
-                    className="hover:text-gray-900 dark:hover:text-white transition-colors"
-                >
+                    className="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-2 transform group-hover:-translate-x-1 transition-transform" />
                     Back to Settings
                   </a>
-                  <span className="text-gray-300 dark:text-gray-600">/</span>
-                  <span className="text-gray-900 dark:text-white">Two-Factor Authentication</span>
+                  <span className="mx-3 text-gray-300 dark:text-gray-600">/</span>
+                  <span className="text-gray-900 dark:text-white font-medium">Two-Factor Authentication</span>
                 </nav>
               </div>
 
-              <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-gray-200 dark:border-dark-700">
+              <div className="bg-white dark:bg-dark-800 rounded-lg shadow-sm border border-gray-200 dark:border-dark-700">
                 <div className="p-6 border-b border-gray-200 dark:border-dark-700">
                   <div className="flex items-center space-x-3">
-                    <div className="h-12 w-12 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 rounded-xl flex items-center justify-center">
+                    <div className="h-10 w-10 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 rounded-lg flex items-center justify-center">
                       <Shield className="h-6 w-6 text-blue-600 dark:text-blue-500" />
                     </div>
                     <div>
