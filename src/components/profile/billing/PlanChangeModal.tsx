@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, AlertCircle } from 'lucide-react';
+import { X, AlertCircle, ArrowUpRight, ArrowRight } from 'lucide-react';
 import { capitalize } from '../../../utils/string';
 
 interface PlanChangeModalProps {
