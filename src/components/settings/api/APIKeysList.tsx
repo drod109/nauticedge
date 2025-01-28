@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Key, Copy, Check, Trash2, AlertCircle } from 'lucide-react';
+import { Key, Copy, Check, Trash2, AlertCircle, Plus } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 
 interface APIKey {
@@ -94,18 +94,13 @@ const APIKeysList = () => {
         </div>
       )}
 
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white">API Keys</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Manage your API keys for accessing the NauticEdge API</p>
-        </div>
-        <button
-          onClick={() => setShowNewKeyModal(true)}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600"
-        >
-          Create New Key
-        </button>
-      </div>
+      <a
+        href="/settings/api-keys/new"
+        className="inline-block w-full px-4 py-3 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 mb-6 text-center"
+      >
+        <Plus className="h-4 w-4 mr-2" />
+        Create New API Key
+      </a>
 
       {/* API Keys List */}
       <div className="bg-white dark:bg-dark-800 rounded-lg border border-gray-200 dark:border-dark-700 divide-y divide-gray-200 dark:divide-dark-700">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link2, Trash2, AlertCircle, Check } from 'lucide-react';
+import { Link2, Trash2, AlertCircle, Check, Plus } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 
 interface Webhook {
@@ -118,18 +118,13 @@ const WebhooksList = () => {
         </div>
       )}
 
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white">Webhooks</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Receive real-time updates for specific events</p>
-        </div>
-        <button
-          onClick={() => setShowNewWebhookModal(true)}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600"
-        >
-          Add Webhook
-        </button>
-      </div>
+      <a
+        href="/settings/webhooks/new"
+        className="inline-block w-full px-4 py-3 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 mb-6 text-center"
+      >
+        <Plus className="h-4 w-4 mr-2" />
+        Add New Webhook
+      </a>
 
       {/* Webhooks List */}
       <div className="bg-white dark:bg-dark-800 rounded-lg border border-gray-200 dark:border-dark-700 divide-y divide-gray-200 dark:divide-dark-700">

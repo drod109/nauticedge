@@ -10,6 +10,8 @@ const Login = () => {
   useEffect(() => {
     const init = async () => {
       try {
+        setLoading(true);
+
         const currentUrl = new URL(window.location.href);
         const redirectPath = currentUrl.searchParams.get('redirect') || '/dashboard';
 
@@ -18,16 +20,18 @@ const Login = () => {
         if (session) {
           try {
             await supabase.auth.signOut();
-          } catch (signOutError) {
-            // Ignore session_not_found errors during sign out
-            if (!signOutError.message?.includes('session_not_found')) {
-              console.error('Error during sign out:', signOutError);
+          } catch (error: any) {
+            // Ignore session_not_found errors
+            if (error.message !== 'session_not_found') {
+              console.error('Error during sign out:', error);
             }
           }
         }
 
         // Clear any stored auth data
-        localStorage.removeItem('sb-' + import.meta.env.VITE_SUPABASE_PROJECT_ID + '-auth-token');
+        const projectId = new URL(import.meta.env.VITE_SUPABASE_URL).hostname.split('.')[0];
+        localStorage.removeItem(`sb-${projectId}-auth-token`);
+
       } catch (error) {
         // Log error but don't throw - we want to show login page regardless
         console.error('Error during initialization:', error);

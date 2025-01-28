@@ -13,6 +13,7 @@ export function useSubscription() {
   const changePlan = useCallback(async (newPlan: string) => {
     setLoading(true);
     setError(null);
+    let success = false;
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -75,6 +76,7 @@ export function useSubscription() {
       }
 
       logger.info('Successfully changed subscription plan', { newPlan });
+      success = true;
       return true;
     } catch (err) {
       const error = err instanceof Error ? err : new Error('An unexpected error occurred');
@@ -83,6 +85,10 @@ export function useSubscription() {
       throw error;
     } finally {
       setLoading(false);
+      if (success) {
+        // Reload the page to reflect the new plan status
+        window.location.reload();
+      }
     }
   }, []);
 

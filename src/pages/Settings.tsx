@@ -166,7 +166,7 @@ const Settings = () => {
           <div className="max-w-full mx-auto w-full py-8 px-4 sm:px-6 lg:px-8">
             <div className="bg-white dark:bg-dark-800 rounded-lg shadow border border-gray-200 dark:border-dark-700">
               <div className="px-8 pt-6">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Account Settings</h1>
+                <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-600 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white mb-6">Account Settings</h1>
                 <div className="flex flex-wrap sm:flex-nowrap gap-4 sm:gap-0 px-0 sm:px-8 -mx-0 sm:-mx-8 pb-4 sm:pb-px border-b border-gray-200 dark:border-dark-700 overflow-x-auto scrollbar-hide">
                   <button
                     onClick={() => setActiveTab('security')}

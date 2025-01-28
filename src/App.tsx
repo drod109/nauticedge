@@ -17,6 +17,10 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Profile = lazy(() => import('./pages/Profile'));
 const AddPaymentMethod = lazy(() => import('./pages/AddPaymentMethod'));
 const Settings = lazy(() => import('./pages/Settings'));
+const APIKeys = lazy(() => import('./pages/APIKeys'));
+const Webhooks = lazy(() => import('./pages/Webhooks'));
+const NewAPIKey = lazy(() => import('./pages/NewAPIKey'));
+const NewWebhook = lazy(() => import('./pages/NewWebhook'));
 const SignUp = lazy(() => import('./pages/SignUp'));
 const About = lazy(() => import('./pages/About'));
 const ChangePassword = lazy(() => import('./pages/ChangePassword'));
@@ -96,6 +100,22 @@ function App() {
     
     if (path === '/settings/change-password') {
       return <ChangePassword />;
+    }
+    
+    if (path === '/settings/api-keys') {
+      return <APIKeys />;
+    }
+    
+    if (path === '/settings/webhooks') {
+      return <Webhooks />;
+    }
+    
+    if (path === '/settings/api-keys/new') {
+      return <NewAPIKey />;
+    }
+    
+    if (path === '/settings/webhooks/new') {
+      return <NewWebhook />;
     }
 
     if (path === '/signup') {
