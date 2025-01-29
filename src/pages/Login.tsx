@@ -10,7 +10,6 @@ const Login = () => {
   useEffect(() => {
     const init = async () => {
       try {
-        // Get the redirect path from URL parameters safely
         const params = new URLSearchParams(window.location.search);
         const redirectPath = params.get('redirect') || '/dashboard';
 
@@ -18,7 +17,11 @@ const Login = () => {
 
         if (session) {
           try {
-            await supabase.auth.signOut();
+            // Only attempt to sign out if we have a valid session
+            const { error } = await supabase.auth.signOut();
+            if (error && error.message !== 'session_not_found') {
+              console.error('Error during sign out:', error);
+            }
             // After signing out, preserve the redirect parameter
             window.location.href = `/login?redirect=${encodeURIComponent(redirectPath)}`;
             return;
