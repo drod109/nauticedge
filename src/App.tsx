@@ -1,4 +1,5 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import { initializeTheme } from './lib/theme';
 
@@ -15,6 +16,7 @@ const Footer = lazy(() => import('./components/footer/Footer'));
 const Login = lazy(() => import('./pages/Login'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Profile = lazy(() => import('./pages/Profile'));
+const NewClient = lazy(() => import('./pages/NewClient'));
 const AddPaymentMethod = lazy(() => import('./pages/AddPaymentMethod'));
 const Settings = lazy(() => import('./pages/Settings'));
 const APIKeys = lazy(() => import('./pages/APIKeys'));
@@ -62,167 +64,63 @@ function App() {
     initializeTheme();
   }, []);
 
-  // Simple route handling
-  const path = window.location.pathname;
-
-  const renderContent = () => {
-    if (path === '/login') {
-      return <Login />;
-    }
-
-    if (path === '/dashboard') {
-      return <Dashboard />;
-    }
-
-    if (path === '/profile') {
-      return <Profile />;
-    }
-    
-    if (path === '/add-payment-method') {
-      return <AddPaymentMethod />;
-    }
-
-    if (path === '/settings') {
-      return <Settings />;
-    }
-    
-    if (path === '/settings/2fa') {
-      return <TwoFactorAuth />;
-    }
-    
-    if (path === '/settings/sessions') {
-      return <Sessions />;
-    }
-    
-    if (path === '/settings/login-history') {
-      return <LoginHistory />;
-    }
-    
-    if (path === '/settings/change-password') {
-      return <ChangePassword />;
-    }
-    
-    if (path === '/settings/api-keys') {
-      return <APIKeys />;
-    }
-    
-    if (path === '/settings/webhooks') {
-      return <Webhooks />;
-    }
-    
-    if (path === '/settings/api-keys/new') {
-      return <NewAPIKey />;
-    }
-    
-    if (path === '/settings/webhooks/new') {
-      return <NewWebhook />;
-    }
-
-    if (path === '/signup') {
-      return <SignUp />;
-    }
-
-    if (path === '/about') {
-      return <About />;
-    }
-
-    if (path === '/contact') {
-      return <Contact />;
-    }
-    
-    if (path === '/privacy') {
-      return <Privacy />;
-    }
-    
-    if (path === '/terms') {
-      return <Terms />;
-    }
-    
-    if (path === '/blog') {
-      return <Blog />;
-    }
-
-    if (path === '/security') {
-      return <Security />;
-    }
-    
-    if (path === '/compliance') {
-      return <Compliance />;
-    }
-    
-    if (path === '/careers') {
-      return <Careers />;
-    }
-    
-    if (path === '/docs') {
-      return <Documentation />;
-    }
-    
-    if (path === '/api') {
-      return <APIReference />;
-    }
-    
-    if (path === '/press') {
-      return <Press />;
-    }
-
-    if (path === '/help') {
-      return <HelpCenter />;
-    }
-
-    if (path === '/community') {
-      return <Community />;
-    }
-    
-    if (path === '/solutions') {
-      return <SolutionsPage />;
-    }
-    
-    if (path === '/cookies') {
-      return <Cookies />;
-    }
-    
-    if (path === '/registration') {
-      return <Registration />;
-    }
-    
-    if (path === '/dashboard/clients') {
-      return <ClientsPage />;
-    }
-
-    if (path === '/schedule') {
-      return <Schedule />;
-    }
-    
-    if (path === '/invoices') {
-      return <Invoices />;
-    }
-    
-    if (path === '/invoices/new') {
-      return <InvoiceBuilder />;
-    }
-
-    return (
-      <>
-        <Navigation />
-        <Suspense fallback={<PageLoader />}>
-          <Hero />
-          <Features />
-          <ClientsSection />
-          <Testimonials />
-          <Pricing />
-          <Footer />
-        </Suspense>
-      </>
-    );
-  };
-
   return (
-    <div className="min-h-screen bg-white dark:bg-dark-900 transition-colors">
-      <Suspense fallback={<PageLoader />}>
-        {renderContent()}
-      </Suspense>
-    </div>
+    <Router>
+      <div className="min-h-screen bg-white dark:bg-dark-900 transition-colors">
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/add-payment-method" element={<AddPaymentMethod />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/settings/2fa" element={<TwoFactorAuth />} />
+            <Route path="/settings/sessions" element={<Sessions />} />
+            <Route path="/settings/login-history" element={<LoginHistory />} />
+            <Route path="/settings/change-password" element={<ChangePassword />} />
+            <Route path="/settings/api-keys" element={<APIKeys />} />
+            <Route path="/settings/webhooks" element={<Webhooks />} />
+            <Route path="/settings/api-keys/new" element={<NewAPIKey />} />
+            <Route path="/settings/webhooks/new" element={<NewWebhook />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/security" element={<Security />} />
+            <Route path="/compliance" element={<Compliance />} />
+            <Route path="/careers" element={<Careers />} />
+            <Route path="/docs" element={<Documentation />} />
+            <Route path="/api" element={<APIReference />} />
+            <Route path="/press" element={<Press />} />
+            <Route path="/help" element={<HelpCenter />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/solutions" element={<SolutionsPage />} />
+            <Route path="/cookies" element={<Cookies />} />
+            <Route path="/registration" element={<Registration />} />
+            <Route path="/dashboard/clients" element={<ClientsPage />} />
+            <Route path="/dashboard/clients/new" element={<NewClient />} />
+            <Route path="/schedule" element={<Schedule />} />
+            <Route path="/invoices" element={<Invoices />} />
+            <Route path="/invoices/new" element={<InvoiceBuilder />} />
+            <Route path="/" element={
+              <>
+                <Navigation />
+                <Suspense fallback={<PageLoader />}>
+                  <Hero />
+                  <Features />
+                  <ClientsSection />
+                  <Testimonials />
+                  <Pricing />
+                  <Footer />
+                </Suspense>
+              </>
+            } />
+          </Routes>
+        </Suspense>
+      </div>
+    </Router>
   );
 }
 

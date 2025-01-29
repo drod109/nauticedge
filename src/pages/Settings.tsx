@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Shield, Globe, Plug, Ruler, ChevronRight, Key } from 'lucide-react';
 import Sidebar from '../components/dashboard/Sidebar';
 import Header from '../components/dashboard/Header';
+import MeasurementUnitsSection from '../components/settings/MeasurementUnitsSection';
 import ActiveSessionsList from '../components/settings/security/ActiveSessionsList';
 import LoginHistoryList from '../components/settings/security/LoginHistoryList';
 import SecuritySection from '../components/settings/security/SecuritySection';
@@ -71,89 +72,7 @@ const Settings = () => {
   );
 
   const renderMeasurementUnitsContent = () => (
-    <div className="p-8">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Measurement Units</h2>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">Configure your preferred measurement units</p>
-        <div className="space-y-6 max-w-xl">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Length</label>
-            <div className="flex items-center justify-between p-4 bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg">
-              <div className="flex items-center">
-                <span className="text-sm text-gray-900 dark:text-white">Metric (meters)</span>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="length"
-                  className="sr-only peer"
-                  defaultChecked
-                />
-                <div className="relative w-11 h-6 bg-gray-200 dark:bg-dark-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500"></div>
-                <span className="ml-3 text-sm text-gray-500 dark:text-gray-400">Imperial (feet)</span>
-              </label>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Weight</label>
-            <div className="flex items-center justify-between p-4 bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg">
-              <div className="flex items-center">
-                <span className="text-sm text-gray-900 dark:text-white">Metric (kilograms)</span>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="weight"
-                  className="sr-only peer"
-                  defaultChecked
-                />
-                <div className="relative w-11 h-6 bg-gray-200 dark:bg-dark-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500"></div>
-                <span className="ml-3 text-sm text-gray-500 dark:text-gray-400">Imperial (pounds)</span>
-              </label>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Temperature</label>
-            <div className="flex items-center justify-between p-4 bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg">
-              <div className="flex items-center">
-                <span className="text-sm text-gray-900 dark:text-white">Celsius</span>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="temperature"
-                  className="sr-only peer"
-                  defaultChecked
-                />
-                <div className="relative w-11 h-6 bg-gray-200 dark:bg-dark-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500"></div>
-                <span className="ml-3 text-sm text-gray-500 dark:text-gray-400">Fahrenheit</span>
-              </label>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Speed</label>
-            <div className="flex items-center justify-between p-4 bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg">
-              <div className="flex items-center">
-                <span className="text-sm text-gray-900 dark:text-white">Knots</span>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="speed"
-                  className="sr-only peer"
-                  defaultChecked
-                />
-                <div className="relative w-11 h-6 bg-gray-200 dark:bg-dark-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500"></div>
-                <span className="ml-3 text-sm text-gray-500 dark:text-gray-400">MPH/KPH</span>
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <MeasurementUnitsSection />
   );
 
   return (

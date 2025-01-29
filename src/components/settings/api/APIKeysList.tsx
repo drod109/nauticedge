@@ -96,10 +96,13 @@ const APIKeysList = () => {
 
       <a
         href="/settings/api-keys/new"
-        className="inline-block w-full px-4 py-3 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 mb-6 text-center"
+        className="relative w-full group mb-6 overflow-hidden rounded-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center"
       >
-        <Plus className="h-4 w-4 mr-2" />
-        Create New API Key
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-400 group-hover:scale-105 transition-transform duration-300"></div>
+        <div className="relative px-6 py-3 flex items-center justify-center space-x-2">
+          <Plus className="h-4 w-4 text-white transform group-hover:scale-110 transition-transform" />
+          <span className="text-sm font-medium text-white">Create New API Key</span>
+        </div>
       </a>
 
       {/* API Keys List */}

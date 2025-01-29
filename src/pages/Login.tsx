@@ -10,16 +10,18 @@ const Login = () => {
   useEffect(() => {
     const init = async () => {
       try {
-        setLoading(true);
-
-        const currentUrl = new URL(window.location.href);
-        const redirectPath = currentUrl.searchParams.get('redirect') || '/dashboard';
+        // Get the redirect path from URL parameters safely
+        const params = new URLSearchParams(window.location.search);
+        const redirectPath = params.get('redirect') || '/dashboard';
 
         const { data: { session } } = await supabase.auth.getSession();
 
         if (session) {
           try {
             await supabase.auth.signOut();
+            // After signing out, preserve the redirect parameter
+            window.location.href = `/login?redirect=${encodeURIComponent(redirectPath)}`;
+            return;
           } catch (error: any) {
             // Ignore session_not_found errors
             if (error.message !== 'session_not_found') {

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, FileText, Download, Mail, Printer, Search, Filter, Loader } from 'lucide-react';
+import { Plus, FileText, Download, Mail, Printer, Search, Filter, Loader, Calendar, DollarSign, Clock, AlertCircle, ArrowUpRight } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import CreateInvoiceModal from './CreateInvoiceModal';
 import { generateInvoicePDF } from '../../utils/pdf';
+import { format } from 'date-fns';
 
 interface Invoice {
   id: string;
@@ -22,6 +23,10 @@ const InvoiceList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<'date' | 'amount' | 'status'>('date');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [dateRange, setDateRange] = useState<'all' | 'week' | 'month' | 'year'>('all');
 
   useEffect(() => {
     fetchInvoices();
@@ -42,6 +47,7 @@ const InvoiceList = () => {
       setInvoices(data || []);
     } catch (error) {
       console.error('Error fetching invoices:', error);
+      setError('Failed to load invoices');
     } finally {
       setLoading(false);
     }
@@ -81,10 +87,12 @@ const InvoiceList = () => {
           };
         }
       }
+
       // Generate and download PDF
       await generateInvoicePDF(invoiceDetails);
     } catch (error) {
       console.error('Error downloading invoice:', error);
+      setError('Failed to download invoice');
     } finally {
       setDownloadingId(null);
     }
@@ -92,9 +100,6 @@ const InvoiceList = () => {
 
   const handleSendEmail = async (invoice: Invoice) => {
     try {
-      // In production, integrate with email service
-      console.log('Sending invoice email:', invoice.invoice_number);
-      
       // Update invoice status to 'sent'
       const { error } = await supabase
         .from('invoices')
@@ -107,20 +112,52 @@ const InvoiceList = () => {
       await fetchInvoices();
     } catch (error) {
       console.error('Error sending invoice:', error);
+      setError('Failed to send invoice');
     }
   };
 
-  const filteredInvoices = invoices.filter(invoice => {
-    const matchesSearch = 
-      invoice.invoice_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      invoice.client_name.toLowerCase().includes(searchTerm.toLowerCase());
+  const getDateRangeFilter = (date: string) => {
+    const now = new Date();
+    const invoiceDate = new Date(date);
     
-    const matchesStatus = statusFilter === 'all' || invoice.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
+    switch (dateRange) {
+      case 'week':
+        return Math.abs(now.getTime() - invoiceDate.getTime()) <= 7 * 24 * 60 * 60 * 1000;
+      case 'month':
+        return now.getMonth() === invoiceDate.getMonth() && now.getFullYear() === invoiceDate.getFullYear();
+      case 'year':
+        return now.getFullYear() === invoiceDate.getFullYear();
+      default:
+        return true;
+    }
+  };
 
-  const getStatusColor = (status: string) => {
+  const filteredInvoices = invoices
+    .filter(invoice => {
+      const matchesSearch = 
+        invoice.invoice_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        invoice.client_name.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesStatus = statusFilter === 'all' || invoice.status === statusFilter;
+      const matchesDateRange = getDateRangeFilter(invoice.issue_date);
+      
+      return matchesSearch && matchesStatus && matchesDateRange;
+    })
+    .sort((a, b) => {
+      if (sortField === 'date') {
+        return sortDirection === 'asc' 
+          ? new Date(a.issue_date).getTime() - new Date(b.issue_date).getTime()
+          : new Date(b.issue_date).getTime() - new Date(a.issue_date).getTime();
+      }
+      if (sortField === 'amount') {
+        return sortDirection === 'asc' 
+          ? a.amount - b.amount
+          : b.amount - a.amount;
+      }
+      return 0;
+    });
+
+  const getStatusStyle = (status: string) => {
     switch (status) {
       case 'paid':
         return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
@@ -133,63 +170,124 @@ const InvoiceList = () => {
     }
   };
 
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'paid':
+        return <DollarSign className="h-4 w-4" />;
+      case 'sent':
+        return <Mail className="h-4 w-4" />;
+      case 'overdue':
+        return <Clock className="h-4 w-4" />;
+      default:
+        return <FileText className="h-4 w-4" />;
+    }
+  };
+
   return (
-    <div className="p-6 bg-gray-50 dark:bg-dark-900">
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
+    <div className="p-4 sm:p-6 space-y-6">
+      {error && (
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start">
+          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 mr-2" />
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Invoices</h1>
-          <button
-            onClick={() => window.location.href = '/invoices/new'}
-            className="flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
-          >
-            <Plus className="h-5 w-5 mr-2" />
-            Create Invoice
-          </button>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage your invoices and billing</p>
+        </div>
+        <a
+          href="/invoices/new"
+          className="flex items-center justify-center px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-all duration-200 shadow-sm hover:shadow group"
+        >
+          <Plus className="h-5 w-5 mr-2 transition-transform group-hover:scale-110" />
+          Create Invoice
+        </a>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        {/* Search */}
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search invoices..."
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          />
         </div>
 
-        <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search invoices..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors placeholder-gray-400 dark:placeholder-gray-500"
-            />
-          </div>
-          <div className="flex items-center space-x-2">
-            <Filter className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-            >
-              <option value="all">All Status</option>
-              <option value="draft">Draft</option>
-              <option value="sent">Sent</option>
-              <option value="paid">Paid</option>
-              <option value="overdue">Overdue</option>
-            </select>
-          </div>
+        {/* Status Filter */}
+        <div className="flex items-center space-x-2">
+          <Filter className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+          <select 
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          >
+            <option value="all">All Status</option>
+            <option value="draft">Draft</option>
+            <option value="sent">Sent</option>
+            <option value="paid">Paid</option>
+            <option value="overdue">Overdue</option>
+          </select>
+        </div>
+
+        {/* Date Range Filter */}
+        <div className="flex items-center space-x-2">
+          <Calendar className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+          <select
+            value={dateRange}
+            onChange={(e) => setDateRange(e.target.value as any)}
+            className="px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          >
+            <option value="all">All Time</option>
+            <option value="week">Last 7 Days</option>
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+          </select>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-dark-800 rounded-lg shadow-sm border border-gray-200 dark:border-dark-700">
+      {/* Invoices List */}
+      <div className="bg-white dark:bg-dark-800 rounded-lg shadow-sm border border-gray-200/50 dark:border-dark-700/50 overflow-hidden">
         {loading ? (
           <div className="p-8 text-center">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 dark:border-blue-500 border-r-transparent dark:border-r-transparent align-[-0.125em]"></div>
-            Loading invoices...
+            <div className="inline-block">
+              <Loader className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-500" />
+            </div>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Loading invoices...</p>
           </div>
         ) : filteredInvoices.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-            No invoices found
+          <div className="p-8 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-dark-700 mb-4">
+              <FileText className="h-8 w-8 text-gray-400 dark:text-gray-500" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No invoices found</h3>
+            <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+              {searchTerm || statusFilter !== 'all'
+                ? 'Try adjusting your search or filters'
+                : 'Get started by creating your first invoice'}
+            </p>
+            {!searchTerm && statusFilter === 'all' && (
+              <a
+                href="/invoices/new"
+                className="mt-4 inline-flex items-center text-sm text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Create Your First Invoice
+              </a>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto scrollbar-hide">
             <table className="w-full">
               <thead className="bg-gray-50 dark:bg-dark-700">
-                <tr className="text-left text-sm font-medium text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-dark-600">
+                <tr className="text-left text-sm font-medium text-gray-600 dark:text-gray-300">
                   <th className="px-6 py-4 font-medium">Invoice #</th>
                   <th className="px-6 py-4 font-medium">Client</th>
                   <th className="px-6 py-4 font-medium">Amount</th>
@@ -201,12 +299,16 @@ const InvoiceList = () => {
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-dark-700">
                 {filteredInvoices.map((invoice) => (
-                  <tr key={invoice.id} className="hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors">
+                  <tr key={invoice.id} className="group hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors">
                     <td className="px-6 py-4">
-                      <div className="flex items-center">
+                      <a
+                        href={`/invoices/${invoice.id}`}
+                        className="flex items-center text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 group/link"
+                      >
                         <FileText className="h-5 w-5 text-gray-400 dark:text-gray-500 mr-2" />
-                        <span className="text-gray-900 dark:text-white font-medium">{invoice.invoice_number}</span>
-                      </div>
+                        <span>{invoice.invoice_number}</span>
+                        <ArrowUpRight className="h-4 w-4 ml-1 opacity-0 group-hover/link:opacity-100 transform group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-all" />
+                      </a>
                     </td>
                     <td className="px-6 py-4 text-gray-900 dark:text-white">{invoice.client_name}</td>
                     <td className="px-6 py-4 text-gray-900 dark:text-white font-medium">
@@ -215,15 +317,20 @@ const InvoiceList = () => {
                         maximumFractionDigits: 2
                       })}
                     </td>
-                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{new Date(invoice.issue_date).toLocaleDateString()}</td>
-                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{new Date(invoice.due_date).toLocaleDateString()}</td>
+                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
+                      {format(new Date(invoice.issue_date), 'MMM d, yyyy')}
+                    </td>
+                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
+                      {format(new Date(invoice.due_date), 'MMM d, yyyy')}
+                    </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(invoice.status)}`}>
-                        {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusStyle(invoice.status)}`}>
+                        {getStatusIcon(invoice.status)}
+                        <span className="ml-1 capitalize">{invoice.status}</span>
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center justify-end space-x-3">
+                      <div className="flex items-center justify-end space-x-3 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => handleDownload(invoice)}
                           className={`p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors ${

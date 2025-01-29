@@ -23,15 +23,27 @@ const NewAPIKey = () => {
     try {
       setLoading(true);
       setError(null);
+      
+      // Validate key name
+      if (!keyName.trim()) {
+        throw new Error('Key name is required');
+      }
 
       const { data, error } = await supabase
         .rpc('create_api_key', {
           p_name: keyName
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('API key creation error:', error);
+        throw new Error(error.message);
+      }
 
-      setNewKey(data.key);
+      if (data?.key) {
+        setNewKey(data.key);
+      } else {
+        throw new Error('No API key returned');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create API key');
     } finally {
