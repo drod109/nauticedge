@@ -174,7 +174,7 @@ const DashboardContent = () => {
         {quickStats.map((stat, index) => (
           <div 
             key={index}
-            className="group bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm p-6 rounded-2xl border border-gray-200/50 dark:border-dark-700/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in-up"
+            className="group bg-white dark:bg-dark-800 p-6 rounded-2xl border border-gray-200/50 dark:border-dark-700/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in-up"
             style={{ animationDelay: `${index * 0.1}s` }}
           >
             <div className="flex items-center justify-between relative">
@@ -194,14 +194,13 @@ const DashboardContent = () => {
               <div className={`h-12 w-12 bg-gradient-to-br from-${stat.color}-50 to-${stat.color}-100/50 dark:from-${stat.color}-900/20 dark:to-${stat.color}-800/10 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300`}>
                 <stat.icon className={`h-6 w-6 text-${stat.color}-600 dark:text-${stat.color}-500 transform group-hover:rotate-12 transition-transform duration-300`} />
               </div>
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl opacity-0 group-hover:opacity-20 dark:group-hover:opacity-10 blur transition-opacity duration-300"></div>
             </div>
           </div>
         ))}
       </div>
 
       {/* Payment Status */}
-      <div className="bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-dark-700/50 shadow-sm hover:shadow-xl transition-all duration-300 animate-fade-in-up">
+      <div className="bg-white dark:bg-dark-800 rounded-2xl border border-gray-200/50 dark:border-dark-700/50 shadow-sm hover:shadow-xl transition-all duration-300 animate-fade-in-up">
         <div className="p-6 border-b border-gray-200 dark:border-dark-700">
           <div className="flex items-center space-x-3">
             <div className="h-10 w-10 bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-800/10 rounded-xl flex items-center justify-center">
@@ -288,7 +287,7 @@ const DashboardContent = () => {
       </div>
 
       {/* Recent Surveys */}
-      <div className="bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-dark-700/50 shadow-sm hover:shadow-xl transition-all duration-300 animate-fade-in-up">
+      <div className="bg-white dark:bg-dark-800 rounded-2xl border border-gray-200/50 dark:border-dark-700/50 shadow-sm hover:shadow-xl transition-all duration-300 animate-fade-in-up">
         <div className="p-6 border-b border-gray-200 dark:border-dark-700">
           <div className="flex items-center space-x-3">
             <div className="h-10 w-10 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 rounded-xl flex items-center justify-center">

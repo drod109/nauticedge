@@ -9,7 +9,7 @@ const Schedule = () => {
         <div className="lg:col-span-2">
           <Calendar />
         </div>
-        <div>
+        <div className="lg:sticky lg:top-6 lg:self-start">
           <UpcomingAppointments />
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { logger } from '../../lib/logger';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -11,11 +12,18 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (!session?.user) {
-          // Redirect to login if no session exists
-          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+        // Get current session
+        const { data: { session }, error } = await supabase.auth.getSession();
+
+        if (error || !session?.user) {
+          if (error?.message.includes('refresh_token_not_found')) {
+            // Clear any invalid auth state
+            await supabase.auth.signOut();
+          }
+          // Redirect to login with return path
+          if (!window.location.pathname.includes('/login')) {
+            window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+          }
           return;
         }
 
@@ -26,7 +34,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
           .eq('id', session?.user.id)
           .single();
 
-        // If no company name is set and not already on registration page
+        // Redirect to registration if needed
         if (!profile?.company_name && window.location.pathname !== '/registration') {
           window.location.href = '/registration';
           return;
@@ -34,8 +42,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         
         setLoading(false);
       } catch (error) {
-        console.error('Auth error:', error);
-        window.location.href = '/login';
+        logger.error('Auth error:', error);
+        // Clear auth state on error
+        await supabase.auth.signOut();
+        // Redirect if not on login page
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+        }
       }
     };
 
@@ -44,7 +57,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT' || !session) {
-        window.location.href = '/login';
+        // Only redirect if not already on login page
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login';
+        }
       }
     });
 

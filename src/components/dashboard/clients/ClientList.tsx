@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Plus, Search, Filter, Mail, Phone, MapPin, Edit, Trash2, AlertCircle, Building2, ArrowUpRight, Download, Share2, MoreVertical } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { useSwipeable } from 'react-swipeable';
 import { useDebounce } from '../../../hooks/useDebounce';
 import { CSVLink } from 'react-csv';
+import ClientCard from './ClientCard';
 
 interface Client {
   id: string;
@@ -36,6 +36,8 @@ const ClientList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -76,19 +78,27 @@ const ClientList = () => {
   // Fetch clients with pagination and sorting
   const fetchClients = useCallback(async (isInitial = false) => {
     try {
+      // Get auth session first
+      const { data: { session }, error: authError } = await supabase.auth.getSession();
+      
+      if (authError) {
+        throw new Error('Authentication error. Please try logging in again.');
+      }
+
+      if (!session?.user) {
+        throw new Error('Not authenticated');
+      }
+
       if (isInitial) {
         setLoading(true);
       } else {
         setIsFetching(true);
       }
 
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
       let query = supabase
         .from('clients')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', session.user.id)
         .order(sortField, { ascending: sortDirection === 'asc' })
         .range((page - 1) * perPage, page * perPage - 1);
 
@@ -98,7 +108,9 @@ const ClientList = () => {
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        throw new Error(`Failed to fetch clients: ${error.message}`);
+      }
 
       if (isInitial) {
         setClients(data || []);
@@ -109,7 +121,16 @@ const ClientList = () => {
 
     } catch (error) {
       console.error('Error fetching clients:', error);
-      setError('Failed to load clients');
+      if (error instanceof Error) {
+        if (error.message.includes('Not authenticated')) {
+          // Redirect to login if not authenticated
+          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+          return;
+        }
+        setError(error.message);
+      } else {
+        setError('Failed to load clients. Please try again.');
+      }
     } finally {
       setLoading(false);
       setIsFetching(false);
@@ -149,36 +170,78 @@ const ClientList = () => {
   }, [hasMore, isFetching]);
 
   // Handle client deletion
-  const handleDelete = async (client: Client) => {
+  const handleDelete = async (client: Client, e: React.MouseEvent) => {
+    // Prevent event bubbling
+    e.stopPropagation();
+    e.preventDefault();
+    
+    // Clear any existing error
+    setError(null);
+    
+    if (!client) return;
+    
     setSelectedClient(client);
     setShowDeleteModal(true);
+  };
+
+  const handleModalClose = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowDeleteModal(false);
+    setShowEditModal(false);
+    setSelectedClient(null);
+    setError(null);
   };
 
   const confirmDelete = async () => {
     if (!selectedClient) return;
     
-    setDeleteLoading(true);
     try {
+      setError(null);
+      setDeleteLoading(true);
+
+      const { data: { session }, error: authError } = await supabase.auth.getSession();
+      if (authError) throw new Error('Authentication error');
+      if (!session?.user) throw new Error('Not authenticated');
+
       const { error: deleteError } = await supabase
         .from('clients')
         .delete()
-        .eq('id', selectedClient.id);
+        .eq('id', selectedClient.id)
+        .eq('user_id', session.user.id);
 
-      if (deleteError) throw deleteError;
+      if (deleteError) {
+        throw new Error(`Failed to delete client: ${deleteError.message}`);
+      }
 
       setClients(prev => prev.filter(c => c.id !== selectedClient.id));
       setShowDeleteModal(false);
       setSelectedClient(null);
     } catch (error) {
       console.error('Error deleting client:', error);
-      setError('Failed to delete client');
+      if (error instanceof Error) {
+        if (error.message.includes('Not authenticated')) {
+          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+          return;
+        }
+        setError(error.message);
+      } else {
+        setError('Failed to delete client. Please try again.');
+      }
     } finally {
       setDeleteLoading(false);
     }
   };
 
   // Handle edit client
-  const handleEdit = (client: Client) => {
+  const handleEdit = (client: Client, e: React.MouseEvent) => {
+    // Prevent event bubbling
+    e.stopPropagation();
+    e.preventDefault();
+
+    if (!client) return;
+    
+    // Clear any existing error
+    setError(null);
     setSelectedClient(client);
     setEditForm({
       name: client.name,
@@ -194,28 +257,60 @@ const ClientList = () => {
 
   const handleEditSubmit = async () => {
     if (!selectedClient) return;
-    
-    setEditLoading(true);
+
     try {
+      setEditLoading(true);
+      setError(null);
+
+      // Validate required fields
+      if (!editForm.name.trim() || !editForm.email.trim()) {
+        throw new Error('Name and email are required');
+      }
+
+      // Validate email format
+      const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+      if (!emailRegex.test(editForm.email.trim())) {
+        throw new Error('Please enter a valid email address');
+      }
+
       const { error: updateError } = await supabase
         .from('clients')
-        .update(editForm)
-        .eq('id', selectedClient.id);
+        .update({
+          name: editForm.name.trim(),
+          email: editForm.email.trim(),
+          phone: editForm.phone,
+          address: editForm.address,
+          city: editForm.city,
+          state: editForm.state,
+          country: editForm.country
+        })
+        .eq('id', selectedClient.id)
+        .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
 
       if (updateError) throw updateError;
 
       // Update client in local state
       setClients(prev => prev.map(c => 
-        c.id === selectedClient.id 
+        c.id === selectedClient?.id 
           ? { ...c, ...editForm }
           : c
       ));
       
       setShowEditModal(false);
       setSelectedClient(null);
-    } catch (error) {
-      console.error('Error updating client:', error);
-      setError('Failed to update client');
+      // Reset form state
+      setEditForm({
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+        city: '',
+        state: '',
+        country: ''
+      });
+    } catch (err) {
+      console.error('Error updating client:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update client');
     } finally {
       setEditLoading(false);
     }
@@ -232,23 +327,6 @@ const ClientList = () => {
     );
     setSortField(field);
   };
-
-  // Handle swipe gestures for mobile
-  const swipeHandlers = useSwipeable({
-    onSwipedLeft: (eventData) => {
-      const clientElement = eventData.event.target as HTMLElement;
-      const clientId = clientElement.closest('[data-client-id]')?.getAttribute('data-client-id');
-      if (clientId) {
-        const client = clients.find(c => c.id === clientId);
-        if (client) {
-          // Show quick actions menu
-          console.log('Show quick actions for client:', client.name);
-        }
-      }
-    },
-    preventDefaultTouchmoveEvent: true,
-    trackMouse: true
-  });
 
   // Export data
   const getExportData = () => {
@@ -328,6 +406,191 @@ const ClientList = () => {
       </div>
 
       {/* Client Grid */}
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && selectedClient && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={handleModalClose}
+          role="dialog"
+          aria-labelledby="delete-modal-title"
+          aria-modal="true"
+        >
+          <div
+            className="bg-white dark:bg-dark-800 rounded-xl shadow-xl max-w-md w-full mx-4 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6">
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-500" />
+                </div>
+                <div className="ml-3">
+                  <h3 id="delete-modal-title" className="text-lg font-medium text-gray-900 dark:text-white">
+                    Delete Client
+                  </h3>
+                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    Are you sure you want to delete {selectedClient.name}? This action cannot be undone.
+                    All associated surveys and invoices will be permanently deleted.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gray-50 dark:bg-dark-700 px-6 py-4 flex flex-col-reverse sm:flex-row justify-end gap-3">
+              <button
+                onClick={handleModalClose}
+                className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-dark-800 border border-gray-300 dark:border-dark-600 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                aria-label="Cancel deletion"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleteLoading}
+                className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 flex items-center justify-center"
+                aria-label="Confirm deletion"
+              >
+                {deleteLoading ? (
+                  <>
+                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  'Delete Client'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {showEditModal && selectedClient && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={handleModalClose}
+          role="dialog"
+          aria-labelledby="edit-modal-title"
+          aria-modal="true"
+        >
+          <div
+            className="bg-white dark:bg-dark-800 rounded-xl shadow-xl max-w-md w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b border-gray-200 dark:border-dark-700">
+              <h3 id="edit-modal-title" className="text-lg font-medium text-gray-900 dark:text-white">
+                Edit Client
+              </h3>
+            </div>
+            {error && (
+              <div className="mx-6 mt-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+              </div>
+            )}
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Name *
+                </label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, email: e.target.value }))}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Phone
+                </label>
+                <input
+                  type="tel"
+                  value={editForm.phone}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, phone: e.target.value }))}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Address
+                </label>
+                <textarea
+                  value={editForm.address}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, address: e.target.value }))}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    City
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.city}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, city: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    State
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.state}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, state: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Country
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.country}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, country: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="p-6 border-t border-gray-200 dark:border-dark-700 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+              <button
+                onClick={handleModalClose}
+                className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-dark-800 border border-gray-300 dark:border-dark-600 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditSubmit}
+                disabled={editLoading}
+                className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 flex items-center justify-center"
+              >
+                {editLoading ? (
+                  <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  'Save Changes'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {loading ? (
         <div className="flex justify-center py-12">
           <div className="h-8 w-8 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-500 rounded-full animate-spin" role="status">
@@ -368,87 +631,20 @@ const ClientList = () => {
             {rowVirtualizer.getVirtualItems().map((virtualRow) => {
               const client = filteredClients[virtualRow.index];
               return (
-                <div
+                <ClientCard
                   key={client.id}
-                  data-client-id={client.id}
-                  className="group bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-gray-200 dark:border-dark-700 p-6 hover:shadow-md transition-all duration-200 hover:-translate-y-1"
+                  client={client}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
                   style={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     width: '100%',
                     height: virtualRow.size,
-                    transform: `translateY(${virtualRow.start}px)`,
+                    transform: `translateY(${virtualRow.start}px)`
                   }}
-                  {...swipeHandlers}
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                        {client.name}
-                      </h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        Added {new Date(client.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => handleEdit(client)}
-                        className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                        aria-label={`Edit ${client.name}`}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => e.key === 'Enter' && handleEdit(client)}
-                      >
-                        <Edit className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(client)}
-                        className="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-500 transition-colors"
-                        aria-label={`Delete ${client.name}`}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => e.key === 'Enter' && handleDelete(client)}
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center text-gray-600 dark:text-gray-400">
-                      <Mail className="h-4 w-4 mr-2 flex-shrink-0" />
-                      <a href={`mailto:${client.email}`} className="truncate hover:text-blue-600 dark:hover:text-blue-500 transition-colors">
-                        {client.email}
-                      </a>
-                    </div>
-                    {client.phone && (
-                      <div className="flex items-center text-gray-600 dark:text-gray-400">
-                        <Phone className="h-4 w-4 mr-2 flex-shrink-0" />
-                        <a href={`tel:${client.phone}`} className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors">
-                          {client.phone}
-                        </a>
-                      </div>
-                    )}
-                    {(client.city || client.state || client.country) && (
-                      <div className="flex items-start text-gray-600 dark:text-gray-400">
-                        <MapPin className="h-4 w-4 mr-2 mt-1 flex-shrink-0" />
-                        <span className="line-clamp-2">
-                          {[client.city, client.state, client.country].filter(Boolean).join(', ')}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex justify-between text-sm border-t border-gray-100 dark:border-dark-700 pt-4">
-                    <div className="text-gray-600 dark:text-gray-400">
-                      <span className="font-medium text-gray-900 dark:text-white">{client.total_surveys}</span> Surveys
-                    </div>
-                    <div className="text-gray-600 dark:text-gray-400">
-                      <span className="font-medium text-gray-900 dark:text-white">{client.total_invoices}</span> Invoices
-                    </div>
-                  </div>
-                </div>
+                />
               );
             })}
           </div>
@@ -459,35 +655,51 @@ const ClientList = () => {
 
       {/* Edit Modal */}
       {showEditModal && selectedClient && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-dark-800 rounded-xl shadow-xl max-w-md w-full mx-4">
+        <div
+          onClick={handleModalClose}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          role="dialog"
+          aria-labelledby="edit-modal-title"
+          aria-modal="true"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white dark:bg-dark-800 rounded-xl shadow-xl max-w-md w-full mx-4"
+          >
             <div className="p-6 border-b border-gray-200 dark:border-dark-700">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+              <h3 id="edit-modal-title" className="text-lg font-medium text-gray-900 dark:text-white">
                 Edit Client
               </h3>
             </div>
+            {error && (
+              <div className="mx-6 mt-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+              </div>
+            )}
             <div className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Name
+                  Name *
                 </label>
                 <input
                   type="text"
                   value={editForm.name}
                   onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter client name"
                   required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Email
+                  Email *
                 </label>
                 <input
                   type="email"
                   value={editForm.email}
                   onChange={(e) => setEditForm(prev => ({ ...prev, email: e.target.value }))}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter email address"
                   required
                 />
               </div>
@@ -562,70 +774,4 @@ const ClientList = () => {
                 className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 flex items-center justify-center"
               >
                 {editLoading ? (
-                  <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  'Save Changes'
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && selectedClient && (
-        <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          role="dialog"
-          aria-labelledby="delete-modal-title"
-          aria-modal="true"
-        >
-          <div className="bg-white dark:bg-dark-800 rounded-xl shadow-xl max-w-md w-full mx-4 overflow-hidden">
-            <div className="p-6">
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-500" />
-                </div>
-                <div className="ml-3">
-                  <h3 id="delete-modal-title" className="text-lg font-medium text-gray-900 dark:text-white">
-                    Delete Client
-                  </h3>
-                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    Are you sure you want to delete {selectedClient.name}? This action cannot be undone.
-                    All associated surveys and invoices will be permanently deleted.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-gray-50 dark:bg-dark-700 px-6 py-4 flex flex-col-reverse sm:flex-row justify-end gap-3">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-white dark:bg-dark-800 border border-gray-300 dark:border-dark-600 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                aria-label="Cancel deletion"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDelete}
-                disabled={deleteLoading}
-                className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 flex items-center justify-center"
-                aria-label="Confirm deletion"
-              >
-                {deleteLoading ? (
-                  <>
-                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Deleting...
-                  </>
-                ) : (
-                  'Delete Client'
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default ClientList;
+                  <div className="h-4 w-4

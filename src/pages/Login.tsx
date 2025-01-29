@@ -10,33 +10,33 @@ const Login = () => {
   useEffect(() => {
     const init = async () => {
       try {
+        // Get the redirect path from URL parameters safely
         const params = new URLSearchParams(window.location.search);
         const redirectPath = params.get('redirect') || '/dashboard';
+
+        // Clear any stored auth data first
+        const projectId = new URL(import.meta.env.VITE_SUPABASE_URL).hostname.split('.')[0];
+        localStorage.removeItem(`sb-${projectId}-auth-token`);
+        localStorage.removeItem(`sb-${projectId}-provider-token`);
+        localStorage.removeItem(`sb-${projectId}-user-id`);
+        localStorage.removeItem('auth_error');
 
         const { data: { session } } = await supabase.auth.getSession();
 
         if (session) {
           try {
-            // Only attempt to sign out if we have a valid session
-            const { error } = await supabase.auth.signOut();
-            if (error && error.message !== 'session_not_found') {
-              console.error('Error during sign out:', error);
-            }
-            // After signing out, preserve the redirect parameter
-            window.location.href = `/login?redirect=${encodeURIComponent(redirectPath)}`;
-            return;
+            await supabase.auth.signOut({ scope: 'local' });
           } catch (error: any) {
-            // Ignore session_not_found errors
-            if (error.message !== 'session_not_found') {
-              console.error('Error during sign out:', error);
-            }
+            // Log error but continue - we want to show login page regardless
+            console.warn('Sign out error:', error);
           }
         }
 
-        // Clear any stored auth data
-        const projectId = new URL(import.meta.env.VITE_SUPABASE_URL).hostname.split('.')[0];
-        localStorage.removeItem(`sb-${projectId}-auth-token`);
-
+        // Redirect to preserve the redirect parameter
+        if (window.location.search !== `?redirect=${encodeURIComponent(redirectPath)}`) {
+          window.location.href = `/login?redirect=${encodeURIComponent(redirectPath)}`;
+          return;
+        }
       } catch (error) {
         // Log error but don't throw - we want to show login page regardless
         console.error('Error during initialization:', error);
@@ -46,6 +46,11 @@ const Login = () => {
     };
 
     init();
+
+    // Cleanup function
+    return () => {
+      setLoading(false); // Ensure loading state is reset if component unmounts during initialization
+    };
   }, []);
 
   if (loading) {

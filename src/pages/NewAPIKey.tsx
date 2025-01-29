@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Key, ArrowLeft, Copy, Check } from 'lucide-react';
 import Sidebar from '../components/dashboard/Sidebar';
 import Header from '../components/dashboard/Header';
@@ -13,6 +13,36 @@ const NewAPIKey = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [subscription, setSubscription] = useState<{ plan: string } | null>(null);
+
+  useEffect(() => {
+    checkSubscription();
+  }, []);
+
+  const checkSubscription = async () => {
+    try {
+      const { data: { session }, error: authError } = await supabase.auth.getSession();
+      if (authError) throw authError;
+      if (!session?.user) throw new Error('Not authenticated');
+
+      const { data, error: subError } = await supabase
+        .from('subscriptions')
+        .select('plan')
+        .eq('user_id', session.user.id)
+        .eq('status', 'active')
+        .single();
+
+      if (subError) throw subError;
+      setSubscription(data);
+
+      if (!data || !['professional', 'enterprise'].includes(data.plan)) {
+        setError('API keys are only available for Professional and Enterprise plans');
+      }
+    } catch (err) {
+      console.error('Subscription check error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to verify subscription status');
+    }
+  };
 
   const handleThemeChange = (newTheme: Theme) => {
     setTheme(newTheme);
@@ -29,22 +59,36 @@ const NewAPIKey = () => {
         throw new Error('Key name is required');
       }
 
-      const { data, error } = await supabase
-        .rpc('create_api_key', {
-          p_name: keyName
-        });
+      // Call the RPC function
+      const { data, error: rpcError } = await supabase.rpc('create_api_key', {
+        p_name: keyName.trim()
+      });
 
-      if (error) {
-        console.error('API key creation error:', error);
-        throw new Error(error.message);
+      if (rpcError) {
+        const message = rpcError.message;
+        if (message.includes('No active subscription found')) {
+          throw new Error('You need an active subscription to create API keys');
+        } else if (message.includes('API keys are only available for Professional and Enterprise plans')) {
+          throw new Error('API keys are only available for Professional and Enterprise plans');
+        } else if (message.includes('Maximum number of active API keys reached')) {
+          throw new Error('You have reached the maximum number of active API keys (10)');
+        } else if (message.includes('An API key with this name already exists')) {
+          throw new Error('An API key with this name already exists');
+        } else if (message.includes('Key name is required')) {
+          throw new Error('Key name is required');
+        } else {
+          throw new Error('Failed to create API key');
+        }
       }
 
-      if (data?.key) {
-        setNewKey(data.key);
-      } else {
-        throw new Error('No API key returned');
+      if (!data?.key) {
+        throw new Error('Failed to create API key');
       }
+
+      setNewKey(data.key);
+      setKeyName('');
     } catch (err) {
+      console.error('Error creating API key:', err);
       setError(err instanceof Error ? err.message : 'Failed to create API key');
     } finally {
       setLoading(false);
@@ -152,8 +196,8 @@ const NewAPIKey = () => {
                       {!newKey ? (
                         <button
                           onClick={createAPIKey}
-                          disabled={!keyName || loading}
-                          className="w-full sm:w-auto px-6 py-3 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50"
+                          disabled={!keyName || loading || !subscription || !['professional', 'enterprise'].includes(subscription.plan)}
+                          className="w-full sm:w-auto px-6 py-3 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 flex items-center justify-center"
                         >
                           {loading ? (
                             <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

@@ -4,50 +4,188 @@ import Navigation from './components/Navigation';
 import { initializeTheme } from './lib/theme';
 
 // Lazy load components
-const Hero = lazy(() => import('./components/Hero'));
-const Features = lazy(() => import('./components/sections/Features'));
-const Solutions = lazy(() => import('./components/sections/Solutions'));
-const Pricing = lazy(() => import('./components/sections/Pricing'));
-const ClientsSection = lazy(() => import('./components/sections/clients/Clients'));
-const Testimonials = lazy(() => import('./components/sections/testimonials/Testimonials'));
-const Footer = lazy(() => import('./components/footer/Footer'));
+const Hero = lazy(async () => {
+  const module = await import('./components/Hero');
+  return { default: module.default };
+});
+const Features = lazy(async () => {
+  const module = await import('./components/sections/Features');
+  return { default: module.default };
+});
+const Solutions = lazy(async () => {
+  const module = await import('./components/sections/Solutions');
+  return { default: module.default };
+});
+const Pricing = lazy(async () => {
+  const module = await import('./components/sections/Pricing');
+  return { default: module.default };
+});
+const ClientsSection = lazy(async () => {
+  const module = await import('./components/sections/clients/Clients');
+  return { default: module.default };
+});
+const Testimonials = lazy(async () => {
+  const module = await import('./components/sections/testimonials/Testimonials');
+  return { default: module.default };
+});
+const Footer = lazy(async () => {
+  const module = await import('./components/footer/Footer');
+  return { default: module.default };
+});
 
 // Lazy load pages
-const Login = lazy(() => import('./pages/Login'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Profile = lazy(() => import('./pages/Profile'));
-const NewClient = lazy(() => import('./pages/NewClient'));
-const AddPaymentMethod = lazy(() => import('./pages/AddPaymentMethod'));
-const Settings = lazy(() => import('./pages/Settings'));
-const APIKeys = lazy(() => import('./pages/APIKeys'));
-const Webhooks = lazy(() => import('./pages/Webhooks'));
-const NewAPIKey = lazy(() => import('./pages/NewAPIKey'));
-const NewWebhook = lazy(() => import('./pages/NewWebhook'));
-const SignUp = lazy(() => import('./pages/SignUp'));
-const About = lazy(() => import('./pages/About'));
-const ChangePassword = lazy(() => import('./pages/ChangePassword'));
-const Sessions = lazy(() => import('./pages/Sessions'));
-const LoginHistory = lazy(() => import('./pages/LoginHistory'));
-const TwoFactorAuth = lazy(() => import('./pages/TwoFactorAuth'));
-const Contact = lazy(() => import('./pages/Contact'));
-const Privacy = lazy(() => import('./pages/Privacy'));
-const Terms = lazy(() => import('./pages/Terms'));
-const Blog = lazy(() => import('./pages/Blog'));
-const Security = lazy(() => import('./pages/Security'));
-const Compliance = lazy(() => import('./pages/Compliance'));
-const Careers = lazy(() => import('./pages/Careers'));
-const Documentation = lazy(() => import('./pages/Documentation'));
-const APIReference = lazy(() => import('./pages/APIReference'));
-const Press = lazy(() => import('./pages/Press'));
-const Cookies = lazy(() => import('./pages/Cookies'));
-const HelpCenter = lazy(() => import('./pages/HelpCenter'));
-const Community = lazy(() => import('./pages/Community'));
-const SolutionsPage = lazy(() => import('./pages/SolutionsPage'));
-const Registration = lazy(() => import('./pages/Registration'));
-const Schedule = lazy(() => import('./pages/Schedule'));
-const Invoices = lazy(() => import('./pages/Invoices'));
-const InvoiceBuilder = lazy(() => import('./pages/InvoiceBuilder'));
-const ClientsPage = lazy(() => import('./pages/Clients'));
+const Login = lazy(async () => {
+  const module = await import('./pages/Login');
+  return { default: module.default };
+});
+const ForgotPassword = lazy(async () => {
+  const module = await import('./pages/ForgotPassword');
+  return { default: module.default };
+});
+const ResetPassword = lazy(async () => {
+  const module = await import('./pages/ResetPassword');
+  return { default: module.default };
+});
+const Dashboard = lazy(async () => {
+  const module = await import('./pages/Dashboard');
+  return { default: module.default };
+});
+const Profile = lazy(async () => {
+  const module = await import('./pages/Profile');
+  return { default: module.default };
+});
+const NewClient = lazy(async () => {
+  const module = await import('./pages/NewClient');
+  return { default: module.default };
+});
+const AddPaymentMethod = lazy(async () => {
+  const module = await import('./pages/AddPaymentMethod');
+  return { default: module.default };
+});
+const Settings = lazy(async () => {
+  const module = await import('./pages/Settings');
+  return { default: module.default };
+});
+const APIKeys = lazy(async () => {
+  const module = await import('./pages/APIKeys');
+  return { default: module.default };
+});
+const Webhooks = lazy(async () => {
+  const module = await import('./pages/Webhooks');
+  return { default: module.default };
+});
+const NewAPIKey = lazy(async () => {
+  const module = await import('./pages/NewAPIKey');
+  return { default: module.default };
+});
+const NewWebhook = lazy(async () => {
+  const module = await import('./pages/NewWebhook');
+  return { default: module.default };
+});
+const SignUp = lazy(async () => {
+  const module = await import('./pages/SignUp');
+  return { default: module.default };
+});
+const About = lazy(async () => {
+  const module = await import('./pages/About');
+  return { default: module.default };
+});
+const ChangePassword = lazy(async () => {
+  const module = await import('./pages/ChangePassword');
+  return { default: module.default };
+});
+const Sessions = lazy(async () => {
+  const module = await import('./pages/Sessions');
+  return { default: module.default };
+});
+const LoginHistory = lazy(async () => {
+  const module = await import('./pages/LoginHistory');
+  return { default: module.default };
+});
+const TwoFactorAuth = lazy(async () => {
+  const module = await import('./pages/TwoFactorAuth');
+  return { default: module.default };
+});
+const Contact = lazy(async () => {
+  const module = await import('./pages/Contact');
+  return { default: module.default };
+});
+const Privacy = lazy(async () => {
+  const module = await import('./pages/Privacy');
+  return { default: module.default };
+});
+const Terms = lazy(async () => {
+  const module = await import('./pages/Terms');
+  return { default: module.default };
+});
+const Blog = lazy(async () => {
+  const module = await import('./pages/Blog');
+  return { default: module.default };
+});
+const Security = lazy(async () => {
+  const module = await import('./pages/Security');
+  return { default: module.default };
+});
+const Compliance = lazy(async () => {
+  const module = await import('./pages/Compliance');
+  return { default: module.default };
+});
+const Careers = lazy(async () => {
+  const module = await import('./pages/Careers');
+  return { default: module.default };
+});
+const Documentation = lazy(async () => {
+  const module = await import('./pages/Documentation');
+  return { default: module.default };
+});
+const APIReference = lazy(async () => {
+  const module = await import('./pages/APIReference');
+  return { default: module.default };
+});
+const Press = lazy(async () => {
+  const module = await import('./pages/Press');
+  return { default: module.default };
+});
+const Cookies = lazy(async () => {
+  const module = await import('./pages/Cookies');
+  return { default: module.default };
+});
+const HelpCenter = lazy(async () => {
+  const module = await import('./pages/HelpCenter');
+  return { default: module.default };
+});
+const Community = lazy(async () => {
+  const module = await import('./pages/Community');
+  return { default: module.default };
+});
+const SolutionsPage = lazy(async () => {
+  const module = await import('./pages/SolutionsPage');
+  return { default: module.default };
+});
+const Registration = lazy(async () => {
+  const module = await import('./pages/Registration');
+  return { default: module.default };
+});
+const Schedule = lazy(async () => {
+  const module = await import('./pages/Schedule');
+  return { default: module.default };
+});
+const Invoices = lazy(async () => {
+  const module = await import('./pages/Invoices');
+  return { default: module.default };
+});
+const InvoiceBuilder = lazy(async () => {
+  const module = await import('./pages/InvoiceBuilder');
+  return { default: module.default };
+});
+const AppointmentDetails = lazy(async () => {
+  const module = await import('./pages/AppointmentDetails');
+  return { default: module.default };
+});
+const Clients = lazy(async () => {
+  const module = await import('./pages/Clients');
+  return { default: module.default };
+});
 
 // Loading component
 const PageLoader = () => (
@@ -70,6 +208,8 @@ function App() {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/add-payment-method" element={<AddPaymentMethod />} />
@@ -99,9 +239,10 @@ function App() {
             <Route path="/solutions" element={<SolutionsPage />} />
             <Route path="/cookies" element={<Cookies />} />
             <Route path="/registration" element={<Registration />} />
-            <Route path="/dashboard/clients" element={<ClientsPage />} />
+            <Route path="/dashboard/clients" element={<Clients />} />
             <Route path="/dashboard/clients/new" element={<NewClient />} />
             <Route path="/schedule" element={<Schedule />} />
+            <Route path="/schedule/appointments/:id" element={<AppointmentDetails />} />
             <Route path="/invoices" element={<Invoices />} />
             <Route path="/invoices/new" element={<InvoiceBuilder />} />
             <Route path="/" element={

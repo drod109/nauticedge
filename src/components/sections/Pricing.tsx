@@ -1,10 +1,12 @@
-import React from 'react';
-import { Check, Zap, Shield, Users } from 'lucide-react';
+import React, { useState } from 'react';
+import { Check, Zap, Shield, Users, ArrowRight } from 'lucide-react';
+import PricingToggle from './pricing/PricingToggle';
 
 const plans = [
   {
     name: 'Basic',
-    price: 49,
+    monthlyPrice: 49,
+    annualPrice: 39,
     description: 'Perfect for independent surveyors',
     icon: Zap,
     features: [
@@ -18,7 +20,8 @@ const plans = [
   },
   {
     name: 'Professional',
-    price: 99,
+    monthlyPrice: 99,
+    annualPrice: 79,
     description: 'Ideal for growing survey businesses',
     icon: Shield,
     features: [
@@ -35,7 +38,8 @@ const plans = [
   },
   {
     name: 'Enterprise',
-    price: 249,
+    monthlyPrice: 249,
+    annualPrice: 199,
     description: 'For large organizations and fleets',
     icon: Users,
     features: [
@@ -53,6 +57,8 @@ const plans = [
 ];
 
 const Pricing = () => {
+  const [isAnnual, setIsAnnual] = useState(false);
+
   return (
     <section id="pricing" className="py-24 bg-gradient-to-b from-white via-gray-50 to-white dark:from-dark-900 dark:via-dark-800 dark:to-dark-900 relative overflow-hidden">
       {/* Background decoration */}
@@ -69,16 +75,21 @@ const Pricing = () => {
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Choose the perfect plan for your needs. All plans include core features with no hidden fees
           </p>
+          <div className="mt-8">
+            <PricingToggle isAnnual={isAnnual} onToggle={setIsAnnual} />
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="flex flex-col md:flex-row max-w-5xl mx-auto">
           {plans.map((plan, index) => (
             <div
               key={index} 
-              className={`group bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm rounded-2xl shadow-sm border-2 overflow-hidden animate-fade-in-up hover:-translate-y-2 transition-all duration-300 ${
+              className={`group flex-1 bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm overflow-hidden animate-fade-in-up hover:-translate-y-2 transition-all duration-300 ${
+                index === 0 ? 'md:rounded-r-none' : 
+                index === plans.length - 1 ? 'md:rounded-l-none' : 'md:rounded-none',
                 plan.popular
-                  ? 'border-blue-500 dark:border-blue-400 scale-105 shadow-xl'
-                  : 'border-gray-200/50 dark:border-dark-700/50 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-xl'
+                  ? 'rounded-lg border-2 border-blue-500 dark:border-blue-400 scale-105 shadow-xl relative z-10 md:-mx-4'
+                  : 'rounded-lg border border-gray-200/50 dark:border-dark-700/50 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-xl md:first:border-r-0 md:last:border-l-0'
               }`} 
               style={{ animationDelay: `${index * 0.1}s` }}
             >
@@ -95,7 +106,7 @@ const Pricing = () => {
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{plan.name}</h3>
                     <div className="text-sm">
-                      <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-500 dark:to-blue-300 bg-clip-text text-transparent">${plan.price}</span>
+                      <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-500 dark:to-blue-300 bg-clip-text text-transparent">${isAnnual ? plan.annualPrice : plan.monthlyPrice}</span>
                       <span className="text-gray-500 dark:text-gray-400">/month</span>
                     </div>
                   </div>
@@ -112,11 +123,23 @@ const Pricing = () => {
                 <button
                   className={`w-full py-3 px-6 rounded-lg font-medium transition-colors mt-8 ${
                     plan.popular
-                      ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
-                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-dark-700 dark:text-white dark:hover:bg-dark-600'
+                      ? 'relative group/button overflow-hidden bg-gradient-to-r from-blue-600 to-blue-400 text-white hover:from-blue-500 hover:to-blue-300 shadow-lg hover:shadow-xl'
+                      : 'bg-white text-gray-900 hover:bg-gray-50 dark:bg-dark-700 dark:text-white dark:hover:bg-dark-600 border border-gray-200 dark:border-dark-600 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-lg'
                   }`}
                 >
-                  Get Started
+                  {plan.popular ? (
+                    <>
+                      <span className="flex items-center justify-center">
+                        Get Started
+                        <ArrowRight className="ml-2 h-5 w-5 transform group-hover/button:translate-x-1 transition-transform" />
+                      </span>
+                    </>
+                  ) : (
+                    <span className="flex items-center justify-center">
+                      Get Started
+                      <ArrowRight className="ml-2 h-5 w-5 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all" />
+                    </span>
+                  )}
                 </button>
               </div>
             </div>

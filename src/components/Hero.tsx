@@ -20,12 +20,21 @@ const Hero = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            <button className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 md:text-lg">
-              <span>Start Free Trial</span>
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </button>
-            <button className="inline-flex items-center justify-center px-8 py-3 border border-gray-300 dark:border-dark-600 text-base font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-dark-800 transition-all duration-300 md:text-lg">
-              <span>Watch Demo</span>
+            <a
+              href="/signup"
+              className="relative inline-flex items-center justify-center px-8 py-3 overflow-hidden font-medium text-white transition-all duration-300 ease-out rounded-lg group"
+            >
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 to-blue-400 group-hover:from-blue-400 group-hover:to-blue-600"></span>
+              <span className="relative group-hover:scale-110 transition-transform duration-300">
+                Start Free Trial
+              </span>
+              <ArrowRight className="relative ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform" />
+            </a>
+            <button className="relative inline-flex items-center justify-center px-8 py-3 text-base font-medium text-gray-900 hover:text-blue-600 dark:text-white dark:hover:text-blue-400 bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-lg transition-all duration-300 group">
+              <span className="relative flex items-center">
+                Watch Demo
+                <ArrowRight className="ml-2 h-5 w-5 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all" />
+              </span>
             </button>
           </div>
           

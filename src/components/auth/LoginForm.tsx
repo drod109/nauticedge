@@ -15,7 +15,6 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(!!getRememberedEmail());
   const [showMFAVerification, setShowMFAVerification] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [requiresMFA, setRequiresMFA] = useState(false);
@@ -347,12 +346,6 @@ const LoginForm = () => {
     );
   }
 
-  if (showForgotPassword) {
-    return (
-      <ForgotPassword onBack={() => setShowForgotPassword(false)} />
-    );
-  }
-
   return (
     <div className="w-full max-w-md p-8 bg-white/80 dark:bg-dark-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 dark:border-dark-700/50 hover:shadow-2xl transition-all duration-300">
       <div className="flex items-center space-x-3 mb-8">
@@ -450,12 +443,12 @@ const LoginForm = () => {
             />
             <label htmlFor="remember" className="ml-2 text-sm text-gray-600 dark:text-gray-400">Remember me</label>
           </div>
-          <button
-            onClick={() => setShowForgotPassword(true)}
-            className="text-sm text-blue-600 dark:text-blue-500 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+          <a
+            href="/forgot-password"
+            className="text-sm text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
           >
             Forgot password?
-          </button>
+          </a>
         </div>
         <p className="text-center text-sm text-gray-600 dark:text-gray-400">
           Don't have an account?{' '}
