@@ -200,10 +200,13 @@ const InvoiceList = () => {
         </div>
         <a
           href="/invoices/new"
-          className="flex items-center justify-center px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-all duration-200 shadow-sm hover:shadow group"
+          className="relative inline-flex items-center justify-center px-6 py-2 overflow-hidden font-medium text-white transition-all duration-300 ease-out rounded-lg group"
         >
-          <Plus className="h-5 w-5 mr-2 transition-transform group-hover:scale-110" />
-          Create Invoice
+          <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 to-blue-400 group-hover:from-blue-400 group-hover:to-blue-600"></span>
+          <span className="relative flex items-center space-x-2 group-hover:scale-110 transition-transform duration-300">
+            <Plus className="h-5 w-5" />
+            <span>Create Invoice</span>
+          </span>
         </a>
       </div>
 

@@ -150,18 +150,18 @@ const Navigation = () => {
             <div className="mt-4 space-y-2">
               <a
                 href="/login"
-                className="block w-full px-3 py-2 text-center border border-gray-300 dark:border-dark-600 text-gray-700 dark:text-gray-300 bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm rounded-lg hover:bg-white dark:hover:bg-dark-800 transition-all duration-300"
-              >
-                Login
-              </a>
-              <a
-                href="/signup"
-                className="block w-full px-3 py-2 text-center relative overflow-hidden font-medium text-white transition-all duration-300 ease-out rounded-lg group"
+                className="relative block w-full px-3 py-2 text-center overflow-hidden font-medium text-white transition-all duration-300 ease-out rounded-lg group"
               >
                 <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 to-blue-400 group-hover:from-blue-400 group-hover:to-blue-600"></span>
                 <span className="relative group-hover:scale-110 transition-transform duration-300">
-                Sign Up
+                  Login
                 </span>
+              </a>
+              <a
+                href="/signup"
+                className="block w-full px-3 py-2 text-center border border-gray-300 dark:border-dark-600 text-gray-700 dark:text-gray-300 bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-lg transition-all duration-300"
+              >
+                Sign Up
               </a>
             </div>
           </div>
