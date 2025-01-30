@@ -203,9 +203,9 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <div className="min-h-screen bg-white dark:bg-dark-900 transition-colors">
-        <Suspense fallback={<PageLoader />}>
+    <Suspense fallback={<PageLoader />}>
+      <Router>
+        <div className="min-h-screen bg-white dark:bg-dark-900 transition-colors">
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -246,22 +246,20 @@ function App() {
             <Route path="/invoices" element={<Invoices />} />
             <Route path="/invoices/new" element={<InvoiceBuilder />} />
             <Route path="/" element={
-              <>
+              <Suspense fallback={<PageLoader />}>
                 <Navigation />
-                <Suspense fallback={<PageLoader />}>
-                  <Hero />
-                  <Features />
-                  <ClientsSection />
-                  <Testimonials />
-                  <Pricing />
-                  <Footer />
-                </Suspense>
-              </>
+                <Hero />
+                <Features />
+                <ClientsSection />
+                <Testimonials />
+                <Pricing />
+                <Footer />
+              </Suspense>
             } />
           </Routes>
-        </Suspense>
-      </div>
-    </Router>
+        </div>
+      </Router>
+    </Suspense>
   );
 }
 

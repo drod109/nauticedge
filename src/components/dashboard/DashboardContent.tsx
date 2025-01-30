@@ -174,7 +174,7 @@ const DashboardContent = () => {
         {quickStats.map((stat, index) => (
           <div 
             key={index}
-            className="group bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm p-6 rounded-2xl border border-gray-200/50 dark:border-dark-700/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in-up"
+            className="group bg-white dark:bg-dark-800 p-6 rounded-2xl border border-gray-200/50 dark:border-dark-700/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in-up"
             style={{ animationDelay: `${index * 0.1}s` }}
           >
             <div className="flex items-center justify-between relative">
@@ -194,7 +194,6 @@ const DashboardContent = () => {
               <div className={`h-12 w-12 bg-gradient-to-br from-${stat.color}-50 to-${stat.color}-100/50 dark:from-${stat.color}-900/20 dark:to-${stat.color}-800/10 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300`}>
                 <stat.icon className={`h-6 w-6 text-${stat.color}-600 dark:text-${stat.color}-500 transform group-hover:rotate-12 transition-transform duration-300`} />
               </div>
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl opacity-0 group-hover:opacity-20 dark:group-hover:opacity-10 blur transition-opacity duration-300"></div>
             </div>
           </div>
         ))}
@@ -303,12 +302,12 @@ const DashboardContent = () => {
         <div className="divide-y divide-gray-200 dark:divide-dark-700">
           {recentSurveys.map((survey, index) => (
             <div key={index} className="p-6 flex items-center hover:bg-gray-50/50 dark:hover:bg-dark-700/50 transition-colors group">
-              <div className="flex-1 min-w-0 flex items-center space-x-3">
+              <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-3 sm:space-y-0">
                 <div className="flex-shrink-0 h-10 w-10 bg-gray-100/50 dark:bg-dark-700/50 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                   <FileText className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{survey.title}</p>
                     {survey.priority === 'high' && (
                       <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400">
@@ -327,11 +326,11 @@ const DashboardContent = () => {
                   </div>
                 </div>
               </div>
-              <div className="ml-4 flex items-center space-x-4">
+              <div className="ml-4 flex flex-col sm:flex-row items-end sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
                 <span className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${getStatusStyle(survey.status)}`}>
                   {survey.status}
                 </span>
-                <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center space-x-2 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                   <button className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
                     <Download className="h-5 w-5 transform hover:scale-110 transition-transform" />
                   </button>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Ship, Building2, CreditCard, ChevronRight, ChevronLeft, Phone, Check } from 'lucide-react';
+import { Ship, Building2, CreditCard, ChevronRight, ChevronLeft, Phone, Check, Clock, Shield } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Theme, getInitialTheme } from '../lib/theme';
 import ThemeToggle from '../components/ThemeToggle';
@@ -68,6 +68,44 @@ const Registration = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     let { name, value } = e.target;
+    
+    // Format credit card number
+    if (name === 'card_number') {
+      // Remove all non-digit characters
+      const digits = value.replace(/\D/g, '');
+      
+      // Format card number as XXXX XXXX XXXX XXXX
+      if (digits.length <= 16) {
+        value = digits.replace(/(\d{4})/g, '$1 ').trim();
+      }
+    }
+    
+    // Format card expiry
+    if (name === 'card_expiry') {
+      // Remove all non-digit characters
+      const digits = value.replace(/\D/g, '');
+      
+      // Format as MM/YY
+      if (digits.length >= 2) {
+        const month = digits.slice(0, 2);
+        const year = digits.slice(2, 4);
+        
+        // Validate month
+        if (parseInt(month) > 12) {
+          value = '12' + (year ? `/${year}` : '');
+        } else {
+          value = month + (year ? `/${year}` : '');
+        }
+      } else {
+        value = digits;
+      }
+    }
+    
+    // Format CVC
+    if (name === 'card_cvc') {
+      // Only allow 3-4 digits
+      value = value.replace(/\D/g, '').slice(0, 4);
+    }
     
     // Format phone number
     if (name === 'company_phone') {
@@ -224,43 +262,55 @@ const Registration = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Card Number
                 </label>
-                <input
-                  type="text"
-                  name="card_number"
-                  value={formData.card_number}
-                  onChange={handleInputChange}
-                  placeholder="1234 5678 9012 3456"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
+                <div className="relative">
+                  <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
+                  <input
+                    type="text"
+                    name="card_number"
+                    value={formData.card_number}
+                    onChange={handleInputChange}
+                    placeholder="1234 5678 9012 3456"
+                    maxLength={19}
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                    required
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Expiry Date
                 </label>
-                <input
-                  type="text"
-                  name="card_expiry"
-                  value={formData.card_expiry}
-                  onChange={handleInputChange}
-                  placeholder="MM/YY"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
+                <div className="relative">
+                  <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
+                  <input
+                    type="text"
+                    name="card_expiry"
+                    value={formData.card_expiry}
+                    onChange={handleInputChange}
+                    placeholder="MM/YY"
+                    maxLength={5}
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                    required
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   CVC
                 </label>
-                <input
-                  type="text"
-                  name="card_cvc"
-                  value={formData.card_cvc}
-                  onChange={handleInputChange}
-                  placeholder="123"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
+                <div className="relative">
+                  <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
+                  <input
+                    type="text"
+                    name="card_cvc"
+                    value={formData.card_cvc}
+                    onChange={handleInputChange}
+                    placeholder="123"
+                    maxLength={4}
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                    required
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -384,7 +434,7 @@ const Registration = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Postal Code
+                  Zip/Postal Code
                 </label>
                 <input
                   type="text"
@@ -421,7 +471,7 @@ const Registration = () => {
                     name="company_phone"
                     value={formData.company_phone}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
                     placeholder="(555) 123-4567"
                     required
                   />
@@ -458,32 +508,67 @@ const Registration = () => {
         <div className="bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-dark-700/50 p-6 sm:p-8 animate-fade-in">
           {/* Progress Steps */}
           <div className="mb-8">
-            <div className="flex items-center justify-center space-x-4">
-              <div className={`flex items-center ${currentStep >= 1 ? 'text-blue-600 dark:text-blue-500' : 'text-gray-400 dark:text-gray-500'}`}>
+            <div className="hidden sm:flex items-center justify-center space-x-4">
+              <div className={`flex items-center space-x-2 ${currentStep >= 1 ? 'text-blue-600 dark:text-blue-500' : 'text-gray-400 dark:text-gray-500'}`}>
                 <div className={`h-8 w-8 rounded-full flex items-center justify-center border-2 ${
                   currentStep >= 1 ? 'border-blue-600 dark:border-blue-500' : 'border-gray-400 dark:border-gray-500'
                 }`}>
                   1
                 </div>
-                <span className="ml-2">Plan Selection</span>
+                <span>Plan Selection</span>
               </div>
               <div className={`w-16 h-0.5 ${currentStep >= 2 ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`} />
-              <div className={`flex items-center ${currentStep >= 2 ? 'text-blue-600 dark:text-blue-500' : 'text-gray-400 dark:text-gray-500'}`}>
+              <div className={`flex items-center space-x-2 ${currentStep >= 2 ? 'text-blue-600 dark:text-blue-500' : 'text-gray-400 dark:text-gray-500'}`}>
                 <div className={`h-8 w-8 rounded-full flex items-center justify-center border-2 ${
                   currentStep >= 2 ? 'border-blue-600 dark:border-blue-500' : 'border-gray-400 dark:border-gray-500'}`}>
                   2
                 </div>
-                <span className="ml-2">Payment</span>
+                <span>Payment</span>
               </div>
               <div className={`w-16 h-0.5 ${currentStep >= 3 ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`} />
-              <div className={`flex items-center ${currentStep >= 3 ? 'text-blue-600 dark:text-blue-500' : 'text-gray-400 dark:text-gray-500'}`}>
+              <div className={`flex items-center space-x-2 ${currentStep >= 3 ? 'text-blue-600 dark:text-blue-500' : 'text-gray-400 dark:text-gray-500'}`}>
                 <div className={`h-8 w-8 rounded-full flex items-center justify-center border-2 ${
                   currentStep >= 3 ? 'border-blue-600 dark:border-blue-500' : 'border-gray-400 dark:border-gray-500'
                 }`}>
                   3
                 </div>
-                <span className="ml-2">Company Details</span>
+                <span>Company Details</span>
               </div>
+            </div>
+            
+            {/* Mobile Steps */}
+            <div className="sm:hidden flex items-center justify-center">
+              <div className="flex items-center space-x-3">
+                {[1, 2, 3].map((step) => (
+                  <div key={step} className="flex items-center">
+                    <div
+                      className={`h-8 w-8 rounded-full flex items-center justify-center border-2 ${
+                        currentStep >= step
+                          ? 'border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-500'
+                          : 'border-gray-400 dark:border-gray-500 text-gray-400 dark:text-gray-500'
+                      }`}
+                    >
+                      {step}
+                    </div>
+                    {step < 3 && (
+                      <div
+                        className={`w-3 h-0.5 mx-1 ${
+                          currentStep > step
+                            ? 'bg-blue-600 dark:bg-blue-500'
+                            : 'bg-gray-300 dark:bg-gray-600'
+                        }`}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mt-2 text-center sm:hidden">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                {currentStep === 1 && 'Plan Selection'}
+                {currentStep === 2 && 'Payment Information'}
+                {currentStep === 3 && 'Company Details'}
+              </p>
             </div>
           </div>
 

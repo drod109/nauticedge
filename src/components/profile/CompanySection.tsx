@@ -163,7 +163,7 @@ const CompanySection = ({
                 <div className="relative mt-1">
                   <input
                     type="text"
-                    value={isEditing ? editForm.company_address_line2 : (userData?.company_address_line2 || 'Not set')}
+                    value={isEditing ? editForm.company_address_line2 : (userData?.company_address_line2 || '')}
                     onChange={(e) => isEditing && onChange('company_address_line2', e.target.value)}
                     className={`block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg ${
                       isEditing 
@@ -208,20 +208,20 @@ const CompanySection = ({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Postal Code</label>
-                  <div className="relative mt-1">
-                    <input
-                      type="text"
-                      value={isEditing ? editForm.company_postal_code : (userData?.company_postal_code || 'Not set')}
-                      onChange={(e) => isEditing && onChange('company_postal_code', e.target.value)}
-                      className={`block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg ${
-                        isEditing 
-                          ? 'bg-white dark:bg-dark-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent' 
-                          : 'bg-gray-50 dark:bg-dark-700 cursor-not-allowed'
-                      } text-gray-900 dark:text-white transition-colors`}
-                      readOnly={!isEditing}
-                    />
-                  </div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Zip / Postal Code
+                  </label>
+                  <input
+                    type="text"
+                    value={isEditing ? editForm.company_postal_code : (userData?.company_postal_code || 'Not set')}
+                    onChange={(e) => isEditing && onChange('company_postal_code', e.target.value)}
+                    className={`block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg ${
+                      isEditing 
+                        ? 'bg-white dark:bg-dark-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent' 
+                        : 'bg-gray-50 dark:bg-dark-700 cursor-not-allowed'
+                    } text-gray-900 dark:text-white transition-colors`}
+                    readOnly={!isEditing}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Country</label>

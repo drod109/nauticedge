@@ -249,50 +249,85 @@ const Profile = () => {
   const fetchUserData = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
+      if (!user) throw new Error('Not authenticated');
 
-        // Update userData state with all profile data
-        setUserData({
-          ...user,
-          ...profile,
-          email: user.email,
-          photo_url: profile?.avatar_url || null,
-          company_name: profile?.company_name || '',
-          company_position: profile?.company_position || '',
-          registration_number: profile?.registration_number || '',
-          tax_id: profile?.tax_id || '',
-          company_address_line1: profile?.company_address_line1 || '',
-          company_address_line2: profile?.company_address_line2 || '',
-          company_city: profile?.company_city || '',
-          company_state: profile?.company_state || '',
-          company_postal_code: profile?.company_postal_code || '',
-          company_country: profile?.company_country || ''
-        });
-        
-        // Update editForm state with all profile data
-        setEditForm({
-          email: user.email,
-          first_name: profile?.first_name || '',
-          last_name: profile?.last_name || '',
-          phone: profile?.phone || '',
-          location: profile?.location || '',
-          company_name: profile?.company_name || '',
-          company_position: profile?.company_position || '',
-          registration_number: profile?.registration_number || '',
-          tax_id: profile?.tax_id || '',
-          company_address_line1: profile?.company_address_line1 || '',
-          company_address_line2: profile?.company_address_line2 || '',
-          company_city: profile?.company_city || '',
-          company_state: profile?.company_state || '',
-          company_postal_code: profile?.company_postal_code || '',
-          company_country: profile?.company_country || ''
-        });
-      }
+      // Get profile data with all fields explicitly selected
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          first_name,
+          last_name,
+          full_name,
+          avatar_url,
+          phone,
+          location,
+          company_name,
+          company_position,
+          registration_number,
+          tax_id,
+          company_address_line1,
+          company_address_line2,
+          company_city,
+          company_state,
+          company_postal_code,
+          company_country
+        `)
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      // Get subscription data
+      const { data: subscription } = await supabase
+        .from('subscriptions')
+        .select('plan, status')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .maybeSingle();
+
+      // Set subscription plan even if no active subscription found
+      setCurrentPlan(subscription?.plan || 'basic');
+
+      // Update userData state with all profile data
+      setUserData({
+        ...user,
+        ...profile,
+        email: user.email,
+        photo_url: profile?.avatar_url || null,
+        company_name: profile?.company_name || '',
+        company_position: profile?.company_position || '',
+        registration_number: profile?.registration_number || '',
+        tax_id: profile?.tax_id || '',
+        company_address_line1: profile?.company_address_line1 || '',
+        company_address_line2: profile?.company_address_line2 || '',
+        company_city: profile?.company_city || '',
+        company_state: profile?.company_state || '',
+        company_postal_code: profile?.company_postal_code || '',
+        company_country: profile?.company_country || ''
+      });
+
+      // Update editForm state
+      setEditForm(prev => ({
+        ...prev,
+        email: user.email,
+        first_name: profile?.first_name || '',
+        last_name: profile?.last_name || '',
+        phone: profile?.phone || '',
+        location: profile?.location || '',
+        company_name: profile?.company_name || '',
+        company_position: profile?.company_position || '',
+        registration_number: profile?.registration_number || '',
+        tax_id: profile?.tax_id || '',
+        company_address_line1: profile?.company_address_line1 || '',
+        company_address_line2: profile?.company_address_line2 || '',
+        company_city: profile?.company_city || '',
+        company_state: profile?.company_state || '',
+        company_postal_code: profile?.company_postal_code || '',
+        company_country: profile?.company_country || ''
+      }));
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load user data');
     } finally {
@@ -434,12 +469,29 @@ const Profile = () => {
               <input
                 type="tel"
                 value={isEditing ? editForm.phone : (userData?.phone || 'Not set')}
-                onChange={(e) => isEditing && setEditForm(prev => ({ ...prev, phone: e.target.value }))}
+                onChange={(e) => {
+                  if (!isEditing) return;
+                  // Remove all non-digit characters
+                  const digits = e.target.value.replace(/\D/g, '');
+                  // Format phone number as (XXX) XXX-XXXX
+                  let formatted = digits;
+                  if (digits.length >= 10) {
+                    formatted = `(${digits.slice(0,3)}) ${digits.slice(3,6)}-${digits.slice(6,10)}`;
+                  } else if (digits.length >= 6) {
+                    formatted = `(${digits.slice(0,3)}) ${digits.slice(3,6)}-${digits.slice(6)}`;
+                  } else if (digits.length >= 3) {
+                    formatted = `(${digits.slice(0,3)}) ${digits.slice(3)}`;
+                  } else if (digits.length > 0) {
+                    formatted = `(${digits}`;
+                  }
+                  setEditForm(prev => ({ ...prev, phone: formatted }));
+                }}
                 className={`block w-full pl-10 px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg ${
                   !isEditing 
                     ? 'bg-gray-50 dark:bg-dark-700 cursor-not-allowed' 
                     : 'bg-white dark:bg-dark-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
                 } text-gray-900 dark:text-white transition-colors`}
+                placeholder="(555) 123-4567"
                 readOnly={!isEditing}
               />
             </div>
