@@ -303,78 +303,147 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
       </div>
 
       {/* Items Table */}
-      <div className="mb-8 overflow-x-auto">
-        <div className="bg-gray-50/50 dark:bg-dark-700/50 backdrop-blur-sm rounded-t-lg">
-          <div className="grid grid-cols-12 gap-4 p-4 font-medium text-gray-700 dark:text-gray-300">
-            <div className="col-span-4">ITEM DESCRIPTION</div>
-            <div className="col-span-2 text-center">QTY</div>
-            <div className="col-span-2 text-center">RATE</div>
-            <div className="col-span-2 text-center">TAX (%)</div>
-            <div className="col-span-2 text-right">AMOUNT</div>
-          </div>
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">Items</h3>
+          <button
+            onClick={addItem}
+            className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+          >
+            <Plus className="h-4 w-4 mr-1.5" />
+            Add Item
+          </button>
         </div>
-        <div className="border border-gray-200/50 dark:border-dark-700/50 rounded-b-lg divide-y divide-gray-200/50 dark:divide-dark-700/50">
+        
+        {/* Desktop Headers - Hidden on Mobile */}
+        <div className="hidden sm:grid grid-cols-12 gap-4 p-4 font-medium text-gray-700 dark:text-gray-300 bg-gray-50/50 dark:bg-dark-700/50 backdrop-blur-sm rounded-t-lg">
+          <div className="col-span-5">DESCRIPTION</div>
+          <div className="col-span-2 text-center">QUANTITY</div>
+          <div className="col-span-2 text-center">RATE</div>
+          <div className="col-span-2 text-center">TAX (%)</div>
+          <div className="col-span-1"></div>
+        </div>
+
+        {/* Items List */}
+        <div className="space-y-4 sm:space-y-0 divide-y divide-gray-200 dark:divide-dark-700 sm:divide-y-0">
           {items.map((item, index) => (
-            <div key={index} className="grid grid-cols-12 gap-4 p-4 items-center">
-              <div className="col-span-4">
-                <input
-                  type="text"
-                  value={item.description}
-                  onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-                  placeholder="Item description"
-                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
-                />
+            <div key={index} className="bg-white dark:bg-dark-800 p-4 sm:p-6 rounded-lg sm:rounded-none border border-gray-200/50 dark:border-dark-700/50 sm:border-0">
+              {/* Mobile Layout */}
+              <div className="block sm:hidden space-y-4">
+                <div className="relative">
+                  <button
+                    onClick={() => removeItem(index)}
+                    className="absolute -right-2 -top-2 p-1.5 text-red-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-colors z-10"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                  <input
+                    type="text"
+                    value={item.description}
+                    onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                    placeholder="Item description"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quantity</label>
+                    <input
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                      min="1"
+                      className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center transition-all duration-300"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rate</label>
+                    <input
+                      type="number"
+                      value={item.rate}
+                      onChange={(e) => handleItemChange(index, 'rate', e.target.value)}
+                      min="0"
+                      step="0.01"
+                      className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center transition-all duration-300"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tax (%)</label>
+                    <input
+                      type="number"
+                      value={item.tax}
+                      onChange={(e) => handleItemChange(index, 'tax', e.target.value)}
+                      min="0"
+                      max="100"
+                      className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center transition-all duration-300"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount</label>
+                    <div className="relative">
+                      <div className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-gray-50 dark:bg-dark-700 text-gray-900 dark:text-white text-center">
+                        ${item.amount.toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="col-span-2">
-                <input
-                  type="number"
-                  value={item.quantity}
-                  onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                  min="1"
-                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
-                />
-              </div>
-              <div className="col-span-2">
-                <input
-                  type="number"
-                  value={item.rate}
-                  onChange={(e) => handleItemChange(index, 'rate', e.target.value)}
-                  min="0"
-                  step="0.01"
-                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
-                />
-              </div>
-              <div className="col-span-2">
-                <input
-                  type="number"
-                  value={item.tax}
-                  onChange={(e) => handleItemChange(index, 'tax', e.target.value)}
-                  min="0"
-                  max="100"
-                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
-                />
-              </div>
-              <div className="col-span-2 flex items-center justify-between">
-                <span className="font-medium text-gray-900 dark:text-white">
-                  ${item.amount.toFixed(2)}
-                </span>
-                <button
-                  onClick={() => removeItem(index)}
-                  className="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                >
-                  <Trash2 className="h-5 w-5" />
-                </button>
+
+              {/* Desktop Layout */}
+              <div className="hidden sm:grid grid-cols-12 gap-4 items-center">
+                <div className="col-span-5">
+                  <input
+                    type="text"
+                    value={item.description}
+                    onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                    placeholder="Item description"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <input
+                    type="number"
+                    value={item.quantity}
+                    onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                    min="1"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center transition-all duration-300"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <input
+                    type="number"
+                    value={item.rate}
+                    onChange={(e) => handleItemChange(index, 'rate', e.target.value)}
+                    min="0"
+                    step="0.01"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center transition-all duration-300"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <input
+                    type="number"
+                    value={item.tax}
+                    onChange={(e) => handleItemChange(index, 'tax', e.target.value)}
+                    min="0"
+                    max="100"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center transition-all duration-300"
+                  />
+                </div>
+                <div className="col-span-1 flex justify-end">
+                  <button
+                    onClick={() => removeItem(index)}
+                    className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
-        <button
-          onClick={addItem}
-          className="mt-4 inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-        >
-          <Plus className="h-4 w-4 mr-1" />
-          Add Item
-        </button>
       </div>
 
       {/* Totals */}
