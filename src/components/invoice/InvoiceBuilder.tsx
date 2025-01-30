@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Upload } from 'lucide-react';
+import { Plus, Trash2, Upload, Check } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 interface InvoiceItem {
@@ -183,18 +183,18 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
   };
 
   return (
-    <div className="bg-white dark:bg-dark-800 rounded-lg shadow-sm border border-gray-200 dark:border-dark-700 p-8">
+    <div className="bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-dark-700/50 p-4 sm:p-8 transition-all duration-300 hover:shadow-xl">
       {/* Header */}
-      <div className="flex justify-between mb-8">
-        <div className="w-32">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-8">
+        <div className="w-24 sm:w-32">
           <label className="block relative w-32 h-32 border-2 border-dashed border-gray-300 dark:border-dark-600 rounded-lg cursor-pointer hover:border-blue-500 dark:hover:border-blue-400">
             {logo ? (
               <img src={logo} alt="Company Logo" className="w-full h-full object-contain rounded-lg" />
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
                 <Upload className="h-8 w-8 mb-2" />
-                <span className="text-xs text-center px-2">Upload Logo</span>
-                <span className="text-xs text-center px-2">Recommended size 100x100</span>
+                <span className="text-xs text-center px-2">Upload</span>
+                <span className="text-xs text-center px-2">100x100</span>
               </div>
             )}
             <input
@@ -206,14 +206,14 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
           </label>
         </div>
         <div className="text-right">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">INVOICE</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-600 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white mb-4">INVOICE</h1>
         </div>
       </div>
 
       {/* Client & Invoice Info */}
-      <div className="grid grid-cols-2 gap-8 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-8">
         <div>
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">From:</h2>
+          <h2 className="text-lg font-medium bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-blue-600 dark:from-white dark:to-blue-400 mb-4">From:</h2>
           <div className="space-y-4 mb-8">
             <div className="text-gray-600 dark:text-gray-400">
               <p className="font-medium">{userData?.company_name || 'Company Name Not Set'}</p>
@@ -227,35 +227,35 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
             </div>
           </div>
           
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Bill To:</h2>
+          <h2 className="text-lg font-medium bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-blue-600 dark:from-white dark:to-blue-400 mb-4">Bill To:</h2>
           <div className="space-y-4">
             <input
               type="text"
               value={formData.invoiceTo}
               onChange={(e) => setFormData(prev => ({ ...prev, invoiceTo: e.target.value }))}
               placeholder="Client Name"
-              className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
             />
             <input
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
               placeholder="Phone Number"
-              className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
             />
             <input
               type="email"
               value={formData.email}
               onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
               placeholder="Email Address"
-              className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
             />
             <textarea
               value={formData.address}
               onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
               placeholder="Address"
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
             />
           </div>
         </div>
@@ -270,12 +270,12 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
                 type="text"
                 value={formData.invoiceNumber}
                 onChange={(e) => setFormData(prev => ({ ...prev, invoiceNumber: e.target.value }))}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
               />
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Invoice Date
               </label>
@@ -283,10 +283,10 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
                 type="date"
                 value={formData.invoiceDate}
                 onChange={(e) => setFormData(prev => ({ ...prev, invoiceDate: e.target.value }))}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
               />
               </div>
-              <div className="flex-1">
+              <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Due Date
                 </label>
@@ -303,8 +303,8 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
       </div>
 
       {/* Items Table */}
-      <div className="mb-8">
-        <div className="bg-gray-50 dark:bg-dark-700 rounded-t-lg">
+      <div className="mb-8 overflow-x-auto">
+        <div className="bg-gray-50/50 dark:bg-dark-700/50 backdrop-blur-sm rounded-t-lg">
           <div className="grid grid-cols-12 gap-4 p-4 font-medium text-gray-700 dark:text-gray-300">
             <div className="col-span-4">ITEM DESCRIPTION</div>
             <div className="col-span-2 text-center">QTY</div>
@@ -313,7 +313,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
             <div className="col-span-2 text-right">AMOUNT</div>
           </div>
         </div>
-        <div className="border border-gray-200 dark:border-dark-700 rounded-b-lg divide-y divide-gray-200 dark:divide-dark-700">
+        <div className="border border-gray-200/50 dark:border-dark-700/50 rounded-b-lg divide-y divide-gray-200/50 dark:divide-dark-700/50">
           {items.map((item, index) => (
             <div key={index} className="grid grid-cols-12 gap-4 p-4 items-center">
               <div className="col-span-4">
@@ -322,7 +322,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
                   value={item.description}
                   onChange={(e) => handleItemChange(index, 'description', e.target.value)}
                   placeholder="Item description"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
                 />
               </div>
               <div className="col-span-2">
@@ -331,7 +331,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
                   value={item.quantity}
                   onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
                   min="1"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
                 />
               </div>
               <div className="col-span-2">
@@ -341,7 +341,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
                   onChange={(e) => handleItemChange(index, 'rate', e.target.value)}
                   min="0"
                   step="0.01"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
                 />
               </div>
               <div className="col-span-2">
@@ -351,7 +351,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
                   onChange={(e) => handleItemChange(index, 'tax', e.target.value)}
                   min="0"
                   max="100"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
                 />
               </div>
               <div className="col-span-2 flex items-center justify-between">
@@ -360,7 +360,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
                 </span>
                 <button
                   onClick={() => removeItem(index)}
-                  className="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-500"
+                  className="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                 >
                   <Trash2 className="h-5 w-5" />
                 </button>
@@ -370,7 +370,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
         </div>
         <button
           onClick={addItem}
-          className="mt-4 flex items-center text-sm text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400"
+          className="mt-4 inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-500 hover:text-blue-700 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
         >
           <Plus className="h-4 w-4 mr-1" />
           Add Item
@@ -378,8 +378,8 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
       </div>
 
       {/* Totals */}
-      <div className="flex justify-end mb-8">
-        <div className="w-80 space-y-3">
+      <div className="flex flex-col sm:flex-row sm:justify-end mb-8">
+        <div className="w-full sm:w-80 space-y-3 p-4 bg-gray-50/50 dark:bg-dark-700/50 backdrop-blur-sm rounded-xl border border-gray-200/50 dark:border-dark-700/50">
           <div className="flex justify-between text-gray-700 dark:text-gray-300">
             <span>Subtotal:</span>
             <span>${calculateSubtotal().toFixed(2)}</span>
@@ -396,18 +396,22 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
       </div>
 
       {/* Actions */}
-      <div className="flex justify-end space-x-4">
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
         <button
           onClick={onCancel}
-          className="px-6 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+          className="w-full sm:w-auto px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-dark-600 rounded-xl hover:bg-gray-50 dark:hover:bg-dark-700 transition-all duration-300"
         >
           Cancel
         </button>
         <button
           onClick={handleSubmit}
-          className="px-6 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600"
+          className="relative w-full sm:w-auto group overflow-hidden rounded-xl"
         >
-          Save Invoice
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-400 group-hover:scale-105 transition-transform duration-300"></div>
+          <div className="relative px-8 py-3 leading-none flex items-center justify-center space-x-2">
+            <span className="text-white font-medium">Save Invoice</span>
+            <Check className="h-5 w-5 text-white transform group-hover:scale-110 transition-transform" />
+          </div>
         </button>
       </div>
     </div>
