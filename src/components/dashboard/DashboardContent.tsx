@@ -200,7 +200,7 @@ const DashboardContent = () => {
       </div>
 
       {/* Payment Status */}
-      <div className="bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-dark-700/50 shadow-sm hover:shadow-xl transition-all duration-300 animate-fade-in-up">
+      <div className="bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-dark-700/50 shadow-sm hover:shadow-xl transition-all duration-300 animate-fade-in-up overflow-hidden">
         <div className="p-6 border-b border-gray-200 dark:border-dark-700">
           <div className="flex items-center space-x-3">
             <div className="h-10 w-10 bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/20 dark:to-green-800/10 rounded-xl flex items-center justify-center">
@@ -213,75 +213,85 @@ const DashboardContent = () => {
           </div>
         </div>
         <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {[
-              { title: 'Paid', amount: totalPaid, icon: DollarSign, color: 'green' },
-              { title: 'Pending', amount: totalPending, icon: Clock, color: 'yellow' },
-              { title: 'Overdue', amount: totalOverdue, icon: AlertCircle, color: 'red' }
-            ].map((item, index) => (
-              <div 
-                key={index} 
-                className={`group p-6 rounded-xl border border-gray-200/50 dark:border-dark-700/50 bg-gradient-to-br from-${item.color}-50/50 to-white dark:from-${item.color}-900/10 dark:to-dark-800/90 backdrop-blur-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden`}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/50 to-white/0 dark:from-white/0 dark:via-white/5 dark:to-white/0 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-                <div className="relative">
-                  <div className="h-12 w-12 bg-white/80 dark:bg-dark-800/80 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <item.icon className={`h-6 w-6 text-${item.color}-600 dark:text-${item.color}-500`} />
-                  </div>
-                  <p className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300">
-                    ${item.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <div className="bg-white dark:bg-dark-800 p-6 rounded-xl border border-green-200/50 dark:border-green-800/50 hover:shadow-lg transition-all duration-300">
+              <div className="flex items-center space-x-4">
+                <div className="h-12 w-12 bg-green-50 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
+                  <DollarSign className="h-6 w-6 text-green-600 dark:text-green-500" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Paid</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                    ${totalPaid.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </p>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{item.title}</p>
                 </div>
               </div>
-            ))}
+            </div>
+              
+            <div className="bg-white dark:bg-dark-800 p-6 rounded-xl border border-yellow-200/50 dark:border-yellow-800/50 hover:shadow-lg transition-all duration-300">
+              <div className="flex items-center space-x-4">
+                <div className="h-12 w-12 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg flex items-center justify-center">
+                  <Clock className="h-6 w-6 text-yellow-600 dark:text-yellow-500" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Pending</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                    ${totalPending.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+              </div>
+            </div>
+              
+            <div className="bg-white dark:bg-dark-800 p-6 rounded-xl border border-red-200/50 dark:border-red-800/50 hover:shadow-lg transition-all duration-300">
+              <div className="flex items-center space-x-4">
+                <div className="h-12 w-12 bg-red-50 dark:bg-red-900/20 rounded-lg flex items-center justify-center">
+                  <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-500" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Overdue</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                    ${totalOverdue.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
           
-          <div className="overflow-x-auto scrollbar-hide rounded-xl border border-gray-200/50 dark:border-dark-700/50">
-            <table className="min-w-full">
-              <thead>
-                <tr className="text-left text-sm font-medium text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-dark-700/50">
-                  <th className="px-6 py-4">Customer</th>
-                  <th className="px-6 py-4">Invoice</th>
-                  <th className="px-6 py-4">Amount</th>
-                  <th className="px-6 py-4">Due Date</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-center">View Survey</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-dark-700">
-                {paymentRecords.map((record, index) => (
-                  <tr key={index} className="text-sm text-gray-900 dark:text-white hover:bg-gray-50/50 dark:hover:bg-dark-700/50 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center">
-                        <span className="text-gray-900 dark:text-white font-medium">{record.customer}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <a href="/sample-invoice.pdf" className="text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400 flex items-center space-x-1 group">
-                        {record.invoice}
-                        <ArrowUpRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
-                      </a>
-                    </td>
-                    <td className="px-6 py-4 font-medium">${record.amount.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{record.dueDate}</td>
-                    <td className="px-6 py-4">
+          <div className="space-y-4">
+            {paymentRecords.map((record, index) => (
+              <div key={index} className="bg-white dark:bg-dark-800 rounded-lg border border-gray-200/50 dark:border-dark-700/50 p-4 hover:shadow-md transition-all duration-300">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between sm:justify-start sm:space-x-4">
+                      <span className="font-medium text-gray-900 dark:text-white">{record.customer}</span>
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusStyle(record.status)}`}>
                         {record.status}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <a 
-                        href={`/surveys/${record.surveyId}`}
-                        className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-500 transition-colors inline-flex justify-center group"
-                      >
-                        <FileSearch className="h-5 w-5 transform group-hover:scale-110 transition-transform" />
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+                      <a href="/sample-invoice.pdf" className="text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400 flex items-center group">
+                        {record.invoice}
+                        <ArrowUpRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
                       </a>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      <span>•</span>
+                      <span>Due {record.dueDate}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between sm:justify-end space-x-4">
+                    <span className="text-lg font-medium text-gray-900 dark:text-white">
+                      ${record.amount.toLocaleString()}
+                    </span>
+                    <a 
+                      href={`/surveys/${record.surveyId}`}
+                      className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-500 hover:bg-gray-50 dark:hover:bg-dark-700 rounded-lg transition-all duration-300 group"
+                    >
+                      <FileSearch className="h-5 w-5 transform group-hover:scale-110 transition-transform" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
