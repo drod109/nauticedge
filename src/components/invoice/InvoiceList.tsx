@@ -198,15 +198,12 @@ const InvoiceList = () => {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Invoices</h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage your invoices and billing</p>
         </div>
-        <a 
-          href="/invoices/new" 
-          className="relative inline-flex items-center justify-center px-4 py-2 overflow-hidden text-sm font-medium text-white transition-all duration-300 ease-out rounded-lg group"
+        <a
+          href="/invoices/new"
+          className="flex items-center justify-center px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-all duration-200 shadow-sm hover:shadow group"
         >
-          <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 to-blue-400 group-hover:from-blue-400 group-hover:to-blue-600"></span>
-          <span className="relative flex items-center">
-            <Plus className="h-5 w-5 mr-2 transform group-hover:scale-110 transition-transform" />
-            Create Invoice
-          </span>
+          <Plus className="h-5 w-5 mr-2 transition-transform group-hover:scale-110" />
+          Create Invoice
         </a>
       </div>
 

@@ -2,7 +2,7 @@
 
 ![NauticEdge](https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=1200&h=400)
 
-NauticEdge is a comprehensive digital platform designed for marine surveyors, boat owners, and insurers. It streamlines the marine survey process with powerful digital tools, real-time collaboration features, and advanced security measures.
+NauticEdge is a comprehensive digital platform designed for marine surveyors, boat owners, and insurers. It streamlines the marine survey process with powerful digital tools and real-time collaboration features.
 
 ## 🌟 Key Features
 
@@ -21,9 +21,6 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - Advanced search and filtering
   - CSV export functionality
   - Customizable views
-  - Drag and drop interface
-  - Real-time collaboration
-  - Automated PDF generation
 
 ### Client Management
 - **Comprehensive Client Profiles**
@@ -38,9 +35,6 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - Import/Export capabilities
   - Advanced search
   - Location detection
-  - Client portal access
-  - Communication history
-  - Document sharing
 
 ### Invoice Management
 - **Professional Invoice System**
@@ -56,9 +50,6 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - Custom templates
   - Tax calculation
   - Multi-currency support
-  - Automatic reminders
-  - Payment gateway integration
-  - Recurring invoices
 
 ### Appointment Scheduling
 - **Advanced Calendar System**
@@ -74,9 +65,6 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - Conflict detection
   - Recurring appointments
   - Automated reminders
-  - Multi-timezone support
-  - Resource allocation
-  - Team scheduling
 
 ### Security Features
 - **Enhanced Authentication**
@@ -112,9 +100,6 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
     - Session termination
     - IP-based security
     - Automatic cleanup
-    - Suspicious activity detection
-    - Geolocation verification
-    - Brute force protection
 
 - **Profile Management**
   - Profile photo upload
@@ -138,9 +123,6 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
     - Suspicious activity detection
     - Location tracking
     - Session termination
-    - Login history
-    - Security audit logs
-    - Device management
 
 ### Subscription Plans
 - **Basic Plan ($49/month)**
@@ -150,8 +132,6 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - 5GB storage
   - Email notifications
   - Basic analytics
-  - Mobile app access
-  - Email support
 
 - **Professional Plan ($99/month)**
   - Everything in Basic
@@ -163,9 +143,6 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - Custom templates
   - Bulk operations
   - Advanced reporting
-  - Webhook integrations
-  - Custom branding
-  - Priority support
 
 - **Enterprise Plan ($249/month)**
   - Everything in Professional
@@ -180,9 +157,6 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - Advanced analytics
   - Custom integrations
   - White-label reports
-  - Dedicated account manager
-  - Custom feature development
-  - Enterprise SLA
 
 ## 🛠️ Tech Stack
 
@@ -208,9 +182,6 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - Optimized builds
   - Environment variables
   - TypeScript support
-  - Code splitting
-  - Tree shaking
-  - Dynamic imports
 
 ### Backend & Infrastructure
 - Supabase
@@ -226,9 +197,6 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - Real-time subscriptions
   - Row Level Security (RLS)
   - Webhooks
-  - Edge Functions
-  - Database Backups
-  - Monitoring
 
 ### Security Features
 - **Comprehensive Authentication**
@@ -243,9 +211,6 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - Session management
   - Device tracking
   - Location monitoring
-  - IP blocking
-  - Audit logging
-  - Security alerts
 
 ### API Features (Professional & Enterprise)
 - RESTful endpoints
@@ -259,9 +224,6 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - Rate limiting
   - Authentication
   - OpenAPI docs
-  - API versioning
-  - Response caching
-  - Error tracking
 
 ## 📋 Prerequisites
 
@@ -273,9 +235,6 @@ NauticEdge is a comprehensive digital platform designed for marine surveyors, bo
   - Google
   - Facebook
   - GitHub
-- Environment variables configured
-- PostgreSQL 14 or higher
-- Modern web browser
 
 ## 🔧 Environment Setup
 
@@ -344,9 +303,6 @@ npm run dev
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
-- `npm run test` - Run tests
-- `npm run typecheck` - Run TypeScript checks
-- `npm run format` - Format code with Prettier
 
 ## 🗄️ Project Structure
 
@@ -431,10 +387,6 @@ nauticedge/
   - SQL injection prevention
   - XSS protection
   - CSRF protection
-- Rate Limiting
-- IP Blocking
-- Audit Logging
-- Security Headers
 
 ## 🔌 API Integration
 
@@ -457,9 +409,6 @@ nauticedge/
 - Audit logging
 - Error handling
 - Input validation
-- Request validation
-- Response sanitization
-- Security headers
 
 ## 📱 Mobile Support
 
@@ -470,9 +419,6 @@ nauticedge/
 - Mobile-first features
 - Cross-device sync
 - Progressive loading
-- Native app features
-- Gesture support
-- Mobile optimizations
 
 ## 🎨 UI/UX Features
 
@@ -484,9 +430,6 @@ nauticedge/
 - Form validation
 - Toast notifications
 - Modal dialogs
-- Drag and drop
-- Infinite scroll
-- Virtual lists
 
 ## 🔄 Real-time Features
 
@@ -497,9 +440,6 @@ nauticedge/
 - Notifications
 - Data synchronization
 - Presence indicators
-- WebSocket support
-- Offline sync
-- Conflict resolution
 
 ## 📊 Analytics & Reporting
 
@@ -510,9 +450,6 @@ nauticedge/
 - Performance metrics
 - Usage statistics
 - Custom reports
-- Advanced filters
-- Scheduled reports
-- Report templates
 
 ## 🤝 Contributing
 
@@ -532,6 +469,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [React](https://reactjs.org/) for frontend framework
 - [Tailwind CSS](https://tailwindcss.com/) for styling
 - [Lucide](https://lucide.dev/) for icons
-- [Vite](https://vitejs.dev/) for build tooling
-- [TypeScript](https://www.typescriptlang.org/) for type safety
-- [date-fns](https://date-fns.org/) for date manipulation

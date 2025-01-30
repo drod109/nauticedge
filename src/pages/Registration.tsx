@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Ship, Building2, CreditCard, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Ship, Building2, CreditCard, ChevronRight, ChevronLeft, Phone, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Theme, getInitialTheme } from '../lib/theme';
 import ThemeToggle from '../components/ThemeToggle';
@@ -20,7 +20,7 @@ interface RegistrationFormData {
   company_state: string;
   company_postal_code: string;
   company_country: string;
-  company_phone_number: string;
+  company_phone: string;
 }
 
 const plans = [
@@ -47,7 +47,7 @@ const Registration = () => {
   const [totalSteps] = useState(3); // Now 3 steps including billing
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState<RegistrationFormData>({
+  const [formData, setFormData] = useState({
     subscription_plan: 'basic',
     card_number: '',
     card_expiry: '',
@@ -63,11 +63,25 @@ const Registration = () => {
     company_state: '',
     company_postal_code: '',
     company_country: '',
-    company_phone_number: ''
+    company_phone: ''
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    
+    // Format phone number
+    if (name === 'company_phone') {
+      // Remove all non-digit characters
+      const digits = value.replace(/\D/g, '');
+      
+      // Format phone number as (XXX) XXX-XXXX
+      if (digits.length <= 10) {
+        value = digits
+          .replace(/(\d{3})/, '($1) ')
+          .replace(/(\d{3})(\d{1,4})/, '$1-$2');
+      }
+    }
+    
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -93,7 +107,7 @@ const Registration = () => {
           !!formData.company_state &&
           !!formData.company_postal_code &&
           !!formData.company_country &&
-          !!formData.company_phone_number
+          !!formData.company_phone
         );
       default:
         return true;
@@ -400,14 +414,18 @@ const Registration = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Phone Number
                 </label>
-                <input
-                  type="tel"
-                  name="company_phone_number"
-                  value={formData.company_phone_number}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
+                  <input
+                    type="text"
+                    name="company_phone"
+                    value={formData.company_phone}
+                    onChange={handleInputChange}
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
+                    placeholder="(555) 123-4567"
+                    required
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -419,14 +437,16 @@ const Registration = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-900">
+    <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-white dark:from-dark-900 dark:via-dark-800 dark:to-dark-900">
       {/* Header */}
-      <header className="bg-white dark:bg-dark-800 border-b border-gray-200 dark:border-dark-700">
+      <header className="bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm border-b border-gray-200/50 dark:border-dark-700/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <Ship className="h-8 w-8 text-blue-600 dark:text-blue-500" />
-              <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">NauticEdge</span>
+              <a href="/" className="group flex items-center">
+                <Ship className="h-8 w-8 text-blue-600 dark:text-blue-500 group-hover:rotate-[-10deg] transition-transform duration-300" />
+                <span className="ml-2 text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-600 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white group-hover:animate-gradient">NauticEdge</span>
+              </a>
             </div>
             <ThemeToggle currentTheme={theme} onThemeChange={setTheme} />
           </div>
@@ -434,8 +454,8 @@ const Registration = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-gray-200 dark:border-dark-700 p-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm rounded-xl shadow-sm border border-gray-200/50 dark:border-dark-700/50 p-6 sm:p-8 animate-fade-in">
           {/* Progress Steps */}
           <div className="mb-8">
             <div className="flex items-center justify-center space-x-4">
@@ -479,33 +499,47 @@ const Registration = () => {
             )}
 
             {/* Navigation Buttons */}
-            <div className="mt-8 flex justify-between">
+            <div className="mt-8 flex flex-col sm:flex-row justify-between gap-4">
               {currentStep > 1 && (
                 <button
                   type="button"
                   onClick={() => setCurrentStep(prev => prev - 1)}
-                  className="px-6 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  className="w-full sm:w-auto px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-dark-600 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition-all duration-300 flex items-center justify-center"
                 >
                   Back
                 </button>
               )}
-              <div className="ml-auto">
+              <div className="w-full sm:w-auto sm:ml-auto">
                 {currentStep < totalSteps ? (
                   <button
                     type="button"
                     onClick={() => validateStep(currentStep) && setCurrentStep(prev => prev + 1)}
-                    className="px-6 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600"
+                    className="w-full sm:w-auto relative group overflow-hidden rounded-lg"
                   >
-                    Next
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-400 group-hover:scale-105 transition-transform duration-300"></div>
+                    <div className="relative px-8 py-3 flex items-center justify-center">
+                      <span className="text-white font-medium">Next</span>
+                      <ChevronRight className="ml-2 h-5 w-5 text-white transform group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </button>
                 ) : (
                   <button
                     type="button"
                     onClick={handleSubmit}
                     disabled={!validateStep(currentStep) || loading}
-                    className="px-6 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50"
+                    className="w-full sm:w-auto relative group overflow-hidden rounded-lg disabled:opacity-50"
                   >
-                    {loading ? 'Completing...' : 'Complete Registration'}
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-400 group-hover:scale-105 transition-transform duration-300"></div>
+                    <div className="relative px-8 py-3 flex items-center justify-center">
+                      {loading ? (
+                        <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <>
+                          <span className="text-white font-medium">Complete Registration</span>
+                          <Check className="ml-2 h-5 w-5 text-white transform group-hover:scale-110 transition-transform" />
+                        </>
+                      )}
+                    </div>
                   </button>
                 )}
               </div>

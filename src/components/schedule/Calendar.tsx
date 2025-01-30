@@ -206,8 +206,7 @@ const Calendar = () => {
               <ChevronRight className="h-5 w-5 text-gray-600 dark:text-gray-400" />
             </button>
           </div>
-          <a
-            href="#"
+          <button 
             onClick={() => {
               const today = new Date();
               setCurrentDate(today);
@@ -227,15 +226,12 @@ const Calendar = () => {
                 description: ''
               });
             }}
-            className="relative inline-flex items-center justify-center px-4 py-2 overflow-hidden text-sm font-medium text-white transition-all duration-300 ease-out rounded-lg group"
+            className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
             aria-label="Create new appointment"
           >
-            <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 to-blue-400 group-hover:from-blue-400 group-hover:to-blue-600"></span>
-            <span className="relative flex items-center">
-              <Plus className="h-4 w-4 mr-2 transform group-hover:scale-110 transition-transform" />
-              New Appointment
-            </span>
-          </a>
+            <Plus className="h-4 w-4 mr-2" />
+            New Appointment
+          </button>
         </div>
       </div>
 
