@@ -20,7 +20,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
   const [userData, setUserData] = useState<any>(null);
   const [logo, setLogo] = useState<string | null>(null);
   const [items, setItems] = useState<InvoiceItem[]>([
-    { description: '', quantity: 1, rate: 0, tax: 0, amount: 0 }
+    { description: '', quantity: 1, rate: 0, tax: 0, amount: 0, id: '1' }
   ]);
 
   useEffect(() => {
@@ -48,9 +48,16 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
     phone: '',
     email: '',
     address: '',
+    address_line1: '',
+    address_line2: '',
+    city: '',
+    state: '',
+    postal_code: '',
+    country: '',
     invoiceNumber: `INV-${new Date().getTime().toString().slice(-6)}`,
     invoiceDate: new Date().toISOString().split('T')[0],
-    dueDate: ''
+    dueDate: '',
+    notes: ''
   });
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,7 +114,14 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
   };
 
   const addItem = () => {
-    setItems([...items, { description: '', quantity: 1, rate: 0, tax: 0, amount: 0 }]);
+    setItems([...items, { 
+      description: '', 
+      quantity: 1, 
+      rate: 0, 
+      tax: 0, 
+      amount: 0,
+      id: String(Date.now())
+    }]);
   };
 
   const removeItem = (index: number) => {

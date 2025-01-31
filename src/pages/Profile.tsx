@@ -97,7 +97,6 @@ const Profile = () => {
           company_position: editForm.company_position,
           registration_number: editForm.registration_number,
           tax_id: editForm.tax_id,
-          tax_id: editForm.tax_id,
           company_address_line1: editForm.company_address_line1,
           company_address_line2: editForm.company_address_line2,
           company_city: editForm.company_city,
