@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { X, Mail, Phone, MapPin, User2, Check } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { formatPhoneNumber } from '../../../utils/phone';
-import { formatPhoneNumber } from '../../../utils/phone';
 
 interface AddClientModalProps {
   onClose: () => void;
@@ -52,7 +51,7 @@ const AddClientModal: React.FC<AddClientModalProps> = ({ onClose, onSuccess }) =
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-0 sm:p-4 overflow-y-auto overscroll-contain">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-0 sm:p-4 overflow-y-auto">
       <div className="bg-white dark:bg-dark-800 w-full sm:max-w-3xl rounded-none sm:rounded-2xl shadow-2xl flex flex-col max-h-[100dvh] sm:max-h-[90dvh] my-auto animate-fade-in">
         <form onSubmit={handleSubmit}>
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-dark-700">
@@ -185,23 +184,23 @@ const AddClientModal: React.FC<AddClientModalProps> = ({ onClose, onSuccess }) =
             <button
               type="button"
               onClick={onClose}
-              className="w-full sm:w-auto relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-medium text-gray-700 dark:text-gray-300 transition-all duration-300 ease-out rounded-lg group hover:bg-gray-50 dark:hover:bg-dark-700 border border-gray-300 dark:border-dark-600"
+              className="w-full sm:w-auto px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-dark-600 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-medium text-white transition-all duration-300 ease-out rounded-lg group disabled:opacity-50"
+              className="relative w-full sm:w-auto group overflow-hidden font-medium text-white transition-all duration-300 ease-out rounded-lg disabled:opacity-50"
             >
               <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 to-blue-400 group-hover:from-blue-400 group-hover:to-blue-600"></span>
-              <span className="relative flex items-center space-x-2">
+              <span className="relative px-8 py-3 flex items-center justify-center space-x-2 group-hover:scale-110 transition-transform duration-300">
                 {loading ? (
                   <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
                   <>
-                    <span className="text-white font-medium">Create Client</span>
-                    <Check className="h-5 w-5 text-white transform group-hover:scale-110 transition-transform" />
+                    <span className="text-white text-sm font-medium">Create Client</span>
+                    <Check className="h-5 w-5 text-white" />
                   </>
                 )}
               </span>

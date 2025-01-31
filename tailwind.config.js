@@ -5,9 +5,14 @@ export default {
   theme: {
     extend: {
       animation: {
+        gradient: 'gradient 3s linear infinite',
         scroll: 'scroll 30s linear infinite',
       },
       keyframes: {
+        gradient: {
+          '0%, 100%': { backgroundPosition: '0% center' },
+          '50%': { backgroundPosition: '100% center' }
+        },
         scroll: {
           '0%': { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-50%)' },

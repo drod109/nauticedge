@@ -171,8 +171,10 @@ const ClientList = () => {
   // Handle client deletion
   const handleDelete = async (client: Client, e: React.MouseEvent) => {
     // Prevent event bubbling
-    e.stopPropagation();
-    e.preventDefault();
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
     
     // Clear any existing error
     setError(null);
@@ -184,7 +186,10 @@ const ClientList = () => {
   };
 
   const handleModalClose = (e: React.MouseEvent) => {
-    e.stopPropagation();
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
     setShowDeleteModal(false);
     setShowEditModal(false);
     setSelectedClient(null);
@@ -234,8 +239,10 @@ const ClientList = () => {
   // Handle edit client
   const handleEdit = (client: Client, e: React.MouseEvent) => {
     // Prevent event bubbling
-    e.stopPropagation();
-    e.preventDefault();
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
 
     if (!client) return;
     
@@ -354,7 +361,7 @@ const ClientList = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Clients</h1>
+          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-600 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white animate-gradient">Clients</h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage your client relationships</p>
         </div>
         <div className="flex items-center space-x-3">
@@ -388,7 +395,7 @@ const ClientList = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search clients..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
             aria-label="Search clients"
           />
         </div>
@@ -397,7 +404,7 @@ const ClientList = () => {
           <select 
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            className="px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
             aria-label="Filter clients"
           >
             <option value="all">All Clients</option>
