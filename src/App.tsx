@@ -178,6 +178,11 @@ const InvoiceBuilder = lazy(async () => {
   const module = await import('./pages/InvoiceBuilder');
   return { default: module.default };
 });
+
+const InvoiceDetails = lazy(async () => {
+  const module = await import('./pages/InvoiceDetails');
+  return { default: module.default };
+});
 const AppointmentDetails = lazy(async () => {
   const module = await import('./pages/AppointmentDetails');
   return { default: module.default };
@@ -245,6 +250,7 @@ function App() {
             <Route path="/schedule/appointments/:id" element={<AppointmentDetails />} />
             <Route path="/invoices" element={<Invoices />} />
             <Route path="/invoices/new" element={<InvoiceBuilder />} />
+            <Route path="/invoices/:id" element={<InvoiceDetails />} />
             <Route path="/" element={
               <Suspense fallback={<PageLoader />}>
                 <Navigation />

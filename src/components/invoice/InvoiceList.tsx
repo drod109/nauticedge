@@ -53,6 +53,21 @@ const InvoiceList = () => {
     }
   };
 
+  const handleViewInvoice = (invoice: Invoice) => {
+    // Prevent navigation if clicking action buttons
+    if (event?.target?.closest('button')) {
+      return;
+    }
+    
+    // Prevent navigation if clicking action buttons
+    if (event?.target?.closest('button')) {
+      return;
+    }
+    
+    // Navigate to invoice details
+    window.location.href = `/invoices/${invoice.id}`;
+  };
+
   const handleDownload = async (invoice: Invoice) => {
     try {
       setDownloadingId(invoice.id);
@@ -186,7 +201,7 @@ const InvoiceList = () => {
   return (
     <div className="p-4 sm:p-6 space-y-6">
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start">
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start">
           <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 mr-2" />
           <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         </div>
@@ -302,10 +317,17 @@ const InvoiceList = () => {
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-dark-700">
                 {filteredInvoices.map((invoice) => (
-                  <tr key={invoice.id} className="group hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors">
+                  <tr 
+                    key={invoice.id} 
+                    onClick={() => handleViewInvoice(invoice)}
+                    className="group hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors cursor-pointer"
+                  >
                     <td className="px-6 py-4">
                       <a
-                        href={`/invoices/${invoice.id}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleViewInvoice(invoice);
+                        }}
                         className="flex items-center text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 group/link"
                       >
                         <FileText className="h-5 w-5 text-gray-400 dark:text-gray-500 mr-2" />
@@ -335,7 +357,10 @@ const InvoiceList = () => {
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end space-x-3 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
-                          onClick={() => handleDownload(invoice)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownload(invoice);
+                          }}
                           className={`p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors ${
                             downloadingId === invoice.id ? 'cursor-not-allowed opacity-50' : ''
                           }`}
@@ -349,14 +374,20 @@ const InvoiceList = () => {
                           )}
                         </button>
                         <button
-                          onClick={() => handleSendEmail(invoice)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSendEmail(invoice);
+                          }}
                           className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                           title="Send Email"
                         >
                           <Mail className="h-5 w-5" />
                         </button>
                         <button
-                          onClick={() => handleDownload(invoice)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownload(invoice);
+                          }}
                           className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                           title="Print"
                         >
