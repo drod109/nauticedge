@@ -193,85 +193,86 @@ const InvoiceDetails = () => {
                               </a>
                             </div>
                           )}
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Logo and Invoice Details */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        {invoice.logo_url ? (
-                          <img 
-                            src={invoice.logo_url} 
-                            alt="Company Logo" 
-                            className="h-24 w-24 object-contain rounded-lg"
-                          />
-                        ) : (
-                          <div className="h-24 w-24 bg-gray-100 dark:bg-dark-700 rounded-lg flex items-center justify-center">
-                            <FileText className="h-8 w-8 text-gray-400 dark:text-gray-500" />
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Invoice Details</h3>
-                        <div className="space-y-2 text-gray-600 dark:text-gray-400">
-                          <div className="flex items-center">
-                            <Calendar className="h-4 w-4 mr-2" />
-                            <span>Issue Date: {format(new Date(invoice.issue_date), 'MMM d, yyyy')}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <Calendar className="h-4 w-4 mr-2" />
-                            <span>Due Date: {format(new Date(invoice.due_date), 'MMM d, yyyy')}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <DollarSign className="h-4 w-4 mr-2" />
-                            <span>Amount: ${invoice.amount.toFixed(2)}</span>
+                      {/* Logo and Invoice Details */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          {invoice.logo_url ? (
+                            <img 
+                              src={invoice.logo_url} 
+                              alt="Company Logo" 
+                              className="h-24 w-24 object-contain rounded-lg"
+                            />
+                          ) : (
+                            <div className="h-24 w-24 bg-gray-100 dark:bg-dark-700 rounded-lg flex items-center justify-center">
+                              <FileText className="h-8 w-8 text-gray-400 dark:text-gray-500" />
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Invoice Details</h3>
+                          <div className="space-y-2 text-gray-600 dark:text-gray-400">
+                            <div className="flex items-center">
+                              <Calendar className="h-4 w-4 mr-2" />
+                              <span>Issue Date: {format(new Date(invoice.issue_date), 'MMM d, yyyy')}</span>
+                            </div>
+                            <div className="flex items-center">
+                              <Calendar className="h-4 w-4 mr-2" />
+                              <span>Due Date: {format(new Date(invoice.due_date), 'MMM d, yyyy')}</span>
+                            </div>
+                            <div className="flex items-center">
+                              <DollarSign className="h-4 w-4 mr-2" />
+                              <span>Amount: ${invoice.amount.toFixed(2)}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Items Table */}
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4">Items</h3>
-                      <div className="overflow-x-auto">
-                        <table className="w-full">
-                          <thead>
-                            <tr className="text-left text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-dark-700">
-                              <th className="pb-3">Description</th>
-                              <th className="pb-3 text-right">Quantity</th>
-                              <th className="pb-3 text-right">Rate</th>
-                              <th className="pb-3 text-right">Amount</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-gray-200 dark:divide-dark-700">
-                            {invoice.items.map((item: any, index: number) => (
-                              <tr key={index}>
-                                <td className="py-4 text-gray-900 dark:text-white">{item.description}</td>
-                                <td className="py-4 text-right text-gray-600 dark:text-gray-400">{item.quantity}</td>
-                                <td className="py-4 text-right text-gray-600 dark:text-gray-400">${item.rate.toFixed(2)}</td>
-                                <td className="py-4 text-right text-gray-900 dark:text-white">${item.amount.toFixed(2)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                          <tfoot>
-                            <tr>
-                              <td colSpan={3} className="pt-6 text-right font-medium text-gray-900 dark:text-white">Total:</td>
-                              <td className="pt-6 text-right font-medium text-gray-900 dark:text-white">
-                                ${invoice.amount.toFixed(2)}
-                              </td>
-                            </tr>
-                          </tfoot>
-                        </table>
-                      </div>
-                    </div>
-
-                    {/* Notes */}
-                    {invoice.notes && (
+                      {/* Items Table */}
                       <div>
-                        <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Notes</h3>
-                        <p className="text-gray-600 dark:text-gray-400 whitespace-pre-wrap">{invoice.notes}</p>
+                        <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4">Items</h3>
+                        <div className="overflow-x-auto">
+                          <table className="w-full">
+                            <thead>
+                              <tr className="text-left text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-dark-700">
+                                <th className="pb-3">Description</th>
+                                <th className="pb-3 text-right">Quantity</th>
+                                <th className="pb-3 text-right">Rate</th>
+                                <th className="pb-3 text-right">Amount</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200 dark:divide-dark-700">
+                              {invoice.items.map((item: any, index: number) => (
+                                <tr key={index}>
+                                  <td className="py-4 text-gray-900 dark:text-white">{item.description}</td>
+                                  <td className="py-4 text-right text-gray-600 dark:text-gray-400">{item.quantity}</td>
+                                  <td className="py-4 text-right text-gray-600 dark:text-gray-400">${item.rate.toFixed(2)}</td>
+                                  <td className="py-4 text-right text-gray-900 dark:text-white">${item.amount.toFixed(2)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                            <tfoot>
+                              <tr>
+                                <td colSpan={3} className="pt-6 text-right font-medium text-gray-900 dark:text-white">Total:</td>
+                                <td className="pt-6 text-right font-medium text-gray-900 dark:text-white">
+                                  ${invoice.amount.toFixed(2)}
+                                </td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
                       </div>
-                    )}
+
+                      {/* Notes */}
+                      {invoice.notes && (
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Notes</h3>
+                          <p className="text-gray-600 dark:text-gray-400 whitespace-pre-wrap">{invoice.notes}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ) : (

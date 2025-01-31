@@ -47,7 +47,6 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
     invoiceTo: '',
     phone: '',
     email: '',
-    address: '',
     address_line1: '',
     address_line2: '',
     city: '',
@@ -147,25 +146,48 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
 
   const handleSubmit = async () => {
     try {
+      // Validate required fields
+      if (!formData.invoiceTo || !formData.invoiceTo.trim()) {
+        throw new Error('Client name is required');
+      }
+      if (!formData.email || !formData.email.trim()) {
+        throw new Error('Client email is required');
+      }
+      if (!formData.dueDate) {
+        throw new Error('Due date is required');
+      }
+      if (!items.length) {
+        throw new Error('At least one item is required');
+      }
+      if (items.some(item => !item.description || !item.description.trim())) {
+        throw new Error('All items must have a description');
+      }
+      if (items.length === 0) {
+        throw new Error('At least one item is required');
+      }
+      if (items.some(item => !item.description.trim())) {
+        throw new Error('All items must have a description');
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
       // Get company info for PDF generation
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
       const companyInfo = {
-        name: userData?.company_name || '',
-        address_line1: userData?.company_address_line1 || '',
-        address_line2: userData?.company_address_line2 || '',
-        city: userData?.company_city || '',
-        state: userData?.company_state || '',
-        postal_code: userData?.company_postal_code || '',
-        country: userData?.company_country || '',
-        tax_id: userData?.tax_id || ''
+        name: profile?.company_name || '',
+        address_line1: profile?.company_address_line1 || '',
+        address_line2: profile?.company_address_line2 || '',
+        city: profile?.company_city || '',
+        state: profile?.company_state || '',
+        postal_code: profile?.company_postal_code || '',
+        country: profile?.company_country || '',
+        tax_id: profile?.tax_id || ''
       };
-      // Validate required fields
-      if (!formData.invoiceTo || !formData.email || !formData.dueDate) {
-        throw new Error('Please fill in all required fields');
-      }
-
       // Insert invoice into database
       const { error } = await supabase
         .from('invoices')
@@ -174,15 +196,15 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
           invoice_number: formData.invoiceNumber,
           client_name: formData.invoiceTo,
           client_email: formData.email,
-          client_phone: formData.phone,
-          client_address: formData.address,
+          client_phone: formData.phone || null,
+          client_address: clientAddress,
           amount: calculateTotal(),
           issue_date: formData.invoiceDate,
           due_date: formData.dueDate,
           items: items,
           company_info: companyInfo,
-          logo_url: logo,
-          notes: '',
+          logo_url: logo || null,
+          notes: formData.notes,
           status: 'draft'
         }]);
 
@@ -193,7 +215,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
 
     } catch (error) {
       console.error('Error creating invoice:', error);
-      alert('Failed to save invoice. Please try again.');
+      throw error instanceof Error ? error : new Error('Failed to save invoice');
     }
   };
 
