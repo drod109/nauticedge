@@ -3,6 +3,10 @@ import { Mail, Lock, Shield, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide
 import MFAVerification from './MFAVerification';
 import ForgotPassword from './ForgotPassword';
 import { supabase } from '../../lib/supabase';
+import { userSchema } from '../../lib/validation';
+import { notificationService } from '../../lib/notifications';
+import { performanceMonitor } from '../../lib/performance';
+import { keyVaultService } from '../../lib/keyVault';
 import { checkMFAStatus } from '../../lib/mfa';
 import { getRememberedEmail, rememberEmail, forgetEmail } from '../../utils/auth';
 
@@ -26,141 +30,173 @@ const LoginForm = () => {
     setLoading(true);
     setError(null);
     
-    // Basic validation
-    if (!email.trim() || !password.trim()) {
-      setError('Please enter both email and password');
-      setLoading(false);
-      return;
-    }
-
-    // Email format validation
-    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-    if (!emailRegex.test(email.trim())) {
-      setError('Please enter a valid email address');
-      setLoading(false);
-      return;
-    }
+    performanceMonitor.startMetric('login_attempt');
     
-    // Handle remember me preference
-    if (rememberMe) {
-      rememberEmail(email);
-    } else {
-      forgetEmail();
-    }
-
-    // Handle remember me preference
-    if (rememberMe) {
-      rememberEmail(email);
-    } else {
-      forgetEmail();
-    }
-
     try {
-      // Add retry logic for network issues
-      const maxRetries = 3;
-      let retryCount = 0;
-      let lastError = null;
-      let locationInfo;
+      // Validate input using Zod schema
+      const validatedData = userSchema.pick({ email: true }).parse({ email });
+    
+      // Handle remember me preference
+      if (rememberMe) {
+        rememberEmail(email);
+      } else {
+        forgetEmail();
+      }
+
+      // Handle remember me preference
+      if (rememberMe) {
+        rememberEmail(email);
+      } else {
+        forgetEmail();
+      }
 
       try {
-        locationInfo = await getLocationInfo();
-      } catch (err) {
-        // Default location info if geolocation fails
-        locationInfo = {
-          city: 'Unknown',
-          country: 'Unknown',
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-        };
-      }
+        // Add retry logic for network issues
+        const maxRetries = 3;
+        let retryCount = 0;
+        let lastError = null;
+        let locationInfo;
 
-      while (retryCount < maxRetries) {
         try {
-          const { data, error: signInError } = await supabase.auth.signInWithPassword({
-            email,
-            password
-          });
+          locationInfo = await getLocationInfo();
+        } catch (err) {
+          // Default location info if geolocation fails
+          locationInfo = {
+            city: 'Unknown',
+            country: 'Unknown',
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+          };
+        }
 
-          if (signInError) {
-            if (signInError.message.includes('Invalid login credentials')) {
-              throw new Error('The email or password you entered is incorrect');
-            }
-            throw signInError;
-          }
-
-          if (data.user) {
-            setSessionId(data.session?.access_token || '');
-            setUserId(data.user.id);
-        
-            // Check if user has MFA enabled
-            const hasMFA = await checkMFAStatus();
-            if (hasMFA) {
-              setShowMFAVerification(true);
-              return;
-            }
-
-            // Create new session record
-            const browserInfo = getBrowserInfo();
-            const { error: sessionError } = await supabase.rpc('create_user_session', {
-              p_user_id: data.user.id,
-              p_session_id: data.session?.access_token || data.user.id,
-              p_user_agent: navigator.userAgent,
-              p_device_info: {
-                type: browserInfo.isMobile ? 'mobile' : 'desktop',
-                browser: browserInfo.browser,
-                os: browserInfo.os
-              },
-              p_location: locationInfo
+        while (retryCount < maxRetries) {
+          try {
+            const { data, error: signInError } = await supabase.auth.signInWithPassword({
+              email,
+              password
             });
 
-            if (sessionError) {
-              // If session already exists, just redirect to dashboard
-              if (sessionError.message?.includes('duplicate key value')) {
-                window.location.href = '/dashboard';
-                return;
+            if (signInError) {
+              if (signInError.message.includes('Invalid login credentials')) {
+                throw new Error('The email or password you entered is incorrect');
               }
-              throw sessionError;
+              throw signInError;
             }
 
-            // Let ProtectedRoute handle the redirection
-            window.location.href = '/dashboard';
-            return;
-          }
-          throw new Error('No user data returned');
-        } catch (err) {
-          lastError = err;
-          if (err instanceof Error && err.name !== 'AuthRetryableFetchError') {
-            throw err; // Don't retry non-network errors
-          }
-          retryCount++;
-          if (retryCount < maxRetries) {
-            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
-            continue;
-          }
-        }
-      }
-      throw lastError || new Error('Failed to sign in after multiple attempts');
-    } catch (err) {
-      if (err instanceof Error) {
-        switch (err.name) {
-          case 'AuthRetryableFetchError':
-            setError('Network error. Please check your connection and try again.');
-            break;
-          case 'AuthApiError':
-            if (err.message.includes('Email not confirmed')) {
-              setError('Please verify your email address before logging in');
-            } else if (err.message.includes('Invalid login credentials')) {
-              setError('The email or password you entered is incorrect');
-            } else {
-              setError(err.message || 'Failed to sign in. Please try again.');
+            if (data.user) {
+              setSessionId(data.session?.access_token || '');
+              setUserId(data.user.id);
+
+              // Only store session token if we have one
+              if (data.session?.access_token) {
+                try {
+                  await keyVaultService.storeSecureKey(
+                    'session_token',
+                    data.session.access_token,
+                    { sensitive: true }
+                  );
+                } catch (error) {
+                  // Log but don't block login if secure storage fails
+                  logger.error('Failed to store session token securely', { 
+                    error: error instanceof Error ? error.message : 'Unknown error'
+                  });
+                }
+              }
+          
+              // Check if user has MFA enabled
+              const hasMFA = await checkMFAStatus();
+              if (hasMFA) {
+                setShowMFAVerification(true);
+                return;
+              }
+
+              // Create new session record
+              const browserInfo = getBrowserInfo();
+              const { error: sessionError } = await supabase.rpc('create_user_session', {
+                p_user_id: data.user.id,
+                p_session_id: data.session?.access_token || data.user.id,
+                p_user_agent: navigator.userAgent,
+                p_device_info: {
+                  type: browserInfo.isMobile ? 'mobile' : 'desktop',
+                  browser: browserInfo.browser,
+                  os: browserInfo.os
+                },
+                p_location: locationInfo
+              });
+
+              if (sessionError) {
+                // If session already exists, just redirect to dashboard
+                if (sessionError.message?.includes('duplicate key value')) {
+                  window.location.href = '/dashboard';
+                  return;
+                }
+                throw sessionError;
+              }
+
+              // Let ProtectedRoute handle the redirection
+              window.location.href = '/dashboard';
+              return;
             }
-            break;
-          default:
-            setError('An unexpected error occurred. Please try again later.');
+            throw new Error('No user data returned');
+          } catch (err) {
+            lastError = err;
+            if (err instanceof Error && err.name !== 'AuthRetryableFetchError') {
+              throw err; // Don't retry non-network errors
+            }
+            retryCount++;
+            if (retryCount < maxRetries) {
+              await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+              continue;
+            }
+          }
         }
-      } else {
-        setError('Unable to sign in at this time. Please try again later.');
+        throw lastError || new Error('Failed to sign in after multiple attempts');
+      } catch (err) {
+        performanceMonitor.endMetric('login_attempt', { error: true });
+        
+        if (err instanceof Error) {
+          switch (err.name) {
+            case 'AuthRetryableFetchError':
+              notificationService.error({
+                title: 'Connection Error',
+                message: 'Please check your internet connection and try again'
+              });
+              break;
+            case 'AuthApiError':
+              if (err.message.includes('Email not confirmed')) {
+                notificationService.warning({
+                  title: 'Email Not Verified',
+                  message: 'Please verify your email address before logging in'
+                });
+              } else if (err.message.includes('Invalid login credentials')) {
+                notificationService.error({
+                  title: 'Invalid Credentials',
+                  message: 'The email or password you entered is incorrect'
+                });
+              } else {
+                notificationService.error({
+                  title: 'Login Failed',
+                  message: err.message || 'Failed to sign in. Please try again.'
+                });
+              }
+              break;
+            default:
+              notificationService.error({
+                title: 'Error',
+                message: 'An unexpected error occurred. Please try again later.'
+              });
+          }
+        } else {
+          notificationService.error({
+            title: 'Error',
+            message: 'Unable to sign in at this time. Please try again later.'
+          });
+        }
+      } finally {
+        setLoading(false);
+        performanceMonitor.endMetric('login_attempt');
       }
-    } finally {
+    } catch (validationError) {
+      setError('Please enter a valid email address');
       setLoading(false);
     }
   };

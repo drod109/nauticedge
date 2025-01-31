@@ -5,6 +5,39 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { createClient } from '@supabase/supabase-js';
 
+// Security headers configuration
+const securityHeaders = {
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      imgSrc: ["'self'", "https:", "data:"],
+      connectSrc: ["'self'", "https://api.supabase.io", "wss://realtime-*.supabase.co"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'none'"],
+      frameSrc: ["'none'"]
+    }
+  },
+  crossOriginEmbedderPolicy: true,
+  crossOriginOpenerPolicy: true,
+  crossOriginResourcePolicy: { policy: "same-site" },
+  dnsPrefetchControl: true,
+  frameguard: { action: "deny" },
+  hidePoweredBy: true,
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  },
+  ieNoOpen: true,
+  noSniff: true,
+  permittedCrossDomainPolicies: true,
+  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+  xssFilter: true
+};
+
 import { errorHandler } from './middleware/errorHandler';
 import { logger } from './utils/logger';
 import surveysRouter from './routes/surveys';
@@ -20,11 +53,14 @@ const io = new Server(httpServer, {
 });
 
 // Middleware
-app.use(helmet());
+app.use(helmet(securityHeaders));
 app.use(cors({
   origin: process.env.CLIENT_URL,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
+  exposedHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining'],
+  credentials: true,
+  maxAge: 600
 }));
 app.use(express.json());
 

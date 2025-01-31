@@ -25,20 +25,35 @@ export interface APIResponse<T> {
 }
 
 class APIClient {
-  private baseUrl = '/api/v1';
   private token: string | null = null;
+  private keyVaultService = keyVaultService;
 
   constructor() {
     // Get token from Supabase session
     const session = supabase.auth.getSession();
     if (session) {
       this.setToken(session.data?.session?.access_token || null);
+      this.initializeApiKey();
     }
 
     // Listen for auth changes
     supabase.auth.onAuthStateChange((event, session) => {
       this.setToken(session?.access_token || null);
+      if (event === 'SIGNED_IN') {
+        this.initializeApiKey();
+      }
     });
+  }
+
+  private async initializeApiKey() {
+    try {
+      const apiKey = await this.keyVaultService.getSecureKey('api_key');
+      if (apiKey) {
+        this.setApiKey(apiKey);
+      }
+    } catch (error) {
+      logger.error('Failed to initialize API key', { error });
+    }
   }
 
   setToken(token: string | null) {
@@ -50,6 +65,8 @@ class APIClient {
     options: RequestInit = {}
   ): Promise<APIResponse<T>> {
     try {
+      performanceMonitor.startMetric(`api_request_${endpoint}`);
+
       const headers: HeadersInit = {
         'Content-Type': 'application/json',
       };
@@ -72,8 +89,11 @@ class APIClient {
         throw new Error(data.error?.message || 'An error occurred');
       }
 
+      performanceMonitor.endMetric(`api_request_${endpoint}`);
+      
       return data;
     } catch (error) {
+      performanceMonitor.endMetric(`api_request_${endpoint}`, { error: true });
       return {
         error: {
           message: error instanceof Error ? error.message : 'An error occurred',

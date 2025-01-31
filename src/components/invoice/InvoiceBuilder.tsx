@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Upload, Check, Mail, Phone } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { invoiceSchema } from '../../lib/validation';
+import { notificationService } from '../../lib/notifications';
+import { performanceMonitor } from '../../lib/performance';
 import { formatPhoneNumber } from '../../utils/phone';
 
 interface InvoiceItem {
@@ -146,7 +149,6 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
 
   const handleSubmit = async () => {
     try {
-      // Validate required fields
       if (!formData.invoiceTo || !formData.invoiceTo.trim()) {
         throw new Error('Client name is required');
       }
@@ -165,9 +167,19 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
       if (items.length === 0) {
         throw new Error('At least one item is required');
       }
-      if (items.some(item => !item.description.trim())) {
-        throw new Error('All items must have a description');
-      }
+      performanceMonitor.startMetric('invoice_creation');
+      
+      // Validate form data using Zod schema
+      const validatedData = invoiceSchema.parse({
+        clientName: formData.invoiceTo,
+        clientEmail: formData.email,
+        clientPhone: formData.phone,
+        clientAddress: formData.address,
+        issueDate: formData.invoiceDate,
+        dueDate: formData.dueDate,
+        items: items,
+        notes: formData.notes
+      });
 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
@@ -191,31 +203,37 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
       // Insert invoice into database
       const { error } = await supabase
         .from('invoices')
-        .insert([{
+        .insert({
           user_id: user.id,
           invoice_number: formData.invoiceNumber,
-          client_name: formData.invoiceTo,
-          client_email: formData.email,
-          client_phone: formData.phone || null,
-          client_address: clientAddress,
+          ...validatedData,
           amount: calculateTotal(),
-          issue_date: formData.invoiceDate,
-          due_date: formData.dueDate,
-          items: items,
           company_info: companyInfo,
           logo_url: logo || null,
-          notes: formData.notes,
           status: 'draft'
-        }]);
+        });
 
       if (error) throw error;
+
+      performanceMonitor.endMetric('invoice_creation');
+      
+      notificationService.success({
+        title: 'Success',
+        message: 'Invoice created successfully'
+      });
 
       // Redirect to invoices list after successful save
       window.location.href = '/invoices';
 
     } catch (error) {
-      console.error('Error creating invoice:', error);
-      throw error instanceof Error ? error : new Error('Failed to save invoice');
+      performanceMonitor.endMetric('invoice_creation', { error: true });
+      
+      notificationService.error({
+        title: 'Error',
+        message: error instanceof Error ? error.message : 'Failed to create invoice'
+      });
+      
+      logger.error('Invoice creation failed', { error });
     }
   };
 
