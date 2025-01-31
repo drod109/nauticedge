@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       animation: {
-        gradient: 'gradient 3s linear infinite',
+        gradient: 'gradient 3s ease infinite',
         scroll: 'scroll 30s linear infinite',
       },
       keyframes: {

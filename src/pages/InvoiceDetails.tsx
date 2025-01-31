@@ -113,7 +113,7 @@ const InvoiceDetails = () => {
                         </div>
                         <div>
                           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                            Invoice #{invoice.invoice_number}
+                            Invoice {invoice.invoice_number.replace('INV-', '')}
                           </h1>
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 ${getStatusStyle(invoice.status)}`}>
                             {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
@@ -144,12 +144,41 @@ const InvoiceDetails = () => {
 
                   {/* Content */}
                   <div className="p-6 space-y-8">
-                    {/* Client Information */}
+                    {/* Company Information */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Bill To</h3>
+                        <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">From:</h3>
+                        <div className="space-y-2">
+                          {invoice.company_info ? (
+                            <>
+                              <p className="font-medium text-gray-900 dark:text-white">{invoice.company_info.name}</p>
+                              <p className="text-gray-600 dark:text-gray-400">{invoice.company_info.address_line1}</p>
+                              {invoice.company_info.address_line2 && (
+                                <p className="text-gray-600 dark:text-gray-400">{invoice.company_info.address_line2}</p>
+                              )}
+                              <p className="text-gray-600 dark:text-gray-400">
+                                {[
+                                  invoice.company_info.city,
+                                  invoice.company_info.state,
+                                  invoice.company_info.postal_code
+                                ].filter(Boolean).join(', ')}
+                              </p>
+                              <p className="text-gray-600 dark:text-gray-400">{invoice.company_info.country}</p>
+                              <p className="text-gray-600 dark:text-gray-400">Tax ID: {invoice.company_info.tax_id}</p>
+                            </>
+                          ) : (
+                            <p className="text-gray-500 dark:text-gray-400">Company information not available</p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Bill To:</h3>
                         <div className="space-y-2">
                           <p className="font-medium text-gray-900 dark:text-white">{invoice.client_name}</p>
+                          {invoice.client_address && (
+                            <p className="text-gray-600 dark:text-gray-400">{invoice.client_address}</p>
+                          )}
                           <div className="flex items-center text-gray-600 dark:text-gray-400">
                             <Mail className="h-4 w-4 mr-2" />
                             <a href={`mailto:${invoice.client_email}`} className="hover:text-blue-600 dark:hover:text-blue-400">
@@ -164,7 +193,23 @@ const InvoiceDetails = () => {
                               </a>
                             </div>
                           )}
-                        </div>
+                      </div>
+                    </div>
+
+                    {/* Logo and Invoice Details */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        {invoice.logo_url ? (
+                          <img 
+                            src={invoice.logo_url} 
+                            alt="Company Logo" 
+                            className="h-24 w-24 object-contain rounded-lg"
+                          />
+                        ) : (
+                          <div className="h-24 w-24 bg-gray-100 dark:bg-dark-700 rounded-lg flex items-center justify-center">
+                            <FileText className="h-8 w-8 text-gray-400 dark:text-gray-500" />
+                          </div>
+                        )}
                       </div>
                       <div>
                         <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Invoice Details</h3>
