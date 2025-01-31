@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Pencil, Mail, Phone, Globe, User2, Building2, CreditCard as BillingIcon, Check, X, BadgeCheck } from 'lucide-react';
 import { Theme, getInitialTheme, setTheme } from '../lib/theme';
+import { formatPhoneNumber } from '../utils/phone';
 import Sidebar from '../components/dashboard/Sidebar';
 import Header from '../components/dashboard/Header';
 import ProfilePhoto from '../components/profile/ProfilePhoto.tsx';
@@ -374,7 +375,7 @@ const Profile = () => {
       first_name: userData?.first_name || '',
       last_name: userData?.last_name || '',
       email: userData?.email || '',
-      phone: userData?.phone || '',
+      phone: userData?.phone ? formatPhoneNumber(userData?.phone) : '+1 ',
       location: userData?.location || ''
     }));
     setIsEditing(true);

@@ -5,6 +5,7 @@ import Header from '../components/dashboard/Header';
 import { Theme, getInitialTheme, setTheme } from '../lib/theme';
 import { supabase } from '../lib/supabase';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
+import { formatPhoneNumber } from '../utils/phone';
 
 const NewClient = () => {
   const [theme, setCurrentTheme] = useState<Theme>(getInitialTheme());
@@ -13,7 +14,7 @@ const NewClient = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
+    phone: '+1 ',
     address: '',
     city: '',
     state: '',
@@ -132,11 +133,14 @@ const NewClient = () => {
                           Phone
                         </label>
                         <div className="relative">
-                          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
                           <input
                             type="tel"
-                            value={formData.phone}
-                            onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                            value={formData.phone || '+1 '}
+                            onChange={(e) => {
+                              const formattedNumber = formatPhoneNumber(e.target.value);
+                              setFormData(prev => ({ ...prev, phone: formattedNumber }));
+                            }}
                             className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="+1 (555) 123-4567"
                           />

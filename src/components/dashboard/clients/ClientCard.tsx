@@ -1,5 +1,6 @@
 import React from 'react';
-import { Mail, Phone, MapPin, Edit, Trash2 } from 'lucide-react';
+import { Mail, Phone, MapPin, Edit, Trash2, FileText, Receipt } from 'lucide-react';
+import { formatPhoneNumber } from '../../../utils/phone';
 
 interface Client {
   id: string;
@@ -25,60 +26,60 @@ interface ClientCardProps {
 const ClientCard: React.FC<ClientCardProps> = ({ client, onEdit, onDelete, style }) => {
   return (
     <div
-      className="group bg-white dark:bg-dark-800 rounded-xl shadow-sm border border-gray-200 dark:border-dark-700 p-6 hover:shadow-md transition-all duration-200 hover:-translate-y-1"
+      className="group bg-white/80 dark:bg-dark-800/80 backdrop-blur-sm p-6 rounded-xl border border-gray-200/50 dark:border-dark-700/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
       style={style}
     >
+      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-100 to-transparent dark:from-blue-900/20 dark:to-transparent rounded-bl-[100px] opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
+      
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          <h3 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-600 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white group-hover:animate-gradient truncate">
             {client.name}
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Added {new Date(client.created_at).toLocaleDateString()}
           </p>
         </div>
-        <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-2 right-2 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={(e) => onEdit(client, e)}
-            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label={`Edit ${client.name}`}
-            role="button"
-            tabIndex={0}
-            type="button"
+            className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-300 group/button"
           >
-            <Edit className="h-5 w-5 transform group-hover:scale-110 transition-transform" />
+            <Edit className="h-5 w-5 transform group-hover/button:scale-110 transition-transform" />
           </button>
           <button
             onClick={(e) => onDelete(client, e)}
-            className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-500 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-red-500"
-            aria-label={`Delete ${client.name}`}
-            role="button"
-            tabIndex={0}
-            type="button"
+            className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-300 group/button"
           >
-            <Trash2 className="h-5 w-5 transform group-hover:scale-110 transition-transform" />
+            <Trash2 className="h-5 w-5 transform group-hover/button:scale-110 transition-transform" />
           </button>
         </div>
       </div>
       
       <div className="space-y-3 mb-6">
         <div className="flex items-center text-gray-600 dark:text-gray-400">
-          <Mail className="h-4 w-4 mr-2 flex-shrink-0" />
-          <a href={`mailto:${client.email}`} className="truncate hover:text-blue-600 dark:hover:text-blue-500 transition-colors">
+          <div className="h-8 w-8 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+            <Mail className="h-4 w-4 text-blue-600 dark:text-blue-500" />
+          </div>
+          <a href={`mailto:${client.email}`} className="truncate hover:text-blue-600 dark:hover:text-blue-500 transition-colors group-hover:underline">
             {client.email}
           </a>
         </div>
         {client.phone && (
           <div className="flex items-center text-gray-600 dark:text-gray-400">
-            <Phone className="h-4 w-4 mr-2 flex-shrink-0" />
-            <a href={`tel:${client.phone}`} className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors">
-              {client.phone}
+            <div className="h-8 w-8 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform">
+              <Phone className="h-4 w-4 text-blue-600 dark:text-blue-500" />
+            </div>
+            <a href={`tel:${client.phone}`} className="hover:text-blue-600 dark:hover:text-blue-500 transition-colors group-hover:underline">
+              {client.phone ? formatPhoneNumber(client.phone) : 'Not provided'}
             </a>
           </div>
         )}
         {(client.city || client.state || client.country) && (
           <div className="flex items-start text-gray-600 dark:text-gray-400">
-            <MapPin className="h-4 w-4 mr-2 mt-1 flex-shrink-0" />
+            <div className="h-8 w-8 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mr-3 mt-1 group-hover:scale-110 transition-transform">
+              <MapPin className="h-4 w-4 text-blue-600 dark:text-blue-500" />
+            </div>
             <span className="line-clamp-2">
               {[client.city, client.state, client.country].filter(Boolean).join(', ')}
             </span>
@@ -86,12 +87,22 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, onEdit, onDelete, style
         )}
       </div>
 
-      <div className="flex justify-between text-sm border-t border-gray-100 dark:border-dark-700 pt-4">
-        <div className="text-gray-600 dark:text-gray-400">
-          <span className="font-medium text-gray-900 dark:text-white">{client.total_surveys}</span> Surveys
+      <div className="flex justify-between text-sm border-t border-gray-100/50 dark:border-dark-700/50 pt-4">
+        <div className="flex items-center space-x-2">
+          <div className="h-6 w-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+            <FileText className="h-3 w-3 text-blue-600 dark:text-blue-500" />
+          </div>
+          <span className="text-gray-600 dark:text-gray-400">
+            <span className="font-medium text-gray-900 dark:text-white">{client.total_surveys}</span> Surveys
+          </span>
         </div>
-        <div className="text-gray-600 dark:text-gray-400">
-          <span className="font-medium text-gray-900 dark:text-white">{client.total_invoices}</span> Invoices
+        <div className="flex items-center space-x-2">
+          <div className="h-6 w-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+            <Receipt className="h-3 w-3 text-blue-600 dark:text-blue-500" />
+          </div>
+          <span className="text-gray-600 dark:text-gray-400">
+            <span className="font-medium text-gray-900 dark:text-white">{client.total_invoices}</span> Invoices
+          </span>
         </div>
       </div>
     </div>

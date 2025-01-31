@@ -1,28 +1,40 @@
 /**
- * Formats a phone number string by:
- * 1. Removing all non-digit characters
- * 2. Adding +1 prefix if missing
- * 3. Formatting to (XXX) XXX-XXXX pattern
+ * Formats a phone number string into the format: +1 (XXX) XXX-XXXX
+ * Handles partial input for a smooth user experience
  */
-export const formatPhoneNumber = (phone: string): string => {
-  // Remove all non-digit characters
-  let digits = phone.replace(/\D/g, '');
-  
-  // If number doesn't start with 1 and is 10 digits, add 1
-  if (digits.length === 10 && !digits.startsWith('1')) {
-    digits = '1' + digits;
+export const formatPhoneNumber = (input: string): string => {
+  // If empty, return empty string
+  if (!input) return '';
+
+  // Remove all non-digit characters except leading +
+  let digits = input.replace(/[^\d+]/g, '');
+
+  // If no + prefix and we have digits, add +1
+  if (!digits.startsWith('+') && digits.length > 0) {
+    digits = '+1' + digits;
   }
-  
-  // If number starts with 1 but no +, add it
-  if (digits.startsWith('1') && !phone.startsWith('+')) {
-    digits = '+' + digits;
+
+  // Extract the national number (everything after +1)
+  let nationalNumber = digits.startsWith('+1') ? digits.slice(2) : digits.slice(1);
+
+  // Limit to 10 digits for national number
+  nationalNumber = nationalNumber.slice(0, 10);
+
+  // Format the number progressively
+  let formatted = '';
+  if (nationalNumber.length > 0) {
+    formatted += '(';
+    formatted += nationalNumber.slice(0, 3);
+    if (nationalNumber.length > 3) {
+      formatted += ') ';
+      formatted += nationalNumber.slice(3, 6);
+      if (nationalNumber.length > 6) {
+        formatted += '-';
+        formatted += nationalNumber.slice(6, 10);
+      }
+    }
   }
-  
-  // Format the number
-  if (digits.length === 11 && digits.startsWith('1')) {
-    return `+${digits.slice(0, 1)} (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`;
-  }
-  
-  // Return original input if it doesn't match expected patterns
-  return phone;
-};
+
+  // Add the country code prefix
+  return digits.startsWith('+') ? `+1 ${formatted}` : formatted;
+}

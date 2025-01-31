@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Upload, Check } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { formatPhoneNumber } from '../../utils/phone';
 
 interface InvoiceItem {
   description: string;
@@ -239,7 +240,7 @@ const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({ onSave, onCancel }) => 
             <input
               type="tel"
               value={formData.phone}
-              onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+              onChange={(e) => setFormData(prev => ({ ...prev, phone: formatPhoneNumber(e.target.value) }))}
               placeholder="Phone Number"
               className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
             />

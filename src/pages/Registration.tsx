@@ -3,6 +3,7 @@ import { Ship, Building2, CreditCard, ChevronRight, ChevronLeft, Phone, Check, C
 import { supabase } from '../lib/supabase';
 import { Theme, getInitialTheme } from '../lib/theme';
 import ThemeToggle from '../components/ThemeToggle';
+import { formatPhoneNumber } from '../utils/phone';
 
 interface RegistrationFormData {
   subscription_plan: 'basic' | 'professional' | 'enterprise';
@@ -109,15 +110,7 @@ const Registration = () => {
     
     // Format phone number
     if (name === 'company_phone') {
-      // Remove all non-digit characters
-      const digits = value.replace(/\D/g, '');
-      
-      // Format phone number as (XXX) XXX-XXXX
-      if (digits.length <= 10) {
-        value = digits
-          .replace(/(\d{3})/, '($1) ')
-          .replace(/(\d{3})(\d{1,4})/, '$1-$2');
-      }
+      value = formatPhoneNumber(value);
     }
     
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -467,12 +460,12 @@ const Registration = () => {
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
                   <input
-                    type="text"
+                    type="tel"
                     name="company_phone"
                     value={formData.company_phone}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-                    placeholder="(555) 123-4567"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
+                    placeholder="+1 (555) 123-4567"
                     required
                   />
                 </div>
