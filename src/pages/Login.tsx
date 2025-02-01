@@ -2,7 +2,7 @@ import React from 'react';
 import LoginForm from '../components/auth/LoginForm';
 import { Ship, ArrowUpRight, Quote } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase'; 
+import { supabase } from '../lib/supabase';
 
 const Login = () => {
   const [loading, setLoading] = useState(true);

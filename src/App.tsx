@@ -1,74 +1,57 @@
 import React, { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ErrorBoundary } from './lib/errorBoundary';
-import { ScrollToTop } from './lib/navigation';
 import Navigation from './components/Navigation';
 import PageLoader from './components/PageLoader';
 import { initializeTheme } from './lib/theme';
-import { performanceMonitor } from './lib/performance';
+// Lazy load components with unique names
+const LandingHero = lazy(() => import('./components/Hero'));
+const LandingFeatures = lazy(() => import('./components/sections/Features'));
+const LandingSolutions = lazy(() => import('./components/sections/Solutions'));
+const LandingPricing = lazy(() => import('./components/sections/Pricing'));
+const LandingClients = lazy(() => import('./components/sections/clients/Clients'));
+const LandingTestimonials = lazy(() => import('./components/sections/testimonials/Testimonials'));
+const LandingFooter = lazy(() => import('./components/footer/Footer'));
 
-// Lazy load components with error boundaries
-const lazyLoad = (importFn: () => Promise<any>, name: string) => {
-  const Component = lazy(async () => {
-    try {
-      const module = await importFn();
-      return { default: module.default };
-    } catch (error) {
-      console.error(`Error loading ${name}:`, error);
-      throw error;
-    }
-  });
-  return performanceMonitor.measureRender(Component, name);
-};
-
-const Hero = lazyLoad(() => import('./components/Hero'), 'Hero');
-const Features = lazyLoad(() => import('./components/sections/Features'), 'Features');
-const Solutions = lazyLoad(() => import('./components/sections/Solutions'), 'Solutions');
-const Pricing = lazyLoad(() => import('./components/sections/Pricing'), 'Pricing');
-const ClientsSection = lazyLoad(() => import('./components/sections/clients/Clients'), 'ClientsSection');
-const Testimonials = lazyLoad(() => import('./components/sections/testimonials/Testimonials'), 'Testimonials');
-const Footer = lazyLoad(() => import('./components/footer/Footer'), 'Footer');
-
-// Lazy load pages
-const Login = lazyLoad(() => import('./pages/Login'), 'Login');
-const ForgotPassword = lazyLoad(() => import('./pages/ForgotPassword'), 'ForgotPassword');
-const ResetPassword = lazyLoad(() => import('./pages/ResetPassword'), 'ResetPassword');
-const Dashboard = lazyLoad(() => import('./pages/Dashboard'), 'Dashboard');
-const Profile = lazyLoad(() => import('./pages/Profile'), 'Profile');
-const NewClient = lazyLoad(() => import('./pages/NewClient'), 'NewClient');
-const AddPaymentMethod = lazyLoad(() => import('./pages/AddPaymentMethod'), 'AddPaymentMethod');
-const Settings = lazyLoad(() => import('./pages/Settings'), 'Settings');
-const APIKeys = lazyLoad(() => import('./pages/APIKeys'), 'APIKeys');
-const Webhooks = lazyLoad(() => import('./pages/Webhooks'), 'Webhooks');
-const NewAPIKey = lazyLoad(() => import('./pages/NewAPIKey'), 'NewAPIKey');
-const NewWebhook = lazyLoad(() => import('./pages/NewWebhook'), 'NewWebhook');
-const SignUp = lazyLoad(() => import('./pages/SignUp'), 'SignUp');
-const About = lazyLoad(() => import('./pages/About'), 'About');
-const ChangePassword = lazyLoad(() => import('./pages/ChangePassword'), 'ChangePassword');
-const Sessions = lazyLoad(() => import('./pages/Sessions'), 'Sessions');
-const LoginHistory = lazyLoad(() => import('./pages/LoginHistory'), 'LoginHistory');
-const TwoFactorAuth = lazyLoad(() => import('./pages/TwoFactorAuth'), 'TwoFactorAuth');
-const Contact = lazyLoad(() => import('./pages/Contact'), 'Contact');
-const Privacy = lazyLoad(() => import('./pages/Privacy'), 'Privacy');
-const Terms = lazyLoad(() => import('./pages/Terms'), 'Terms');
-const Blog = lazyLoad(() => import('./pages/Blog'), 'Blog');
-const Security = lazyLoad(() => import('./pages/Security'), 'Security');
-const Compliance = lazyLoad(() => import('./pages/Compliance'), 'Compliance');
-const Careers = lazyLoad(() => import('./pages/Careers'), 'Careers');
-const Documentation = lazyLoad(() => import('./pages/Documentation'), 'Documentation');
-const APIReference = lazyLoad(() => import('./pages/APIReference'), 'APIReference');
-const Press = lazyLoad(() => import('./pages/Press'), 'Press');
-const Cookies = lazyLoad(() => import('./pages/Cookies'), 'Cookies');
-const HelpCenter = lazyLoad(() => import('./pages/HelpCenter'), 'HelpCenter');
-const Community = lazyLoad(() => import('./pages/Community'), 'Community');
-const SolutionsPage = lazyLoad(() => import('./pages/SolutionsPage'), 'SolutionsPage');
-const Registration = lazyLoad(() => import('./pages/Registration'), 'Registration');
-const Schedule = lazyLoad(() => import('./pages/Schedule'), 'Schedule');
-const Invoices = lazyLoad(() => import('./pages/Invoices'), 'Invoices');
-const InvoiceBuilder = lazyLoad(() => import('./pages/InvoiceBuilder'), 'InvoiceBuilder');
-const InvoiceDetails = lazyLoad(() => import('./pages/InvoiceDetails'), 'InvoiceDetails');
-const AppointmentDetails = lazyLoad(() => import('./pages/AppointmentDetails'), 'AppointmentDetails');
-const Clients = lazyLoad(() => import('./pages/Clients'), 'Clients');
+// Lazy load pages with unique names
+const LoginPage = lazy(() => import('./pages/Login'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPassword'));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPassword'));
+const DashboardPage = lazy(() => import('./pages/Dashboard'));
+const ProfilePage = lazy(() => import('./pages/Profile'));
+const NewClientPage = lazy(() => import('./pages/NewClient'));
+const AddPaymentMethodPage = lazy(() => import('./pages/AddPaymentMethod'));
+const SettingsPage = lazy(() => import('./pages/Settings'));
+const APIKeysPage = lazy(() => import('./pages/APIKeys'));
+const WebhooksPage = lazy(() => import('./pages/Webhooks'));
+const NewAPIKeyPage = lazy(() => import('./pages/NewAPIKey'));
+const NewWebhookPage = lazy(() => import('./pages/NewWebhook'));
+const SignUpPage = lazy(() => import('./pages/SignUp'));
+const AboutPage = lazy(() => import('./pages/About'));
+const ChangePasswordPage = lazy(() => import('./pages/ChangePassword'));
+const SessionsPage = lazy(() => import('./pages/Sessions'));
+const LoginHistoryPage = lazy(() => import('./pages/LoginHistory'));
+const TwoFactorAuthPage = lazy(() => import('./pages/TwoFactorAuth'));
+const ContactPage = lazy(() => import('./pages/Contact'));
+const PrivacyPage = lazy(() => import('./pages/Privacy'));
+const TermsPage = lazy(() => import('./pages/Terms'));
+const BlogPage = lazy(() => import('./pages/Blog'));
+const SecurityPage = lazy(() => import('./pages/Security'));
+const CompliancePage = lazy(() => import('./pages/Compliance'));
+const CareersPage = lazy(() => import('./pages/Careers'));
+const DocumentationPage = lazy(() => import('./pages/Documentation'));
+const APIReferencePage = lazy(() => import('./pages/APIReference'));
+const PressPage = lazy(() => import('./pages/Press'));
+const CookiesPage = lazy(() => import('./pages/Cookies'));
+const HelpCenterPage = lazy(() => import('./pages/HelpCenter'));
+const CommunityPage = lazy(() => import('./pages/Community'));
+const SolutionsPage = lazy(() => import('./pages/SolutionsPage'));
+const RegistrationPage = lazy(() => import('./pages/Registration'));
+const SchedulePage = lazy(() => import('./pages/Schedule'));
+const InvoicesPage = lazy(() => import('./pages/Invoices'));
+const InvoiceBuilderPage = lazy(() => import('./pages/InvoiceBuilder'));
+const InvoiceDetailsPage = lazy(() => import('./pages/InvoiceDetails'));
+const AppointmentDetailsPage = lazy(() => import('./pages/AppointmentDetails'));
+const ClientsPage = lazy(() => import('./pages/Clients'));
 
 function App() {
   useEffect(() => {
@@ -76,51 +59,56 @@ function App() {
   }, []);
 
   return (
-    <ErrorBoundary>
-      <Suspense fallback={<PageLoader />}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-white dark:from-dark-900 dark:via-dark-800 dark:to-dark-900 flex items-center justify-center">
+        <div className="relative">
+          <div className="h-12 w-12 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-500 rounded-full animate-spin"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/90 to-transparent dark:via-dark-800/90 animate-pulse"></div>
+        </div>
+      </div>
+    }>
         <Router>
-          <ScrollToTop />
           <div className="min-h-screen bg-white dark:bg-dark-900 transition-colors">
             <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/add-payment-method" element={<AddPaymentMethod />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/settings/2fa" element={<TwoFactorAuth />} />
-              <Route path="/settings/sessions" element={<Sessions />} />
-              <Route path="/settings/login-history" element={<LoginHistory />} />
-              <Route path="/settings/change-password" element={<ChangePassword />} />
-              <Route path="/settings/api-keys" element={<APIKeys />} />
-              <Route path="/settings/webhooks" element={<Webhooks />} />
-              <Route path="/settings/api-keys/new" element={<NewAPIKey />} />
-              <Route path="/settings/webhooks/new" element={<NewWebhook />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/security" element={<Security />} />
-              <Route path="/compliance" element={<Compliance />} />
-              <Route path="/careers" element={<Careers />} />
-              <Route path="/docs" element={<Documentation />} />
-              <Route path="/api" element={<APIReference />} />
-              <Route path="/press" element={<Press />} />
-              <Route path="/help" element={<HelpCenter />} />
-              <Route path="/community" element={<Community />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/add-payment-method" element={<AddPaymentMethodPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/settings/2fa" element={<TwoFactorAuthPage />} />
+              <Route path="/settings/sessions" element={<SessionsPage />} />
+              <Route path="/settings/login-history" element={<LoginHistoryPage />} />
+              <Route path="/settings/change-password" element={<ChangePasswordPage />} />
+              <Route path="/settings/api-keys" element={<APIKeysPage />} />
+              <Route path="/settings/webhooks" element={<WebhooksPage />} />
+              <Route path="/settings/api-keys/new" element={<NewAPIKeyPage />} />
+              <Route path="/settings/webhooks/new" element={<NewWebhookPage />} />
+              <Route path="/signup" element={<SignUpPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/security" element={<SecurityPage />} />
+              <Route path="/compliance" element={<CompliancePage />} />
+              <Route path="/careers" element={<CareersPage />} />
+              <Route path="/docs" element={<DocumentationPage />} />
+              <Route path="/api" element={<APIReferencePage />} />
+              <Route path="/press" element={<PressPage />} />
+              <Route path="/help" element={<HelpCenterPage />} />
+              <Route path="/community" element={<CommunityPage />} />
               <Route path="/solutions" element={<SolutionsPage />} />
-              <Route path="/cookies" element={<Cookies />} />
-              <Route path="/registration" element={<Registration />} />
-              <Route path="/dashboard/clients" element={<Clients />} />
-              <Route path="/dashboard/clients/new" element={<NewClient />} />
-              <Route path="/schedule" element={<Schedule />} />
-              <Route path="/schedule/appointments/:id" element={<AppointmentDetails />} />
-              <Route path="/invoices" element={<Invoices />} />
-              <Route path="/invoices/new" element={<InvoiceBuilder />} />
-              <Route path="/invoices/:id" element={<InvoiceDetails />} />
+              <Route path="/cookies" element={<CookiesPage />} />
+              <Route path="/registration" element={<RegistrationPage />} />
+              <Route path="/dashboard/clients" element={<ClientsPage />} />
+              <Route path="/dashboard/clients/new" element={<NewClientPage />} />
+              <Route path="/schedule" element={<SchedulePage />} />
+              <Route path="/schedule/appointments/:id" element={<AppointmentDetailsPage />} />
+              <Route path="/invoices" element={<InvoicesPage />} />
+              <Route path="/invoices/new" element={<InvoiceBuilderPage />} />
+              <Route path="/invoices/:id" element={<InvoiceDetailsPage />} />
               <Route path="*" element={
                 <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-white dark:from-dark-900 dark:via-dark-800 dark:to-dark-900 flex items-center justify-center p-4">
                   <div className="text-center">
@@ -138,19 +126,18 @@ function App() {
               <Route path="/" element={
                 <Suspense fallback={<PageLoader />}>
                   <Navigation />
-                  <Hero />
-                  <Features />
-                  <ClientsSection />
-                  <Testimonials />
-                  <Pricing />
-                  <Footer />
+                  <LandingHero />
+                  <LandingFeatures />
+                  <LandingClients />
+                  <LandingTestimonials />
+                  <LandingPricing />
+                  <LandingFooter />
                 </Suspense>
               } />
             </Routes>
           </div>
         </Router>
       </Suspense>
-    </ErrorBoundary>
   );
 }
 
