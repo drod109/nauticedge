@@ -1,9 +1,9 @@
 import React from 'react';
-import { DivideIcon as LucideIcon } from 'lucide-react';
+import { DivideIcon } from 'lucide-react';
 import { theme } from '../../theme';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  icon?: LucideIcon;
+  icon?: typeof DivideIcon;
   error?: string;
   label?: string;
   helpText?: string;

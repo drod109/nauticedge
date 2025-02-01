@@ -1,8 +1,30 @@
 import React, { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navigation from './components/Navigation';
-import PageLoader from './components/PageLoader';
 import { initializeTheme } from './lib/theme';
+import { ErrorBoundary } from './lib/errorBoundary';
+import PageLoader from './components/PageLoader';
+
+// Lazy load pages with retry
+const retryLazyLoad = (importFn: () => Promise<any>) => {
+  return new Promise((resolve, reject) => {
+    const retry = () => {
+      importFn()
+        .then(resolve)
+        .catch((error) => {
+          // Only retry on chunk loading errors
+          if (error.message.includes('Failed to fetch dynamically imported module')) {
+            console.warn('Retrying chunk load:', error);
+            setTimeout(retry, 1000);
+          } else {
+            reject(error);
+          }
+        });
+    };
+    retry();
+  });
+};
+
 // Lazy load components with unique names
 const LandingHero = lazy(() => import('./components/Hero'));
 const LandingFeatures = lazy(() => import('./components/sections/Features'));
@@ -20,7 +42,7 @@ const DashboardPage = lazy(() => import('./pages/Dashboard'));
 const ProfilePage = lazy(() => import('./pages/Profile'));
 const NewClientPage = lazy(() => import('./pages/NewClient'));
 const AddPaymentMethodPage = lazy(() => import('./pages/AddPaymentMethod'));
-const SettingsPage = lazy(() => import('./pages/Settings'));
+const SettingsPage = lazy(() => retryLazyLoad(() => import('./pages/Settings')));
 const APIKeysPage = lazy(() => import('./pages/APIKeys'));
 const WebhooksPage = lazy(() => import('./pages/Webhooks'));
 const NewAPIKeyPage = lazy(() => import('./pages/NewAPIKey'));

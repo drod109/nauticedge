@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
   build: {
+    modulePreload: {
+      polyfill: true
+    },
     sourcemap: true,
     target: 'esnext',
     minify: 'terser',
@@ -16,17 +19,21 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          'react-vendor': ['react', 'react-dom'],
-          'vendor': [
-            'lucide-react',
-            'date-fns',
-            '@supabase/supabase-js',
-            'zod'
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['lucide-react'],
+          'data-vendor': ['date-fns', '@supabase/supabase-js', 'zod'],
+          'settings': [
+            './src/pages/Settings',
+            './src/components/settings'
           ],
-          'app': [
-            './src/utils',
-            './src/components',
-            './src/lib'
+          'auth': [
+            './src/pages/Login',
+            './src/pages/SignUp',
+            './src/components/auth'
+          ],
+          'dashboard': [
+            './src/pages/Dashboard',
+            './src/components/dashboard'
           ]
         }
       }
@@ -36,16 +43,23 @@ export default defineConfig(({ mode }) => ({
     include: [
       'react',
       'react-dom',
+      'react-router-dom',
       'lucide-react',
       '@supabase/supabase-js',
       'date-fns',
       'zod'
     ],
-    exclude: []
+    exclude: [],
+    esbuildOptions: {
+      target: 'esnext'
+    }
   },
   server: {
     fs: {
       strict: false
+    },
+    hmr: {
+      overlay: true
     },
     headers: {
       'X-Content-Type-Options': 'nosniff',

@@ -76,6 +76,33 @@ const LoginForm = () => {
               password
             });
 
+            // Log the login attempt
+            const browserInfo = getBrowserInfo();
+            
+            const loginAttempt = {
+              user_id: data?.user?.id,
+              success: !signInError,
+              device_info: {
+                type: browserInfo.isMobile ? 'mobile' : 'desktop',
+                browser: browserInfo.browser,
+                os: browserInfo.os
+              },
+              location: {
+                city: locationInfo.city,
+                country: locationInfo.country
+              }
+            };
+
+            // Store login attempt
+            const { error: logError } = await supabase
+              .from('login_attempts')
+              .insert([loginAttempt]);
+
+            if (logError) {
+              console.error('Error logging login attempt:', logError);
+              // Continue with login even if logging fails
+            }
+
             if (signInError) {
               if (signInError.message.includes('Invalid login credentials')) {
                 throw new Error('The email or password you entered is incorrect');
@@ -384,7 +411,7 @@ const LoginForm = () => {
   }
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-md bg-white/90 dark:bg-dark-800/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-gray-200/50 dark:border-dark-700/50 animate-fade-in">
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Welcome back</h2>
         <p className="text-gray-600 dark:text-gray-400">Sign in to continue to NauticEdge</p>

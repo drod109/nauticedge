@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Smartphone, Laptop, Monitor, LogOut, AlertCircle } from 'lucide-react';
+import { Smartphone, Laptop, Monitor, LogOut, AlertCircle, Shield, Globe, Clock } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { formatDistanceToNow } from 'date-fns';
 import type { UserSession } from '../../../types/auth';
+import { Alert, Card, Stack } from '../../../lib/designSystem';
+import { performanceMonitor } from '../../../lib/performance';
+import { notificationService } from '../../../lib/notifications';
 
 const MAX_SESSIONS = 10; // Maximum number of active sessions to store
 
@@ -12,6 +15,7 @@ const ActiveSessionsList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sessionCount, setSessionCount] = useState(0);
+  const [terminatingSession, setTerminatingSession] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSessions();
@@ -19,6 +23,8 @@ const ActiveSessionsList = () => {
 
   const fetchSessions = async () => {
     try {
+      performanceMonitor.startMetric('fetch_sessions');
+      
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
@@ -47,9 +53,12 @@ const ActiveSessionsList = () => {
           await handleLogout(oldSession.id);
         }
       }
+
+      performanceMonitor.endMetric('fetch_sessions');
     } catch (error) {
       console.error('Error fetching sessions:', error);
       setError('Failed to load active sessions');
+      performanceMonitor.endMetric('fetch_sessions', { error: true });
     } finally {
       setLoading(false);
     }
@@ -57,6 +66,9 @@ const ActiveSessionsList = () => {
 
   const handleLogout = async (sessionId: string) => {
     try {
+      setTerminatingSession(sessionId);
+      performanceMonitor.startMetric('terminate_session');
+
       const { error } = await supabase
         .from('user_sessions')
         .update({
@@ -69,9 +81,24 @@ const ActiveSessionsList = () => {
 
       // Refresh sessions list
       await fetchSessions();
+      
+      notificationService.success({
+        title: 'Session Terminated',
+        message: 'The session has been successfully ended'
+      });
+
+      performanceMonitor.endMetric('terminate_session');
     } catch (err) {
       console.error('Error ending session:', err);
       setError('Failed to end session');
+      performanceMonitor.endMetric('terminate_session', { error: true });
+      
+      notificationService.error({
+        title: 'Error',
+        message: 'Failed to terminate session. Please try again.'
+      });
+    } finally {
+      setTerminatingSession(null);
     }
   };
 
@@ -88,83 +115,128 @@ const ActiveSessionsList = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-8">
-        <div className="h-8 w-8 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-500 rounded-full animate-spin"></div>
+      <div className="flex justify-center py-12">
+        <div className="relative">
+          <div className="h-12 w-12 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-500 rounded-full animate-spin"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/90 to-transparent dark:via-dark-800/90 animate-pulse"></div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <Stack spacing={6}>
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <div className="flex items-start">
-            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 mr-2" />
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-          </div>
-        </div>
+        <Alert
+          type="error"
+          title="Error"
+          message={error}
+          closeable
+          onClose={() => setError(null)}
+        />
       )}
 
-      <div className="grid grid-cols-1 gap-4">
-        {sessionCount >= MAX_SESSIONS && (
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4 mb-4">
-            <p className="text-sm text-yellow-700 dark:text-yellow-400">
-              You've reached the maximum number of active sessions ({MAX_SESSIONS}). 
-              Older sessions will be automatically ended when new ones are created.
-            </p>
-          </div>
-        )}
+      {sessionCount >= MAX_SESSIONS && (
+        <Alert
+          type="warning"
+          title="Session Limit Reached"
+          message={`You've reached the maximum number of active sessions (${MAX_SESSIONS}). Older sessions will be automatically ended when new ones are created.`}
+          closeable
+        />
+      )}
 
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {sessions.map((session) => (
-          <div
+          <Card
             key={session.id}
-            className={`group bg-white dark:bg-dark-800 rounded-xl border ${
+            variant="elevated"
+            hoverable
+            className={`group transition-all duration-300 ${
               session.session_id === currentSessionId
-                ? 'border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/20'
-                : 'border-gray-200/50 dark:border-dark-700/50'
-            } p-6 hover:shadow-lg transition-all duration-300`}
+                ? 'ring-2 ring-blue-500 dark:ring-blue-400'
+                : ''
+            }`}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${
-                  session.session_id === currentSessionId
-                    ? 'bg-blue-100 dark:bg-blue-900/40'
-                    : 'bg-gray-100 dark:bg-dark-700'
-                }`}>
-                  {getDeviceIcon(session.device_info?.type || 'desktop')}
+            <div className="p-6 space-y-4">
+              {/* Device Info */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${
+                    session.session_id === currentSessionId
+                      ? 'bg-blue-100 dark:bg-blue-900/40'
+                      : 'bg-gray-100 dark:bg-dark-700'
+                  }`}>
+                    {getDeviceIcon(session.device_info?.type || 'desktop')}
+                  </div>
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {session.device_info?.browser} on {session.device_info?.os}
+                      </p>
+                      {session.session_id === currentSessionId && (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-400">
+                          Current Session
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {session.device_info?.browser} on {session.device_info?.os}
-                    </p>
-                    {session.session_id === currentSessionId && (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-400">
-                        Current Session
-                      </span>
+                {session.session_id !== currentSessionId && (
+                  <button
+                    onClick={() => handleLogout(session.id)}
+                    disabled={terminatingSession === session.id}
+                    className="flex items-center px-3 py-1.5 text-sm text-red-600 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors group"
+                  >
+                    {terminatingSession === session.id ? (
+                      <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <LogOut className="h-4 w-4 mr-1.5 transform group-hover:scale-110 transition-transform" />
+                        End Session
+                      </>
                     )}
-                  </div>
-                  <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                    <span>{formatDistanceToNow(new Date(session.created_at), { addSuffix: true })}</span>
-                    <span>•</span>
-                    <span>{session.location?.city}, {session.location?.country}</span>
-                  </div>
+                  </button>
+                )}
+              </div>
+
+              {/* Session Details */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex items-center space-x-2">
+                  <Clock className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                  <span>{formatDistanceToNow(new Date(session.created_at), { addSuffix: true })}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Globe className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                  <span>{session.location?.city}, {session.location?.country}</span>
                 </div>
               </div>
-              {session.session_id !== currentSessionId && (
-                <button
-                  onClick={() => handleLogout(session.id)}
-                  className="flex items-center px-3 py-1.5 text-sm text-red-600 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                >
-                  <LogOut className="h-4 w-4 mr-1.5" />
-                  End Session
-                </button>
+
+              {/* Security Info */}
+              {session.session_id === currentSessionId && (
+                <div className="mt-4 p-4 bg-blue-50/50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800/50">
+                  <div className="flex items-center space-x-2 text-sm text-blue-700 dark:text-blue-300">
+                    <Shield className="h-4 w-4" />
+                    <span>This is your current active session</span>
+                  </div>
+                </div>
               )}
             </div>
-          </div>
+          </Card>
         ))}
       </div>
-    </div>
+
+      {sessions.length === 0 && !error && (
+        <div className="text-center py-12">
+          <div className="h-16 w-16 bg-gray-100 dark:bg-dark-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <Monitor className="h-8 w-8 text-gray-400 dark:text-gray-500" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Active Sessions</h3>
+          <p className="text-gray-500 dark:text-gray-400">
+            You don't have any other active sessions at the moment.
+          </p>
+        </div>
+      )}
+    </Stack>
   );
 };
 

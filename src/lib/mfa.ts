@@ -192,27 +192,29 @@ export async function verifyMFALogin(code: string) {
       type: browserInfo.isMobile ? 'mobile' : 'desktop',
       browser: browserInfo.browser,
       os: browserInfo.os,
-      location: {
-        latitude: locationInfo.latitude,
-        longitude: locationInfo.longitude,
-        city: locationInfo.city,
-        country: locationInfo.country
-      }
     };
 
     const { error: logError } = await supabase
-      .from('mfa_verification_attempts')
+      .from('login_attempts')
       .insert({
         user_id: user.id,
-        ip_address: '0.0.0.0', // Will be set by server
         success: true,
         device_info: deviceInfo,
+        location: {
+          city: locationInfo.city,
+          country: locationInfo.country
+        },
+        location: {
+          city: locationInfo.city,
+          country: locationInfo.country
+        },
         created_at: timestamp
       });
 
     if (logError) {
       console.error('Error logging verification attempt:', logError);
-      // Continue anyway as this is not critical
+      // Log error but continue - don't fail login if logging fails
+      logger.error('Failed to log login attempt', { error: logError });
     }
 
     // Update last used timestamp
