@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, ArrowRight, History, Laptop, Lock, Key, Webhook } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
+import { formatDistanceToNow } from 'date-fns';
 
 const SecuritySection = () => {
   const [mfaEnabled, setMfaEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPlan, setCurrentPlan] = useState<string>('basic');
+  const [lastPasswordChange, setLastPasswordChange] = useState<string | null>(null);
 
   useEffect(() => {
     const checkMFAStatus = async () => {
@@ -14,6 +16,17 @@ const SecuritySection = () => {
         setLoading(true);
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
+
+        // Get last password change
+        const { data: passwordData } = await supabase
+          .from('password_history')
+          .select('changed_at')
+          .eq('user_id', user.id)
+          .order('changed_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        setLastPasswordChange(passwordData?.changed_at || null);
 
         // Get subscription plan
         const { data: subscription } = await supabase
@@ -97,10 +110,19 @@ const SecuritySection = () => {
           <div className="bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-200/30 dark:border-dark-700/30">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600 dark:text-gray-400">Last Password Change</span>
-              <span className="text-sm font-medium text-orange-600 dark:text-orange-400">Never</span>
+              <span className="text-sm font-medium text-orange-600 dark:text-orange-400">
+                {lastPasswordChange ? 'Changed' : 'Never'}
+              </span>
             </div>
             <div className="mt-2 h-2 bg-gray-100 dark:bg-dark-700 rounded-full overflow-hidden">
-              <div className="h-full w-0 bg-gradient-to-r from-orange-600 to-orange-400 dark:from-orange-500 dark:to-orange-300 rounded-full"></div>
+              <div className={`h-full transition-all duration-300 bg-gradient-to-r from-orange-600 to-orange-400 dark:from-orange-500 dark:to-orange-300 rounded-full ${
+                lastPasswordChange ? 'w-full' : 'w-0'
+              }`}></div>
+            </div>
+            <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              {lastPasswordChange 
+                ? `Last changed ${formatDistanceToNow(new Date(lastPasswordChange), { addSuffix: true })}` 
+                : 'Never changed'}
             </div>
           </div>
         </div>
@@ -252,13 +274,18 @@ const SecuritySection = () => {
               <div>
                 <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">Change Password</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Update your password</p>
+                <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  {lastPasswordChange 
+                    ? `Last changed ${formatDistanceToNow(new Date(lastPasswordChange), { addSuffix: true })}` 
+                    : 'Never changed'}
+                </div>
               </div>
             </div>
             <ArrowRight className="h-5 w-5 text-gray-400 dark:text-gray-500 transform group-hover:translate-x-1 transition-transform" />
           </div>
           <div className="flex items-center space-x-2">
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/20 text-orange-800 dark:text-orange-400">
-              Never changed
+              {lastPasswordChange ? 'Changed' : 'Never changed'}
             </span>
           </div>
         </a>

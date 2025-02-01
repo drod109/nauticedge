@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu, X, Ship, ChevronDown } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -17,11 +17,11 @@ const navItems = [
 ];
 
 const Navigation = () => {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [openDropdown, setOpenDropdown] = React.useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const checkAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();

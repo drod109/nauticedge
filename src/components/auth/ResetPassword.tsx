@@ -32,6 +32,10 @@ const ResetPassword = () => {
     setError(null);
 
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       // Validate passwords match
       if (newPassword !== confirmPassword) {
         throw new Error('Passwords do not match');
@@ -48,6 +52,24 @@ const ResetPassword = () => {
       });
 
       if (updateError) throw updateError;
+
+      // Record password change
+      try {
+        const { error: historyError } = await supabase
+          .from('password_history')
+          .insert([{
+            user_id: user.id,
+            changed_at: new Date().toISOString()
+          }]);
+
+        if (historyError) {
+          console.error('Error recording password change:', historyError);
+          // Continue even if recording fails
+        }
+      } catch (historyError) {
+        console.error('Error recording password change:', historyError);
+        // Continue even if recording fails
+      }
 
       setSuccess(true);
       

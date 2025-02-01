@@ -8,13 +8,23 @@ interface LocationInfo {
 
 export async function getLocationInfo(): Promise<LocationInfo> {
   try {
-    const fallbackLocation = {
-      city: 'Unknown City',
-      country: 'Unknown Country',
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      latitude: undefined,
-      longitude: undefined
-    };
+    // First try to get location from IP
+    try {
+      const ipResponse = await fetch('https://ipapi.co/json/');
+      const ipData = await ipResponse.json();
+      
+      if (ipData && !ipData.error) {
+        return {
+          city: ipData.city || 'Unknown City',
+          country: ipData.country_name || 'Unknown Country',
+          timezone: ipData.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+          latitude: ipData.latitude,
+          longitude: ipData.longitude
+        };
+      }
+    } catch (error) {
+      console.warn('Error getting location from IP:', error);
+    }
 
     // Try to get more accurate location using browser geolocation
     if ('geolocation' in navigator) {
@@ -41,7 +51,7 @@ export async function getLocationInfo(): Promise<LocationInfo> {
           return {
             city: components.city || components.town || components.village || components.county || 'Unknown City',
             country: components.country || 'Unknown Country',
-            timezone: data.results[0].annotations?.timezone?.name || fallbackLocation.timezone,
+            timezone: data.results[0].annotations?.timezone?.name || Intl.DateTimeFormat().resolvedOptions().timeZone,
             latitude,
             longitude
           };
@@ -51,7 +61,14 @@ export async function getLocationInfo(): Promise<LocationInfo> {
       }
     }
 
-    return fallbackLocation;
+    // Return fallback location if all methods fail
+    return {
+      city: 'Unknown City',
+      country: 'Unknown Country',
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      latitude: undefined,
+      longitude: undefined
+    };
   } catch (error) {
     console.error('Error getting location:', error);
     return {

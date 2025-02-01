@@ -2,6 +2,7 @@ export interface UserSession {
   id: string;
   session_id: string;
   ip_address: string;
+  ip_address: string;
   user_agent: string;
   device_info: {
     type: string;

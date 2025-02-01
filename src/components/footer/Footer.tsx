@@ -24,19 +24,19 @@ const Footer = () => {
   return (
     <footer className="bg-gradient-to-b from-white to-gray-50 dark:from-dark-900 dark:to-dark-950 border-t border-gray-200/50 dark:border-dark-700/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-12 animate-fade-in">
-          <div className="flex items-center mb-8 lg:mb-0">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-12 animate-fade-in">
+          <div className="flex items-center space-x-4">
             <Ship className="h-8 w-8 text-blue-600 dark:text-blue-500" />
-            <span className="ml-2 text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-600 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white">NauticEdge</span>
+            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-600 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white">NauticEdge</span>
           </div>
           <div className="flex flex-wrap gap-8">
             <a href="/contact" className="group inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
               Contact Sales
-              <ArrowUpRight className="ml-1 h-4 w-4 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              <ArrowUpRight className="ml-1 h-4 w-4 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
             </a>
             <a href="/demo" className="group inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
               Request Demo
-              <ArrowUpRight className="ml-1 h-4 w-4 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              <ArrowUpRight className="ml-1 h-4 w-4 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
             </a>
           </div>
         </div>

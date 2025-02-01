@@ -1,29 +1,15 @@
-import React, { useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navigation from './components/Navigation';
-import { initializeTheme } from './lib/theme';
-import { ErrorBoundary } from './lib/errorBoundary';
+import React, { useEffect, lazy, Suspense, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ErrorBoundary } from './lib/errorBoundary'; 
 import PageLoader from './components/PageLoader';
+import Login from './pages/Login';
+import Landing from './pages/Landing';
 
-// Lazy load pages with retry
-const retryLazyLoad = (importFn: () => Promise<any>) => {
-  return new Promise((resolve, reject) => {
-    const retry = () => {
-      importFn()
-        .then(resolve)
-        .catch((error) => {
-          // Only retry on chunk loading errors
-          if (error.message.includes('Failed to fetch dynamically imported module')) {
-            console.warn('Retrying chunk load:', error);
-            setTimeout(retry, 1000);
-          } else {
-            reject(error);
-          }
-        });
-    };
-    retry();
-  });
-};
+// Lazy load survey pages
+const SurveysPage = lazy(() => import('./pages/dashboard/surveys'));
+const NewSurveyPage = lazy(() => import('./pages/dashboard/surveys/new'));
+const EditSurveyPage = lazy(() => import('./pages/dashboard/surveys/[id]/edit'));
+const ViewSurveyPage = lazy(() => import('./pages/dashboard/surveys/[id]'));
 
 // Lazy load components with unique names
 const LandingHero = lazy(() => import('./components/Hero'));
@@ -35,14 +21,13 @@ const LandingTestimonials = lazy(() => import('./components/sections/testimonial
 const LandingFooter = lazy(() => import('./components/footer/Footer'));
 
 // Lazy load pages with unique names
-const LoginPage = lazy(() => import('./pages/Login'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPassword'));
 const ResetPasswordPage = lazy(() => import('./pages/ResetPassword'));
 const DashboardPage = lazy(() => import('./pages/Dashboard'));
 const ProfilePage = lazy(() => import('./pages/Profile'));
 const NewClientPage = lazy(() => import('./pages/NewClient'));
 const AddPaymentMethodPage = lazy(() => import('./pages/AddPaymentMethod'));
-const SettingsPage = lazy(() => retryLazyLoad(() => import('./pages/Settings')));
+const SettingsPage = lazy(() => import('./pages/Settings'));
 const APIKeysPage = lazy(() => import('./pages/APIKeys'));
 const WebhooksPage = lazy(() => import('./pages/Webhooks'));
 const NewAPIKeyPage = lazy(() => import('./pages/NewAPIKey'));
@@ -76,10 +61,6 @@ const AppointmentDetailsPage = lazy(() => import('./pages/AppointmentDetails'));
 const ClientsPage = lazy(() => import('./pages/Clients'));
 
 function App() {
-  useEffect(() => {
-    initializeTheme();
-  }, []);
-
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-white dark:from-dark-900 dark:via-dark-800 dark:to-dark-900 flex items-center justify-center">
@@ -92,7 +73,7 @@ function App() {
         <Router>
           <div className="min-h-screen bg-white dark:bg-dark-900 transition-colors">
             <Routes>
-              <Route path="/login" element={<LoginPage />} />
+              <Route path="/login" element={<Login />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
@@ -131,31 +112,11 @@ function App() {
               <Route path="/invoices" element={<InvoicesPage />} />
               <Route path="/invoices/new" element={<InvoiceBuilderPage />} />
               <Route path="/invoices/:id" element={<InvoiceDetailsPage />} />
-              <Route path="*" element={
-                <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-white dark:from-dark-900 dark:via-dark-800 dark:to-dark-900 flex items-center justify-center p-4">
-                  <div className="text-center">
-                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">404</h1>
-                    <p className="text-gray-600 dark:text-gray-400 mb-8">Page not found</p>
-                    <a
-                      href="/"
-                      className="inline-flex items-center px-6 py-3 text-base font-medium text-white bg-blue-600 dark:bg-blue-500 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
-                    >
-                      Return Home
-                    </a>
-                  </div>
-                </div>
-              } />
-              <Route path="/" element={
-                <Suspense fallback={<PageLoader />}>
-                  <Navigation />
-                  <LandingHero />
-                  <LandingFeatures />
-                  <LandingClients />
-                  <LandingTestimonials />
-                  <LandingPricing />
-                  <LandingFooter />
-                </Suspense>
-              } />
+              <Route path="/dashboard/surveys" element={<SurveysPage />} />
+              <Route path="/dashboard/surveys/new" element={<NewSurveyPage />} />
+              <Route path="/dashboard/surveys/:id/edit" element={<EditSurveyPage />} />
+              <Route path="/dashboard/surveys/:id" element={<ViewSurveyPage />} />
+              <Route path="/" element={<Landing />} />
             </Routes>
           </div>
         </Router>

@@ -58,7 +58,7 @@ const FooterLinks = () => {
               <li key={link.label}>
                 <a
                   href={link.href}
-                  className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-500 transition-colors"
+                  className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 >
                   {link.label}
                 </a>

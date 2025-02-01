@@ -181,21 +181,28 @@ const ActiveSessionsList = () => {
                     </div>
                   </div>
                 </div>
-                {session.session_id !== currentSessionId && (
-                  <button
-                    onClick={() => handleLogout(session.id)}
-                    disabled={terminatingSession === session.id}
-                    className="flex items-center px-3 py-1.5 text-sm text-red-600 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors group"
-                  >
-                    {terminatingSession === session.id ? (
-                      <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <>
-                        <LogOut className="h-4 w-4 mr-1.5 transform group-hover:scale-110 transition-transform" />
-                        End Session
-                      </>
+                {session.session_id !== currentSessionId && session.is_active && !session.ended_at && (
+                  <div className="relative">
+                    <button
+                      onClick={() => handleLogout(session.id)}
+                      disabled={terminatingSession === session.id}
+                      className="flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 dark:bg-red-500 rounded-lg hover:bg-red-700 dark:hover:bg-red-600 disabled:opacity-50 transition-colors"
+                    >
+                      {terminatingSession === session.id ? (
+                        <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          <LogOut className="h-5 w-5 mr-2" />
+                          <span className="whitespace-nowrap">End Session</span>
+                        </>
+                      )}
+                    </button>
+                    {terminatingSession === session.id && (
+                      <div className="absolute top-full left-0 mt-2 p-2 bg-white dark:bg-dark-800 rounded-lg shadow-lg border border-gray-200 dark:border-dark-700 text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                        Terminating session...
+                      </div>
                     )}
-                  </button>
+                  </div>
                 )}
               </div>
 
@@ -203,11 +210,19 @@ const ActiveSessionsList = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-500 dark:text-gray-400">
                 <div className="flex items-center space-x-2">
                   <Clock className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                  <span>{formatDistanceToNow(new Date(session.created_at), { addSuffix: true })}</span>
+                  <div className="flex flex-col">
+                    <span>{formatDistanceToNow(new Date(session.created_at), { addSuffix: true })}</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">IP: {session.ip_address || 'Unknown'}</span>
+                  </div>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Globe className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                  <span>{session.location?.city}, {session.location?.country}</span>
+                  <div className="flex flex-col">
+                    <span>{session.location?.city}, {session.location?.country}</span>
+                   <span className="text-xs text-gray-400 dark:text-gray-500">
+                     {session.location?.timezone || 'Unknown timezone'}
+                   </span>
+                  </div>
                 </div>
               </div>
 

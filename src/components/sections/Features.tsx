@@ -40,7 +40,6 @@ const MobileAppsBanner = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement email subscription
     setSubscribed(true);
     setEmail('');
   };
@@ -90,7 +89,7 @@ const MobileAppsBanner = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-l-lg bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 hover:bg-white dark:hover:bg-dark-800"
+                  className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-dark-600 rounded-l-lg bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
                 <button
@@ -122,6 +121,7 @@ const MobileAppsBanner = () => {
     </div>
   );
 };
+
 const Features = () => {
   return (
     <section id="features" className="py-24 bg-gradient-to-b from-white via-gray-50 to-white dark:from-dark-900 dark:via-dark-800 dark:to-dark-900 relative overflow-hidden">

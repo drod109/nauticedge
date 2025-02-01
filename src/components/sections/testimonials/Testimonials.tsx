@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, Quote } from 'lucide-react';
+import { Quote, Star } from 'lucide-react';
 
 const testimonials = [
   {
@@ -7,7 +7,7 @@ const testimonials = [
     role: 'Senior Surveyor',
     company: 'Maritime Inspections Ltd',
     image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&q=80',
-    quote: 'NauticEdge has revolutionized how we conduct surveys. The mobile app and real-time reporting features have saved us countless hours. The platform\'s intuitive design and comprehensive features make it an indispensable tool for modern marine surveyors.',
+    quote: 'NauticEdge has revolutionized how we conduct surveys. The mobile app and real-time reporting features have saved us countless hours.',
     rating: 5
   },
   {
@@ -15,7 +15,7 @@ const testimonials = [
     role: 'Fleet Manager',
     company: 'Pacific Marine',
     image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&q=80',
-    quote: 'The analytics and reporting capabilities have given us unprecedented insights into our fleet maintenance needs. Being able to track trends and generate detailed reports has transformed our maintenance planning process.',
+    quote: 'The analytics and reporting capabilities have given us unprecedented insights into our fleet maintenance needs.',
     rating: 5
   },
   {
@@ -23,7 +23,7 @@ const testimonials = [
     role: 'Insurance Adjuster',
     company: 'Marine Underwriters',
     image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&q=80',
-    quote: 'Having standardized, digital survey reports has streamlined our entire claims process. The level of detail and consistency in the reports has significantly reduced processing time and improved accuracy. Highly recommended for marine insurance professionals.',
+    quote: 'Having standardized, digital survey reports has streamlined our entire claims process. The level of detail and consistency in the reports has significantly reduced processing time.',
     rating: 5
   }
 ];

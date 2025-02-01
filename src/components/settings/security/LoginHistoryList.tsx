@@ -11,6 +11,7 @@ const MAX_LOGIN_HISTORY = 50; // Maximum number of login history entries to stor
 interface LoginAttempt {
   id: string;
   created_at: string;
+  ip_address: string;
   success: boolean;
   device_info: {
     type: string;
@@ -162,6 +163,8 @@ const LoginHistoryList = () => {
                     <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                       <span>{format(new Date(attempt.created_at), 'MMM d, yyyy HH:mm:ss')}</span>
                       <span>•</span>
+                      <span>IP: {attempt.ip_address || 'Unknown'}</span>
+                      <span>•</span>
                       <span>{attempt.location?.city}, {attempt.location?.country}</span>
                     </div>
                   </div>
@@ -176,7 +179,7 @@ const LoginHistoryList = () => {
             <div className="h-16 w-16 bg-gray-100 dark:bg-dark-700 rounded-full mx-auto mb-4 flex items-center justify-center">
               <History className="h-8 w-8 text-gray-400 dark:text-gray-500" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Login History</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Login Activity</h3>
             <p className="text-gray-500 dark:text-gray-400">
               Your login activity will appear here
             </p>
