@@ -2,52 +2,7 @@
 
 ![NauticEdge](https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&q=80&w=1200&h=400)
 
-## 🔒 Security Features
-
-### Enhanced Authentication
-- **Secure Key Vault Service**
-  - AES-256 bit encryption for sensitive data
-  - Secure token storage
-  - Encrypted key-value storage
-
-### Session Management
-- Advanced session tracking
-- Device fingerprinting
-- Location-based security
-- Automatic session timeouts
-- Concurrent session control
-
-### Performance Monitoring
-- Real-time performance tracking
-- Component render metrics
-- Memory usage monitoring
-- FPS tracking
-- Web Vitals monitoring
-- Resource timing analysis
-
-### Error Handling
-- Comprehensive error boundaries
-- Automatic error recovery
-- Detailed error logging
-- User-friendly error messages
-- Performance impact tracking
-
-### Notifications
-- Real-time notification system
-- Multiple notification types
-  - Success
-  - Error
-  - Warning
-  - Info
-- Customizable duration
-- Animated transitions
-
-### Form Validation
-- Zod schema validation
-- Type-safe validation rules
-- Custom validation messages
-- Real-time validation
-- Cross-field validation
+NauticEdge is a comprehensive digital platform designed for marine surveyors, boat owners, and insurers. It streamlines the entire marine survey process with powerful digital tools, real-time collaboration features, and advanced analytics.
 
 ## 🌟 Key Features
 
@@ -110,6 +65,17 @@
   - Conflict detection
   - Recurring appointments
   - Automated reminders
+
+### Marina Management
+- **Comprehensive Marina Features**
+  - Fleet management
+  - Dock planning
+  - Slip assignments
+  - Maintenance tracking
+  - Inspection scheduling
+  - Work order management
+  - Real-time occupancy tracking
+  - Billing integration
 
 ### Security Features
 - **Enhanced Authentication**
@@ -270,21 +236,66 @@
   - Device tracking
   - Location monitoring
 
-### API Features (Professional & Enterprise)
+### API Features
 - RESTful endpoints
 - Rate limiting
-- Performance monitoring
-- Error tracking
-- Metrics collection
-- Authentication
-- OpenAPI docs
+- Authentication & authorization
+- OpenAPI documentation
 - Webhook support
-- Custom integrations
-- Monitoring
-- Analytics
-  - Rate limiting
-  - Authentication
-  - OpenAPI docs
+  - Custom events
+  - Retry logic
+  - Error handling
+  - Delivery tracking
+
+### API Security
+- API key management
+- Request signing
+- Rate limiting
+- IP whitelisting
+- Audit logging
+- Error handling
+- Input validation
+
+## 📱 Mobile Support
+
+- Responsive design
+- Touch-optimized UI
+- Offline capabilities
+- Push notifications
+- Mobile-first features
+- Cross-device sync
+- Progressive loading
+
+## 🎨 UI/UX Features
+
+- Dark/Light theme
+- Responsive layouts
+- Animated transitions
+- Loading states
+- Error handling
+- Form validation
+- Toast notifications
+- Modal dialogs
+
+## 🔄 Real-time Features
+
+- Live updates
+- Collaborative editing
+- Status indicators
+- Activity feeds
+- Notifications
+- Data synchronization
+- Presence indicators
+
+## 📊 Analytics & Reporting
+
+- Custom dashboards
+- Export options
+- Data visualization
+- Trend analysis
+- Performance metrics
+- Usage statistics
+- Custom reports
 
 ## 📋 Prerequisites
 
@@ -373,46 +384,96 @@ npm run dev
 nauticedge/
 ├── src/
 │   ├── components/
-│   │   ├── auth/          # Authentication components
+│   │   ├── auth/             # Authentication components
 │   │   │   ├── LoginForm.tsx
 │   │   │   ├── SignUpForm.tsx
 │   │   │   ├── MFASetup.tsx
 │   │   │   └── ProtectedRoute.tsx
-│   │   ├── dashboard/     # Dashboard components
+│   │   ├── dashboard/        # Dashboard components
 │   │   │   ├── Header.tsx
 │   │   │   ├── Sidebar.tsx
 │   │   │   └── DashboardContent.tsx
-│   │   ├── invoice/       # Invoice components
+│   │   ├── fleet/            # Fleet management components
+│   │   │   ├── FleetList.tsx
+│   │   │   ├── FleetDetails.tsx
+│   │   │   ├── AddFleetModal.tsx
+│   │   │   ├── AddVesselModal.tsx
+│   │   │   ├── AddInspectionModal.tsx
+│   │   │   ├── InspectionList.tsx
+│   │   │   ├── InspectionDetails.tsx
+│   │   │   ├── MaintenanceList.tsx
+│   │   │   ├── MaintenanceDetails.tsx
+│   │   │   ├── WorkOrderList.tsx
+│   │   │   └── WorkOrderDetails.tsx
+│   │   ├── invoice/          # Invoice components
 │   │   │   ├── InvoiceList.tsx
 │   │   │   ├── InvoiceBuilder.tsx
 │   │   │   └── CreateInvoiceModal.tsx
-│   │   ├── profile/       # Profile components
+│   │   ├── marina/           # Marina management components
+│   │   │   ├── MarinaSelector.tsx
+│   │   │   ├── MarinaAnalytics.tsx
+│   │   │   ├── DockBuilder.tsx
+│   │   │   ├── SlipAssignmentModal.tsx
+│   │   │   └── nodes/        # Dock builder node components
+│   │   │       ├── PierNode.tsx
+│   │   │       ├── SlipNode.tsx
+│   │   │       ├── WalkwayNode.tsx
+│   │   │       └── UtilityNode.tsx
+│   │   ├── profile/          # Profile components
 │   │   │   ├── ProfilePhoto.tsx
 │   │   │   ├── CompanySection.tsx
 │   │   │   └── BillingSection.tsx
-│   │   ├── schedule/      # Scheduling components
+│   │   ├── schedule/         # Scheduling components
 │   │   │   ├── Calendar.tsx
 │   │   │   └── UpcomingAppointments.tsx
-│   │   └── sections/      # Landing page sections
+│   │   └── sections/         # Landing page sections
 │   │       ├── Hero.tsx
 │   │       ├── Features.tsx
 │   │       └── Pricing.tsx
-│   ├── hooks/            # Custom React hooks
+│   ├── hooks/               # Custom React hooks
 │   │   ├── useAuth.ts
 │   │   ├── useAPI.ts
 │   │   └── useSubscription.ts
-│   ├── lib/              # Library configurations
+│   ├── lib/                 # Library configurations
 │   │   ├── supabase.ts
 │   │   ├── theme.ts
 │   │   └── mfa.ts
-│   ├── pages/            # Page components
+│   ├── pages/               # Page components
 │   │   ├── Dashboard.tsx
 │   │   ├── Profile.tsx
-│   │   └── Settings.tsx
-│   ├── types/            # TypeScript definitions
+│   │   ├── Settings.tsx
+│   │   └── marina/          # Marina management pages
+│   │       ├── index.tsx
+│   │       ├── fleets/
+│   │       │   ├── index.tsx
+│   │       │   ├── new.tsx
+│   │       │   └── [id]/
+│   │       │       ├── index.tsx
+│   │       │       ├── edit.tsx
+│   │       │       └── vessels/
+│   │       │           └── new.tsx
+│   │       ├── inspections/
+│   │       │   ├── index.tsx
+│   │       │   ├── new.tsx
+│   │       │   └── [id]/
+│   │       │       └── index.tsx
+│   │       └── maintenance/
+│   │           ├── index.tsx
+│   │           ├── new.tsx
+│   │           ├── [id]/
+│   │           │   └── index.tsx
+│   │           └── work-orders/
+│   │               ├── index.tsx
+│   │               ├── new.tsx
+│   │               └── [id]/
+│   │                   └── index.tsx
+│   ├── types/               # TypeScript definitions
 │   │   ├── auth.ts
-│   │   └── supabase.ts
-│   └── utils/            # Utility functions
+│   │   ├── supabase.ts
+│   │   ├── fleet.ts
+│   │   ├── marina.ts
+│   │   └── survey.ts
+│   └── utils/               # Utility functions
 │       ├── auth.ts
 │       ├── browser.ts
 │       ├── location.ts
@@ -479,47 +540,6 @@ nauticedge/
 - Audit logging
 - Error handling
 - Input validation
-
-## 📱 Mobile Support
-
-- Responsive design
-- Touch-optimized UI
-- Offline capabilities
-- Push notifications
-- Mobile-first features
-- Cross-device sync
-- Progressive loading
-
-## 🎨 UI/UX Features
-
-- Dark/Light theme
-- Responsive layouts
-- Animated transitions
-- Loading states
-- Error handling
-- Form validation
-- Toast notifications
-- Modal dialogs
-
-## 🔄 Real-time Features
-
-- Live updates
-- Collaborative editing
-- Status indicators
-- Activity feeds
-- Notifications
-- Data synchronization
-- Presence indicators
-
-## 📊 Analytics & Reporting
-
-- Custom dashboards
-- Export options
-- Data visualization
-- Trend analysis
-- Performance metrics
-- Usage statistics
-- Custom reports
 
 ## 🤝 Contributing
 
